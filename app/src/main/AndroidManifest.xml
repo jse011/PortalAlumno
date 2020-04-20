@@ -1,0 +1,60 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:dist="http://schemas.android.com/apk/distribution"
+            xmlns:tools="http://schemas.android.com/tools"
+        package="com.consultoraestrategia.ss_portalalumno">
+
+        <dist:module
+            dist:instant="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application android:allowBackup="true"
+        android:name=".global.iCRMEdu"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:targetApi="n">
+        <activity
+            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".main.MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".login2.principal.Login2Activity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/activity_login_title"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+        <activity android:theme="@style/AppTheme.NoActionBar"
+            android:name=".tabsCurso.view.activities.TabsCursoActivity" />
+        <activity android:theme="@style/AppTheme.NoActionBar"
+            android:name=".tabsSesiones.TabSesionesActivity" />
+        <activity android:theme="@style/AppTheme.NoActionBar"
+            android:label=""
+            android:name=".tareas_mvp.tareaDescripcion.TareaDescripcionActivity" />
+        <provider
+            android:name=".provider.GenericFileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileprovider" />
+        </provider>
+    </application>
+</manifest>

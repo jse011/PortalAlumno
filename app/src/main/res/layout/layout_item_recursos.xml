@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:apps="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp"
+    android:layout_marginEnd="2dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginStart="8dp"
+    android:background="@color/md_grey_300"
+    android:layout_marginRight="2dp"
+    android:fadeScrollbars="false"
+    android:nestedScrollingEnabled="false"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:scrollbarSize="5dp"
+    android:scrollbarStyle="outsideInset"
+    android:scrollbarThumbVertical="@color/md_red_A700"
+    android:scrollbarTrackVertical="@color/md_red_300"
+    android:scrollbars="vertical"
+    android:visibility="visible"
+    apps:fastScrollVerticalThumbDrawable="@color/md_red_400">
+
+    <TextView
+
+        android:id="@+id/img_recurso"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/ext_xls"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_descripcion_rec"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="0dp"
+        android:maxLines="2"
+        android:text="Nombre Recurso"
+        android:textColor="#000"
+        android:textSize="11dp"
+        app:layout_constraintLeft_toRightOf="@+id/img_recurso"
+        app:layout_constraintTop_toTopOf="@+id/img_recurso" />
+
+    <TextView
+        android:id="@+id/txt_extencion_rec"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:maxLines="1"
+        android:text="tipo"
+        android:textSize="10dp"
+        app:layout_constraintLeft_toRightOf="@+id/img_recurso"
+        app:layout_constraintTop_toBottomOf="@+id/txt_descripcion_rec" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp"
+    android:background="#f5f5f5">
+
+    <ImageView
+        android:id="@+id/img_fondo_progres"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:alpha="0.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/border_radius_repositorio" />
+
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:theme="@style/RepositorioCircularProgress"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/img_close"
+        app:layout_constraintEnd_toEndOf="@+id/img_close"
+        app:layout_constraintStart_toStartOf="@+id/img_close"
+        app:layout_constraintTop_toTopOf="@+id/img_close" />
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/progress_succes"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:indeterminateDrawable="@drawable/progress_success"
+        android:visibility="visible"
+        app:cpb_background_progressbar_width="0dp"
+        app:cpb_progressbar_color="#4CAF50"
+        app:cpb_progressbar_width="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/img_close"
+        app:layout_constraintEnd_toEndOf="@+id/img_close"
+        app:layout_constraintStart_toStartOf="@+id/img_close"
+        app:layout_constraintTop_toTopOf="@+id/img_close" />
+
+
+    <ImageView
+        android:id="@+id/img_close"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="8dp"
+        android:padding="8dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_repositorio"
+        tools:ignore="VectorDrawableCompat"
+        android:layout_marginRight="8dp" />
+
+    <ImageView
+        android:id="@+id/img_download"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:padding="8dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/img_fondo_progres"
+        app:layout_constraintEnd_toEndOf="@+id/img_fondo_progres"
+        app:layout_constraintStart_toStartOf="@+id/img_fondo_progres"
+        app:layout_constraintTop_toTopOf="@+id/img_fondo_progres"
+        app:srcCompat="@drawable/ic_down_arrow"
+        tools:ignore="VectorDrawableCompat" />
+
+    <ImageView
+
+        android:id="@+id/imgRecurso"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="2dp"
+        android:background="#05000000"
+        android:src="@drawable/youtube"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtNombreRecurso"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:maxLines="2"
+        android:text="Nombre Recurso"
+        android:textColor="#000"
+        android:textSize="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/img_fondo_progres"
+        app:layout_constraintLeft_toRightOf="@+id/imgRecurso"
+        app:layout_constraintStart_toEndOf="@+id/imgRecurso"
+        app:layout_constraintTop_toTopOf="@+id/imgRecurso" />
+
+    <TextView
+        android:id="@+id/txtdescripcion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:maxLines="1"
+        android:text="tipo"
+        android:textSize="9dp"
+        app:layout_constraintEnd_toStartOf="@+id/img_fondo_progres"
+        app:layout_constraintStart_toEndOf="@+id/imgRecurso"
+        app:layout_constraintTop_toBottomOf="@+id/txtNombreRecurso" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
