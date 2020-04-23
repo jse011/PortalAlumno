@@ -66,4 +66,5 @@ dependencies {
     implementation 'com.mikhaellopez:circularprogressbar:2.0.0'
     implementation 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
     implementation 'com.github.HaarigerHarald:android-youtubeExtractor:2.0.0'
+    implementation 'com.karumi:dexter:5.0.0'
 }

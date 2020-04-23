@@ -324,6 +324,11 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
         if(unidadAprendizajeFragment!=null){
             unidadAprendizajeFragment.notifyChangeFragment();
         }
+
+        FragmentTareas fragmentTareas = getFragment(FragmentTareas.class);
+        if(fragmentTareas!=null){
+            fragmentTareas.notifyChangeFragment();
+        }
     }
 
     private <T extends Fragment> T getFragment(Class<T> tClass) {

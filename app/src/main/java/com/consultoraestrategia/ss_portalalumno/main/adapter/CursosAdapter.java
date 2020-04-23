@@ -19,12 +19,15 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CursosAdapter extends RecyclerView.Adapter<CursosAdapter.ViewHolder> {
 
@@ -62,8 +65,10 @@ public class CursosAdapter extends RecyclerView.Adapter<CursosAdapter.ViewHolder
         TextView txtHorario;
         @BindView(R.id.txtSalon)
         TextView txtSalon;
-        @BindView(R.id.txtAlumno)
-        TextView txtAlumno;
+        @BindView(R.id.txtProfesor)
+        TextView txtProfesor;
+        @BindView(R.id.img_profesor)
+        CircleImageView imgProfesor;
         @BindView(R.id.txtNombreDocente)
         TextView txtNombreDocente;
         @BindView(R.id.imgAccionClase)
@@ -90,8 +95,13 @@ public class CursosAdapter extends RecyclerView.Adapter<CursosAdapter.ViewHolder
             txtPeriodo.setText(cursosUi.getSeccionyperiodo());
 
             txtSalon.setText(cursosUi.getSalon());
-            txtNombreDocente.setText("");
-            txtAlumno.setText(12 + " Alumnos");
+
+            Glide.with(itemView.getContext())
+                    .load(cursosUi.getFotoProfesor())
+                    .apply(UtilsGlide.getGlideRequestOptions())
+                    .into(imgProfesor);
+            String docente = "Docente: "+cursosUi.getProfesor();
+            txtNombreDocente.setText(docente);
 
 
             fondo.setAlpha((float) 0.2);

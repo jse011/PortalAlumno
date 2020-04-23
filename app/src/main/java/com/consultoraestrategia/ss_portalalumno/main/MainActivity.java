@@ -1,5 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.main;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -47,11 +49,13 @@ import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.main.listeners.MenuListener;
+import com.consultoraestrategia.ss_portalalumno.permisos.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.karumi.dexter.Dexter;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
@@ -93,6 +97,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
 
     private MenuAdapter menuAdapter;
     private CursosAdapter adapter;
+    private DialogOnAnyDeniedMultiplePermissionsListener dialogMultiplePermissionsListener;
 
     @Override
     protected String getTag() {
@@ -109,6 +114,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         MainRepositorio mainRepositorio = new MainRepositorioImpl();
         return new MainPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCursos(mainRepositorio));
     }
+
 
     @Override
     protected MainView getBaseView() {
@@ -129,6 +135,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         setupToolbar();
         setupRecyclerProgramas();
         setupAdapter();
+        setupValidatePermisos(this);
     }
 
     private void setupAdapter() {
@@ -361,5 +368,27 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                     .into(navBarImagenProfileHijo);
             navBarContentProfileHijo.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void setupValidatePermisos(Activity activity) {
+        if(dialogMultiplePermissionsListener==null)dialogMultiplePermissionsListener =
+                DialogOnAnyDeniedMultiplePermissionsListener.Builder
+                        .withContext(activity)
+                        .withTitle("Permisos de internet, lectura y escritura y cámara.")
+                        .withMessage("Tanto los permisos como el permiso de Internet y el permiso de lectura y escritura son necesarios para el correcto funcionamiento del aplicativo móvil.")
+                        .withButtonText(android.R.string.ok)
+                        .withIcon(R.drawable.base_academico)
+                        .build();
+
+        Dexter.withActivity(activity)
+                .withPermissions(
+                        Manifest.permission.INTERNET,
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        //Manifest.permission.READ_CONTACTS,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                .withListener(dialogMultiplePermissionsListener)
+                .check();
     }
 }

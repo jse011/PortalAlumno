@@ -370,6 +370,9 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                             TransaccionUtils.fastStoreListInsert(Georeferencia.class, response.getGeoreferencias(), databaseWrapper, true);
                             TransaccionUtils.fastStoreListInsert(CargaCursoDocenteDet.class, response.getCargaCursoDocenteDet(), databaseWrapper, true);
                             TransaccionUtils.fastStoreListInsert(Relaciones.class, response.getRelaciones(), databaseWrapper, true);
+
+
+
                             SessionUser sessionUser = SessionUser.getCurrentUser();
                             sessionUser.setDataImported(true);
                             sessionUser.save();

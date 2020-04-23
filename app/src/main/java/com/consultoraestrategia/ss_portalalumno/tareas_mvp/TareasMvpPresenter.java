@@ -45,4 +45,7 @@ public interface TareasMvpPresenter extends BasePresenter<TareasMvpView> {
     void onDestroyView();
 
     void onClickTarea(TareasUI tareasUI);
+
+    void notifyChangeFragment();
+
 }

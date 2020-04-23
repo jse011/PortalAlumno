@@ -184,6 +184,21 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
         this.tipoTarea = extras.getInt(FragmentTareas.tipoTareas,0);
 
+
+        setData();
+        if(view!=null)view.showProgress();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(view!=null)view.hideProgress();
+                getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+            }
+        }, 1000);
+
+
+    }
+
+    private void setData() {
         this.anioAcademicoId = iCRMEdu.variblesGlobales.getAnioAcademicoId();
         this.programaEducativoId = iCRMEdu.variblesGlobales.getProgramEducativoId();
         GbCalendarioPerioUi gbCalendarioPerioUi = iCRMEdu.variblesGlobales.getGbCalendarioPerioUi();
@@ -202,17 +217,6 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
             GbSesionAprendizajeUi gbSesionAprendizajeUi = iCRMEdu.variblesGlobales.getGbSesionAprendizajeUi();
             this.mSesionAprendizajeId = gbSesionAprendizajeUi.getSesionAprendizajeId();
         }
-
-        if(view!=null)view.showProgress();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(view!=null)view.hideProgress();
-                getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-            }
-        }, 1000);
-
-
     }
 
 
@@ -499,6 +503,13 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
         iCRMEdu.variblesGlobales.setGbTareaUi(gbTareaUi);
         if(view!=null)view.showTareaDescripcionActivity();
         Log.d(TAG, gbTareaUi.toString());
+    }
+
+    @Override
+    public void notifyChangeFragment() {
+        cancelAllDowload();
+        setData();
+        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
     }
 
     private void cancelAllDowload() {

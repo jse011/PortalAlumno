@@ -433,4 +433,7 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
         presenter.onClickArchivo(repositorioFileUi);
     }
 
+    public void notifyChangeFragment() {
+        presenter.notifyChangeFragment();
+    }
 }

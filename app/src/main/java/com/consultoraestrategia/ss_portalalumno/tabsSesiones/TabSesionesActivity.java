@@ -132,7 +132,7 @@ public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPr
         ViewpagerAdapter viewpagerAdapter = new ViewpagerAdapter(getSupportFragmentManager(), 0, null);
         viewpagerAdapter.addFragment(new ActividadesFragment(), "ACTIVIDADES");
         viewpagerAdapter.addFragment(FragmentTareasSesiones.newInstanceSesion(), "TAREA");
-        viewpagerAdapter.addFragment(new InstrumentoFragment(), "INSTRUMENTOS");
+        viewpagerAdapter.addFragment(new InstrumentoFragment(), "EVALUACION");
 
         vpCurso.setOffscreenPageLimit(4);
         vpCurso.setAdapter(viewpagerAdapter);

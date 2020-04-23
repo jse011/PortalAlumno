@@ -12,6 +12,8 @@ public class CursosUi {
     private String backgroundSolidColor2;
     private String backgroundSolidColor3;
     private int planCursoId;
+    private String profesor;
+    private String fotoProfesor;
 
     public int getCursoId() {
         return cursoId;
@@ -99,5 +101,21 @@ public class CursosUi {
 
     public int getPlanCursoId() {
         return planCursoId;
+    }
+
+    public void setProfesor(String profesor) {
+        this.profesor = profesor;
+    }
+
+    public String getProfesor() {
+        return profesor;
+    }
+
+    public void setFotoProfesor(String fotoProfesor) {
+        this.fotoProfesor = fotoProfesor;
+    }
+
+    public String getFotoProfesor() {
+        return fotoProfesor;
     }
 }

@@ -8,6 +8,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.Aula;
 import com.consultoraestrategia.ss_portalalumno.entities.Aula_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaAcademica;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaAcademica_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.CargaCursoDocente;
+import com.consultoraestrategia.ss_portalalumno.entities.CargaCursoDocente_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaCursos;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaCursos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Contrato;
@@ -16,6 +18,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.Cursos;
 import com.consultoraestrategia.ss_portalalumno.entities.Cursos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.DetalleContratoAcad;
 import com.consultoraestrategia.ss_portalalumno.entities.DetalleContratoAcad_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Empleado;
+import com.consultoraestrategia.ss_portalalumno.entities.Empleado_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.NivelAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.NivelAcademico_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.ParametrosDisenio;
@@ -219,6 +223,34 @@ public class MainRepositorioImpl implements MainRepositorio {
                 cursosUi.setBackgroundSolidColor2(parametrosDisenio.getColor2());
                 cursosUi.setBackgroundSolidColor3(parametrosDisenio.getColor3());
             }
+
+            Persona empleado = null;
+            if(cursoCustom.getEmpleadoId()!=0){
+                empleado = SQLite.select()
+                        .from(Persona.class)
+                        .innerJoin(Empleado.class)
+                        .on(Persona_Table.personaId.withTable()
+                                .eq(Empleado_Table.personaId.withTable()))
+                        .where(Empleado_Table.empleadoId.withTable().eq(cursoCustom.getEmpleadoId()))
+                        .querySingle();
+            }else {
+                empleado = SQLite.select()
+                        .from(Persona.class)
+                        .innerJoin(Empleado.class)
+                        .on(Persona_Table.personaId.withTable()
+                                .eq(Empleado_Table.personaId.withTable()))
+                        .innerJoin(CargaCursoDocente.class)
+                        .on(CargaCursoDocente_Table.docenteId.withTable().eq(Empleado_Table.empleadoId.withTable()))
+                        .where(CargaCursoDocente_Table.cargaCursoId.withTable().eq(cursoCustom.getCargaCursoId()))
+                        .querySingle();
+            }
+
+            if(empleado!=null){
+                cursosUi.setProfesor(UtilsPortalAlumno.capitalize(UtilsPortalAlumno.getFirstWord(empleado.getNombres())) +" "+ UtilsPortalAlumno.capitalize(empleado.getApellidoPaterno()));
+                cursosUi.setFotoProfesor(empleado.getFoto());
+            }
+
+
             cursosUiList.add(cursosUi);
         }
 
