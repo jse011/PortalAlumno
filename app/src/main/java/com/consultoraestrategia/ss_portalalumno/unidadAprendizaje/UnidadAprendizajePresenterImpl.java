@@ -10,6 +10,7 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPeri
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetFireBaseUnidadAprendizajeList;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetUnidadAprendizajeList;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
@@ -17,7 +18,7 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.Unida
 import java.util.List;
 
 public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<UnidadAprendizajeView> implements UnidadAprendizajePresenter {
-    private GetUnidadAprendizajeList getUnidadAprendizajeList;
+    private GetFireBaseUnidadAprendizajeList getFireBaseUnidadAprendizajeList;
     private int cargaCursoId;
     private int anioAcademicoId;
     private int planCursoId;
@@ -26,9 +27,9 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     private String color2;
     private String color3;
 
-    public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, GetUnidadAprendizajeList getUnidadAprendizajeList) {
+    public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, GetFireBaseUnidadAprendizajeList getFireBaseUnidadAprendizajeList) {
         super(handler, res);
-        this.getUnidadAprendizajeList = getUnidadAprendizajeList;
+        this.getFireBaseUnidadAprendizajeList = getFireBaseUnidadAprendizajeList;
     }
 
     @Override
@@ -43,22 +44,32 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     }
 
     private void setupListUnidades() {
-        List<UnidadAprendizajeUi> unidadAprendizajeUiList = getUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId);
+       getFireBaseUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId, new GetFireBaseUnidadAprendizajeList.CallBack() {
+            @Override
+            public void onSucces(List<UnidadAprendizajeUi> unidadAprendizajeUiList) {
+                int columnas = 0;//3
+                if(view!=null)columnas = view.getColumnasSesionesList();
+                Log.d(getTag(),"columnas: " + columnas);
+                for (UnidadAprendizajeUi unidadAprendizajeUi: unidadAprendizajeUiList){
+                    List<SesionAprendizajeUi> sesionAprendizajeUiList = unidadAprendizajeUi.getObjectListSesiones();
 
-        int columnas = 0;//3
-        if(view!=null)columnas = view.getColumnasSesionesList();
-        Log.d(getTag(),"columnas: " + columnas);
-        for (UnidadAprendizajeUi unidadAprendizajeUi: unidadAprendizajeUiList){
-            List<SesionAprendizajeUi> sesionAprendizajeUiList = unidadAprendizajeUi.getObjectListSesiones();
-
-            if(sesionAprendizajeUiList==null||columnas >= sesionAprendizajeUiList.size()){
-                unidadAprendizajeUi.setVisibleVerMas(false);
-            } else {
-                unidadAprendizajeUi.setVisibleVerMas(true);
+                    if(sesionAprendizajeUiList==null||columnas >= sesionAprendizajeUiList.size()){
+                        unidadAprendizajeUi.setVisibleVerMas(false);
+                    } else {
+                        unidadAprendizajeUi.setVisibleVerMas(true);
+                    }
+                }
+                if(view!=null)view.hideProgress();
+                if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
             }
-        }
-        if(view!=null)view.hideProgress();
-        if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+
+
     }
 
     @Override

@@ -26,4 +26,6 @@ public interface MainView extends BaseView<MainPresenter> {
     void setNameAnioAcademico(String nombre);
 
     void changeFotoUsuarioApoderado(String fotoApoderado);
+
+    void validateFirebase(String usuarioFirebase, String passwordFirebase);
 }

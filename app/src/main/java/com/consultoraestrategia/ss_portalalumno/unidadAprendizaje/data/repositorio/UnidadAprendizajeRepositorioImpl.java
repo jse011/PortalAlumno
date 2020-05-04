@@ -2,8 +2,11 @@ package com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.data.reposito
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.PlanCursos;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
@@ -15,9 +18,16 @@ import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje_Table;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.From;
@@ -111,6 +121,46 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
             listObject.add(unidad);
         }
         return listObject;
+    }
+
+    @Override
+    public void getFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int plancursoId, Callback<List<UnidadAprendizajeUi>> callback) {
+        GlobalSettings globalSettings = GlobalSettings.getCurrentSettings();
+        String nodeFirebase = globalSettings!=null?globalSettings.getFirebaseNode():"sinServer";
+        SilaboEvento silaboEvento = SQLite.select()
+                .from(SilaboEvento.class)
+                .where(SilaboEvento_Table.cargaCursoId.eq(idCargaCurso))
+                .querySingle();
+
+        int silaboEventoId = silaboEvento!=null?silaboEvento.getSilaboEventoId():0;
+
+        CalendarioPeriodo calendarioPeriodo = SQLite.select()
+                .from(CalendarioPeriodo.class)
+                .where(CalendarioPeriodo_Table.calendarioPeriodoId.eq(idCalendarioPeriodo))
+                .querySingle();
+
+        int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase+"/"+"/AV_Unidad/silid_"+silaboEventoId);
+        ApiRetrofit.Log.d(TAG,  ":)");
+        mDatabase.orderByChild("TipoPeriodoId")
+                .equalTo(tipoPeriodoId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.d(TAG, dataSnapshot.getKey()+"");
+                        Log.d(TAG, dataSnapshot.getValue()+"");
+                        final Gson gsons = new Gson();
+                        final String representacionJSON = gsons.toJson(dataSnapshot.getValue());
+                        ApiRetrofit.Log.d(TAG,  representacionJSON);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, databaseError.getMessage()+"");
+                        Log.d(TAG, databaseError.getDetails()+"");
+                        Log.d(TAG, databaseError.getCode()+"");
+                    }
+                });
     }
 
 }

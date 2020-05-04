@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -52,9 +54,14 @@ import com.consultoraestrategia.ss_portalalumno.main.listeners.MenuListener;
 import com.consultoraestrategia.ss_portalalumno.permisos.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.karumi.dexter.Dexter;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -98,6 +105,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     private MenuAdapter menuAdapter;
     private CursosAdapter adapter;
     private DialogOnAnyDeniedMultiplePermissionsListener dialogMultiplePermissionsListener;
+    private FirebaseAuth mAuth;
 
     @Override
     protected String getTag() {
@@ -115,6 +123,10 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         return new MainPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCursos(mainRepositorio));
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+    }
 
     @Override
     protected MainView getBaseView() {
@@ -368,6 +380,52 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                     .into(navBarImagenProfileHijo);
             navBarContentProfileHijo.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void validateFirebase(String usuarioFirebase, String passwordFirebase) {
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser==null){
+            initializingFirebase(usuarioFirebase, passwordFirebase);
+        }
+    }
+
+    private void initializingFirebase(String email, String password){
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(getTag(), "signInWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();;
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            createAccountFirebase(email, password);
+                            Log.w(getTag(), "signInWithEmail:failure", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void  createAccountFirebase(String email, String password){
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(getTag(), "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(getTag(), "createUserWithEmail:failure", task.getException());
+
+                        }
+                    }
+                });
     }
 
     private void setupValidatePermisos(Activity activity) {

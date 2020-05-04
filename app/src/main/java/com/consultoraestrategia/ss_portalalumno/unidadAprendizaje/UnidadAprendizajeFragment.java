@@ -25,6 +25,7 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.Sesio
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.UnidadesAdapter;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.data.repositorio.UnidadAprendizajeRepositorio;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.data.repositorio.UnidadAprendizajeRepositorioImpl;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetFireBaseUnidadAprendizajeList;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetUnidadAprendizajeList;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
@@ -51,7 +52,7 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     @Override
     protected UnidadAprendizajePresenter getPresenter() {
         UnidadAprendizajeRepositorio repositorio = new UnidadAprendizajeRepositorioImpl();
-        return new UnidadAprendizajePresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetUnidadAprendizajeList(repositorio));
+        return new UnidadAprendizajePresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetFireBaseUnidadAprendizajeList(repositorio));
     }
 
     @Override

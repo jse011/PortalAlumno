@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
+import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AlumnoUi;
@@ -23,6 +24,8 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     private List<CursosUi> cursosUiList = new ArrayList<>();
     private GetCursos getCursos;
     private AnioAcademicoUi anioAcademicoUi;
+    private String usuario;
+    private String firebaseNode;
 
     public MainPresenterImpl(UseCaseHandler handler, Resources res, GetCursos getCursos) {
         super(handler, res);
@@ -48,9 +51,15 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
             if(view!=null)view.showActivityLogin();
             return;
         }
-        GetCursos.Response response = getCursos.execute();
+        usuario = SessionUser.getCurrentUser().getUsername();
+        GlobalSettings globalSettings = GlobalSettings.getCurrentSettings();
+        if(globalSettings!=null){
+            firebaseNode = globalSettings.getFirebaseNode();
+        }
 
+        GetCursos.Response response = getCursos.execute();
         AlumnoUi alumnoUi = response.getAlumnoUi();
+
         if(view!=null)view.changeNombreUsuario(alumnoUi.getNombre());
         if(view!=null)view.changeFotoUsuario(alumnoUi.getFoto());
         if(view!=null)view.changeFotoUsuarioApoderado(alumnoUi.getFotoApoderado());
@@ -121,6 +130,13 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     public void onAccesoSelected(UsuarioAccesoUI usuarioAccesoUI) {
         //Log.d(TAG, "onAccesoSelected : " + usuarioAccesoUI.getIdAcceso());
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        String usuarioFirebase = firebaseNode + "_" + usuario+"@gmail.com";
+        if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
     }
 
     @Override
