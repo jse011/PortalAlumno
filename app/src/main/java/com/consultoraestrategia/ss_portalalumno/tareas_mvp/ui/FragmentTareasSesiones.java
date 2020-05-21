@@ -22,7 +22,9 @@ import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.gadgets.autoColumnGrid.AutoColumnGridLayoutManager;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadYoutube;
+import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSesion;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSilabo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpPresenter;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpPresenterImpl;
@@ -133,7 +135,10 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
                         new RemoteMvpDataSource(getContext()))
 
                 ),
-                new DowloadYoutube(getContext()));
+                
+                new UpdateFireBaseTareaSilabo(tareasMvpRepository),
+                new UpdateFireBaseTareaSesion(tareasMvpRepository),
+                new OfflineFirebase(getContext()));
 
         setPresenter(presenter);
         Log.d(TAG, "onCreate");

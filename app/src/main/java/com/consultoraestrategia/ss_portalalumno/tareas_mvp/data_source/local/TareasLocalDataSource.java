@@ -38,6 +38,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.TareasMvpDataSource;
@@ -93,6 +95,12 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
 
     @Override
     public List<RecursosUI> getRecursosTarea(String tareaId) {
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_UrlArchivo"))
+                .querySingle();
+
+        String urlArchivo  = webconfig!=null?webconfig.getContent():"";
         TareasUI tareasUI = new TareasUI();
         List<TareasRecursosC> tareasRecursosList = SQLite.select()
                 .from(TareasRecursosC.class)
@@ -189,7 +197,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                         recursosUI.setArchivoId(archivo.getKey());
                         recursosUI.setNombreArchivo(archivo.getNombre());
                         recursosUI.setPath(archivo.getLocalpath());
-                        recursosUI.setUrl(archivo.getPath());
+                        recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                         recursosUI.setFechaAccionArchivo(archivo.getFechaAccion());
                         //recursosUI.setDescripcion(recursoDidacticoEvento.getDescripcion());
                         if (TextUtils.isEmpty(archivo.getLocalpath())) {
@@ -197,7 +205,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                         } else {
                             recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
                         }
-                        recursosUI.setUrl(archivo.getPath());
+                        recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                         recursosUI.setPath(archivo.getLocalpath());
                     } else if (recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO) {
                         recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
@@ -228,7 +236,12 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
         DatabaseWrapper databaseWrapper = appDatabase.getWritableDatabase();
         try {
             databaseWrapper.beginTransaction();
+            Webconfig webconfig = SQLite.select()
+                    .from(Webconfig.class)
+                    .where(Webconfig_Table.nombre.eq("wstr_UrlArchivo"))
+                    .querySingle();
 
+            String urlArchivo  = webconfig!=null?webconfig.getContent():"";
             String nombreCurso = getNombreCurso(idCargaCurso);
             List<UnidadAprendizaje> unidadAprendizajeList = new ArrayList<>();
             List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList = new ArrayList<>();
@@ -283,7 +296,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                             .from(TareasC.class)
                             .where(TareasC_Table.unidadAprendizajeId.is(unidadAprendizaje.getUnidadAprendizajeId()))
                             .and(TareasC_Table.estadoId.notIn(265))
-                            .and(TareasC_Table.sesionAprendizajeId.eq(0))
+                            //.and(TareasC_Table.sesionAprendizajeId.eq(0))
                             .orderBy(TareasC_Table.fechaCreacion.asc())
                             .queryList());
                 }else {
@@ -363,7 +376,8 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                                     break;
                                 case 380://vinculo
                                     recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
-                                    recursosUI.setUrl(recursoDidacticoEvento.getUrl());
+                                    recursosUI.setUrl(TextUtils.isEmpty(recursoDidacticoEvento.getUrl())?
+                                            recursoDidacticoEvento.getDescripcion():recursoDidacticoEvento.getUrl());
                                     recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
                                     recursosUI.setTipoFileU(RepositorioTipoFileU.VINCULO);
                                     break;
@@ -414,7 +428,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                                     recursosUI.setArchivoId(archivo.getKey());
                                     recursosUI.setNombreArchivo(archivo.getNombre());
                                     recursosUI.setPath(archivo.getLocalpath());
-                                    recursosUI.setUrl(archivo.getPath());
+                                    recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                                     recursosUI.setFechaAccionArchivo(archivo.getFechaAccion());
                                     //recursosUI.setDescripcion(recursoDidacticoEvento.getDescripcion());
                                     if(TextUtils.isEmpty(archivo.getLocalpath())){
@@ -422,7 +436,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                                     }else {
                                         recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
                                     }
-                                    recursosUI.setUrl(archivo.getPath());
+                                    recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                                     recursosUI.setPath(archivo.getLocalpath());
                                 }else if(recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO){
                                     recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
@@ -589,6 +603,16 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                 }
             }
         }.start();
+    }
+
+    @Override
+    public void updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple) {
+
+    }
+
+    @Override
+    public void updateFirebaseTareaSesion(int idCargaCurso, int calendarioPeriodoId, int SesionAprendizajeId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple) {
+
     }
 
 

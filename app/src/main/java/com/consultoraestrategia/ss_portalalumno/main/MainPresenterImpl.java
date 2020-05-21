@@ -7,6 +7,9 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
+import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AlumnoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AnioAcademicoUi;
@@ -14,6 +17,7 @@ import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,17 +49,17 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     @Override
     public void onCreate() {
         super.onCreate();
-
         boolean dataImported = SessionUser.getCurrentUser() != null && SessionUser.getCurrentUser().isDataImported();
         if(!dataImported){
             if(view!=null)view.showActivityLogin();
             return;
         }
         usuario = SessionUser.getCurrentUser().getUsername();
-        GlobalSettings globalSettings = GlobalSettings.getCurrentSettings();
-        if(globalSettings!=null){
-            firebaseNode = globalSettings.getFirebaseNode();
-        }
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+        firebaseNode = webconfig!=null?webconfig.getContent():"sinServer";
 
         GetCursos.Response response = getCursos.execute();
         AlumnoUi alumnoUi = response.getAlumnoUi();

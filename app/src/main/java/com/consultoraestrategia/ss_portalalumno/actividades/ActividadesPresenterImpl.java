@@ -6,9 +6,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.DowloadImageUseCase;
-import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.DowloadYoutube;
 import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.GetActividadesList;
 import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.UpdateActividad;
+import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.UpdateFirebaseActividades;
 import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.UpdateSuccesDowloadArchivo;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.ActividadesUi;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RecursosUi;
@@ -19,6 +19,7 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.global.offline.Offline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +36,19 @@ public class ActividadesPresenterImpl implements ActividadesPresenter {
     private ActividadesView view;
     private DowloadImageUseCase dowloadImageUseCase;
     private UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo;
-    private DowloadYoutube dowloadYoutube;
+    private UpdateFirebaseActividades updateFirebaseActividades;
+    private Offline offline;
+    private List<ActividadesUi> actividadesUiList = new ArrayList<>();
 
-    public ActividadesPresenterImpl(UseCaseHandler handler, GetActividadesList getActividadesList, UpdateActividad updateActividad, DowloadImageUseCase dowloadImageUseCase, UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo, DowloadYoutube dowloadYoutube) {
+    public ActividadesPresenterImpl(UseCaseHandler handler, GetActividadesList getActividadesList, UpdateActividad updateActividad, DowloadImageUseCase dowloadImageUseCase, UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo,
+                                    UpdateFirebaseActividades updateFirebaseActividades, Offline offline) {
         this.handler = handler;
         this.getActividadesList = getActividadesList;
         this.updateActividad = updateActividad;
         this.dowloadImageUseCase = dowloadImageUseCase;
         this.updateSuccesDowloadArchivo = updateSuccesDowloadArchivo;
-        this.dowloadYoutube = dowloadYoutube;
+        this.offline = offline;
+        this.updateFirebaseActividades = updateFirebaseActividades;
     }
 
     @Override
@@ -59,6 +64,7 @@ public class ActividadesPresenterImpl implements ActividadesPresenter {
     private void getActividadesList() {
         Log.d(TAG, "getActividadesList");
         if (view != null) view.hideMessage();
+        actividadesUiList.clear();
         handler.execute(getActividadesList,
                 new GetActividadesList.RequestValues(cargaCursoId, sesionAprendizajeId, backgroundColor),
                 new UseCase.UseCaseCallback<GetActividadesList.ResponseValue>() {
@@ -66,10 +72,41 @@ public class ActividadesPresenterImpl implements ActividadesPresenter {
                     public void onSuccess(GetActividadesList.ResponseValue response) {
                         Log.d(TAG, "onSuccess");
                         if (response.getActividadesUiList().size() != 0) {
+                            actividadesUiList.addAll(response.getActividadesUiList());
                             List<Object> objects = new ArrayList<Object>(response.getActividadesUiList());
                             if (view != null) view.showListObject(objects);
                         } else view.showMessage();
 
+                        if(offline.isConnect()){
+                            updateFirebaseActividades.execute(cargaCursoId, sesionAprendizajeId, actividadesUiList, new UpdateFirebaseActividades.CallBack() {
+                                @Override
+                                public void onSucces() {
+                                    actividadesUiList.clear();
+                                    handler.execute(getActividadesList,
+                                            new GetActividadesList.RequestValues(cargaCursoId, sesionAprendizajeId, backgroundColor), new UseCase.UseCaseCallback<GetActividadesList.ResponseValue>() {
+                                                @Override
+                                                public void onSuccess(GetActividadesList.ResponseValue response) {
+                                                    if (response.getActividadesUiList().size() != 0) {
+                                                        actividadesUiList.addAll(response.getActividadesUiList());
+                                                        List<Object> objects = new ArrayList<Object>(response.getActividadesUiList());
+                                                        if (view != null) view.showListObject(objects);
+                                                    } else view.showMessage();
+                                                }
+
+                                                @Override
+                                                public void onError() {
+
+                                                }
+                                            });
+
+                                }
+
+                                @Override
+                                public void onError(String error) {
+
+                                }
+                            });
+                        }
                     }
 
                     @Override
@@ -127,7 +164,7 @@ public class ActividadesPresenterImpl implements ActividadesPresenter {
     }
     @Override
     public void onResumeFragment() {
-        initViewActividades();
+
     }
 
     @Override
@@ -195,12 +232,7 @@ public class ActividadesPresenterImpl implements ActividadesPresenter {
                 if (view != null) view.showVinculo(repositorioFileUi.getUrl());
                 break;
             case YOUTUBE:
-                if(TextUtils.isEmpty(repositorioFileUi.getPath())){
-                    dowloadYoutube.execute(repositorioFileUi);
-                }else {
-                    if (view != null) view.leerArchivo(repositorioFileUi.getPath());
-                }
-                //if (view != null) view.showYoutube(repositorioFileUi.getUrl());
+                if(view!=null)view.showYoutube(repositorioFileUi.getUrl());
                 break;
             case MATERIALES:
                 break;

@@ -5,6 +5,7 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.DownloadCanc
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.ParametroDisenioUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
 
 import java.util.List;
 
@@ -26,6 +27,10 @@ public interface TareasMvpDataSource {
         void onLoad(boolean success, T item);
     }
 
+    interface CallbackSimple{
+        void onLoad(boolean success);
+    }
+
     interface CallbackProgress<T>  {
         void onProgress(int count);
         void onLoad(boolean success, T item);
@@ -39,4 +44,8 @@ public interface TareasMvpDataSource {
     void updateSucessDowload(String archivoId, String path, Callback<Boolean> callback);
 
     void dowloadImage(String url, String nombre, String carpeta, CallbackProgress<String> stringCallbackProgress);
+
+    void updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple);
+
+    void updateFirebaseTareaSesion(int idCargaCurso, int calendarioPeriodoId, int SesionAprendizajeId,List<TareasUI> tareasUIList, CallbackSimple callbackSimple);
 }

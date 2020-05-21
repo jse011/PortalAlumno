@@ -9,7 +9,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ViewpagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = ViewpagerAdapter.class.getSimpleName();
@@ -56,6 +58,24 @@ public class ViewpagerAdapter extends FragmentStatePagerAdapter {
             notifyDataSetChanged();
         }
 
+    }
+
+    public void removeAll(){
+        mFragmentList.clear();
+        mFragmentTitleList.clear();
+        notifyDataSetChanged();
+    }
+
+    public void setListFragment(List<Fragment>  fragmentList){
+        mFragmentList.clear();
+        mFragmentTitleList.clear();
+        int count =0;
+        for (Fragment fragment: fragmentList){
+            count++;
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(String.valueOf(count));
+        }
+        notifyDataSetChanged();
     }
 
 

@@ -36,7 +36,6 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.TareasMvp
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.local.TareasLocalDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.remote.RemoteMvpDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadImageUseCase;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadYoutube;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.GetRecuros;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.MoverArchivosAlaCarpetaTarea;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateSuccesDowloadArchivo;
@@ -92,8 +91,7 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
                 new GetRecuros(tareasMvpRepository),
                 new DowloadImageUseCase(tareasMvpRepository),
                 new UpdateSuccesDowloadArchivo(tareasMvpRepository),
-                new MoverArchivosAlaCarpetaTarea(tareasMvpRepository),
-                new DowloadYoutube(this));
+                new MoverArchivosAlaCarpetaTarea(tareasMvpRepository));
     }
 
     @Override

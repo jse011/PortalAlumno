@@ -47,6 +47,9 @@
         <activity android:theme="@style/AppTheme.NoActionBar"
             android:label=""
             android:name=".tareas_mvp.tareaDescripcion.TareaDescripcionActivity" />
+        <activity android:theme="@style/AppTheme.NoActionBar"
+            android:name=".instrumento.evaluacion.InstrumentoEvaluacionActivity" />
+
         <provider
             android:name=".provider.GenericFileProvider"
             android:authorities="${applicationId}.provider"

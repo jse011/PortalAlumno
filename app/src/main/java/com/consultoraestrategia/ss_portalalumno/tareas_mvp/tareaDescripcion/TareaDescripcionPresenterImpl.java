@@ -10,7 +10,6 @@ import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadImageUseCase;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadYoutube;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.GetRecuros;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.MoverArchivosAlaCarpetaTarea;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateSuccesDowloadArchivo;
@@ -30,15 +29,13 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
     private DowloadImageUseCase dowloadImageUseCase;
     private UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo;
     private MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea;
-    private DowloadYoutube dowloadYoutube;
 
-    public TareaDescripcionPresenterImpl(UseCaseHandler handler, Resources res, GetRecuros getRecuros, DowloadImageUseCase dowloadImageUseCase, UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo, MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea, DowloadYoutube dowloadYoutube) {
+    public TareaDescripcionPresenterImpl(UseCaseHandler handler, Resources res, GetRecuros getRecuros, DowloadImageUseCase dowloadImageUseCase, UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo, MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea) {
         super(handler, res);
         this.getRecuros = getRecuros;
         this.dowloadImageUseCase = dowloadImageUseCase;
         this.updateSuccesDowloadArchivo = updateSuccesDowloadArchivo;
         this.moverArchivosAlaCarpetaTarea = moverArchivosAlaCarpetaTarea;
-        this.dowloadYoutube = dowloadYoutube;
     }
 
     @Override
@@ -176,7 +173,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
                 break;
             case YOUTUBE:
                 if(TextUtils.isEmpty(repositorioFileUi.getPath())){
-                    dowloadYoutube.execute(repositorioFileUi);
+                    if(view!=null)view.showYoutube(repositorioFileUi.getUrl());
                 }else {
                     if (view != null) view.leerArchivo(repositorioFileUi.getPath());
                 }

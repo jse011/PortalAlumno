@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -26,10 +25,11 @@ import com.consultoraestrategia.ss_portalalumno.actividades.ui.ActividadesFragme
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
+import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
 import com.consultoraestrategia.ss_portalalumno.base.viewpager.ViewpagerAdapter;
-import com.consultoraestrategia.ss_portalalumno.instrumento.InstrumentoFragment;
+import com.consultoraestrategia.ss_portalalumno.instrumento.lista.InstrumentoListaFragment;
+import com.consultoraestrategia.ss_portalalumno.sincronizar.instrumentos.SyncInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.ui.FragmentTareasSesiones;
-import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -38,7 +38,7 @@ import com.google.android.material.tabs.TabLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPresenter> implements TabSesionView {
+public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPresenter> implements TabSesionView, BaseFragmentListener {
     @BindView(R.id.imgBackgroundAppbar)
     ImageView imgBackgroundAppbar;
     @BindView(R.id.toolbarprogress)
@@ -132,7 +132,7 @@ public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPr
         ViewpagerAdapter viewpagerAdapter = new ViewpagerAdapter(getSupportFragmentManager(), 0, null);
         viewpagerAdapter.addFragment(new ActividadesFragment(), "ACTIVIDADES");
         viewpagerAdapter.addFragment(FragmentTareasSesiones.newInstanceSesion(), "TAREA");
-        viewpagerAdapter.addFragment(new InstrumentoFragment(), "EVALUACION");
+        viewpagerAdapter.addFragment(new InstrumentoListaFragment(), "EVALUACION");
 
         vpCurso.setOffscreenPageLimit(4);
         vpCurso.setAdapter(viewpagerAdapter);

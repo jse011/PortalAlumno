@@ -49,6 +49,9 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
     CardView cardvSesiones;
     @BindView(R.id.contItemView)
     ConstraintLayout contItemView;
+    @BindView(R.id.txt_tag)
+    TextView txtTag;
+
     private SesionAprendizajeUi sesionAprendizaje;
     private EstadoSesiones estadoSesiones=EstadoSesiones.CREADO;
     private UnidadesAdapter.UnidadListener listener;
@@ -92,7 +95,7 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
         fechaEjecucion.setTimeInMillis(sesionAprendizaje.getFechaEjecucion());
         txt_fechasesion.setText(f_fecha_letras(fechaEjecucion));
         cantRecursos.setText(sesionAprendizaje.getCantidad_recursos()+"");
-        cambiarTagColor();
+        cambiarTagColor(sesionAprendizaje);
         itemView.setOnClickListener(this);
     }
 
@@ -117,47 +120,53 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
         }
     }
 
-    private void cambiarTagColor(){
-        String nombreEstadoSession = "";
-        Drawable drawable = null;
-        Drawable drawables = null;
-        @ColorInt
-        int colorEstado = 0;
-        switch (estadoSesiones){
-            case HECHO:
-                nombreEstadoSession = "Hecho";//Verde
-                colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_green_600);
-                drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_red);
-                drawables = ContextCompat.getDrawable(itemView.getContext(), R.drawable.border_session_verde);
-                //fondo.setBackgroundColor(R.drawable.border_session_verde);
-                break;
-            case CREADO:
-                nombreEstadoSession = "Creado";//Azul
-                colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_blue_600);
-                drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_blue);
-                drawables = ContextCompat.getDrawable(itemView.getContext(), R.drawable.border_session_azul);
-                break;
-            case PENDIENTE:
-                nombreEstadoSession = "Pendiente";//Rojo
-                colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_red_500);
-                drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_red_600);
-                drawables = ContextCompat.getDrawable(itemView.getContext(), R.drawable.border_session_rojo);
-                break;
-            case PROGRAMADO:
-                nombreEstadoSession = "Programado";//Magenta
-                colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_orange_600);
-                drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_orange);
-                drawables = ContextCompat.getDrawable(itemView.getContext(), R.drawable.border_session_magenta);
-                break;
+    private void cambiarTagColor(SesionAprendizajeUi sesionAprendizajeUi){
+
+        if(sesionAprendizajeUi.getEstadoEjecucionId()==317){
+            int colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_green_600);
+            txtTag.setVisibility(View.VISIBLE);
+            txtTag.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_red));
+            txtTag.setTextColor(colorEstado);
+            //txtTag.setText("Hecho");
+            txt_fechasesion.setTextColor(ContextCompat.getColor(itemView.getContext(),R.color.md_grey_500));
+            lin_titulosesion.setBackgroundColor(colorEstado);
+            cardvSesiones.setCardBackgroundColor(colorEstado);
+            txttiempo_medida.setTextColor(colorEstado);
+            txttiempo.setTextColor(colorEstado);
+            Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
+            circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
+            cantRecursos.setBackground(circle);
+        }else {
+            int colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_blue_600);
+            txtTag.setVisibility(View.GONE);
+            txtTag.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_blue));
+            txtTag.setTextColor(colorEstado);
+            //txtTag.setText("Creado");
+            txt_fechasesion.setTextColor(ContextCompat.getColor(itemView.getContext(),R.color.md_grey_500));
+            lin_titulosesion.setBackgroundColor(colorEstado);
+            cardvSesiones.setCardBackgroundColor(colorEstado);
+            txttiempo_medida.setTextColor(colorEstado);
+            txttiempo.setTextColor(colorEstado);
+            Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
+            circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
+            cantRecursos.setBackground(circle);
         }
-        //corner_bg_orange
-        lin_titulosesion.setBackgroundColor(colorEstado);
-        cardvSesiones.setCardBackgroundColor(colorEstado);
-        txttiempo_medida.setTextColor(colorEstado);
-        txttiempo.setTextColor(colorEstado);
-        Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
-        circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
-        cantRecursos.setBackground(circle);
+
+
+        if(sesionAprendizajeUi.isActual()){
+            int colorEstado = ContextCompat.getColor(itemView.getContext(),R.color.md_red_500);
+            txtTag.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.corner_bg_red_600));
+            txtTag.setTextColor(colorEstado);
+            //txtTag.setText("Hoy");
+            txt_fechasesion.setTextColor(ContextCompat.getColor(itemView.getContext(),R.color.md_blue_600));
+            lin_titulosesion.setBackgroundColor(colorEstado);
+            cardvSesiones.setCardBackgroundColor(colorEstado);
+            txttiempo_medida.setTextColor(colorEstado);
+            txttiempo.setTextColor(colorEstado);
+            Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
+            circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
+            cantRecursos.setBackground(circle);
+        }
 
     }
 

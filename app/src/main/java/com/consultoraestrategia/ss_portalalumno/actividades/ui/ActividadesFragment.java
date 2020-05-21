@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.consultoraestrategia.ss_portalalumno.actividades.adapter.holder.ActividadListener;
 import com.consultoraestrategia.ss_portalalumno.actividades.adapterDownload.adapter.DownloadItemListener;
-import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.DowloadYoutube;
+import com.consultoraestrategia.ss_portalalumno.actividades.domain.usecase.UpdateFirebaseActividades;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.ActividadesUi;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RecursosUi;
+import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.OpenIntents;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.actividades.ActividadesPresenter;
@@ -44,9 +44,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.huber.youtubeExtractor.VideoMeta;
-import at.huber.youtubeExtractor.YouTubeExtractor;
-import at.huber.youtubeExtractor.YtFile;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -92,7 +89,8 @@ public class ActividadesFragment extends Fragment implements ActividadesView, Ac
                 new UpdateActividad(repository),
                 new DowloadImageUseCase(repository),
                 new UpdateSuccesDowloadArchivo(repository),
-                new DowloadYoutube(getContext())
+                new UpdateFirebaseActividades(repository),
+                new OfflineFirebase(getContext())
         );
         setPresenter(presenter);
     }

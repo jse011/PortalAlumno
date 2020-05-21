@@ -27,6 +27,10 @@ public interface ActividadesDataSource {
         void onLoad(boolean success, T item);
     }
 
+    interface CallbackSimple {
+        void onLoad(boolean success);
+    }
+
     interface CallbackProgress<T>  {
         void onProgress(int count);
         void onLoad(boolean success, T item);
@@ -36,4 +40,6 @@ public interface ActividadesDataSource {
     void getActividadesList(int cargaCurso, int sesionAprendizajeId, String backgroundColor, CallbackActividades callbackActividades);
 
     void updateActividad(ActividadesUi actividadesUi, Callback<ActividadesUi> callback);
+
+    void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList, CallbackSimple callbackSimple);
 }

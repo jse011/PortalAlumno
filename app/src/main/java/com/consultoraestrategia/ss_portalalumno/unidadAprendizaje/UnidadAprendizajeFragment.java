@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -20,17 +19,18 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragment;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
+import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.SesionColumnCountProvider;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.UnidadesAdapter;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.data.repositorio.UnidadAprendizajeRepositorio;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.data.repositorio.UnidadAprendizajeRepositorioImpl;
-import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetFireBaseUnidadAprendizajeList;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetUnidadAprendizajeList;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.SaveToogle;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.UpdateFireBaseUnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -52,7 +52,11 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     @Override
     protected UnidadAprendizajePresenter getPresenter() {
         UnidadAprendizajeRepositorio repositorio = new UnidadAprendizajeRepositorioImpl();
-        return new UnidadAprendizajePresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetFireBaseUnidadAprendizajeList(repositorio));
+        return new UnidadAprendizajePresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(),
+                new OfflineFirebase(getContext()),
+                new GetUnidadAprendizajeList(repositorio),
+                new UpdateFireBaseUnidadAprendizaje(repositorio),
+                new SaveToogle(repositorio));
     }
 
     @Override

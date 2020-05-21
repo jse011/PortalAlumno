@@ -27,6 +27,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.RecursoReferenciaC;
 import com.consultoraestrategia.ss_portalalumno.entities.RecursoReferenciaC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
@@ -129,7 +131,12 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
 
     @Override
     public void getActividadesList(int cargaCurso, int sesionAprendizajeId, String backgroundColor, CallbackActividades callbackActividades) {
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_UrlArchivo"))
+                .querySingle();
 
+        String urlArchivo  = webconfig!=null?webconfig.getContent():"";
         List<ActividadAprendizaje> padreActividadAprendizajeList = SQLite.select(UtilsDBFlow.f_allcolumnTable(ActividadAprendizaje_Table.ALL_COLUMN_PROPERTIES))
                 .from(ActividadAprendizaje.class)
                 .where(ActividadAprendizaje_Table.sesionAprendizajeId.withTable().is(sesionAprendizajeId))
@@ -176,6 +183,8 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
                         .from(ActividadAprendizaje.class)
                         .where(ActividadAprendizaje_Table.parentId.is(actividad.getActividadAprendizajeId()))
                         .queryList();
+
+            Log.d(TAG, "subActividadAprendizajes Size: " + actividadAprendizajes.size());
                 List<SubRecursosUi> subRecursosUiList = new ArrayList<>();
                 int i = 0;
                 /*Cuano tiene Recursos Hijos - de la actividad*/
@@ -189,27 +198,26 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
                                 .where(RecursoReferenciaC_Table.actividadAprendizajeId.withTable().is(aprendizaje.getActividadAprendizajeId()))
                                 .queryList();
 
-                        subRecursosUiList.add(new SubRecursosUi(i, aprendizaje.getDescripcionActividad(), getListSubRecurso(mlst_recursoDidacticoEvento2)));
+                        subRecursosUiList.add(new SubRecursosUi(aprendizaje.getActividadAprendizajeId(), i, aprendizaje.getDescripcionActividad(), getListSubRecurso(mlst_recursoDidacticoEvento2, urlArchivo)));
                     }
                 }
 
 
-                if (secuencia != null) {
                     ActividadesUi actividadesUi = new ActividadesUi(actividad.getActividad(),
                             countRecursoActividad,
                             actividad.getTiempo(),
                             actividad.getEstadoId(),
                             actividad.getTiempo(),
-                            tipoActividad.getNombre(),
-                            secuencia.getNombre(),
+                            tipoActividad!=null?tipoActividad.getNombre():"",
+                            secuencia!=null?secuencia.getNombre():"",
                             actividad.getDescripcionActividad(),
                             backgroundColor,
-                            getRecursosListActividad(mlst_recursoDidacticoEvento),
+                            getRecursosListActividad(mlst_recursoDidacticoEvento, urlArchivo),
                             subRecursosUiList);
 
                     actividadesUi.setId(actividad.getActividadAprendizajeId());
 
-                    switch (secuencia.getTipoId()) {
+                    switch (secuencia!=null?secuencia.getTipoId():0) {
                         case 356:
                             actividadesUi.seteSecuencia(ESecuencia.Inicio);
                             break;
@@ -218,6 +226,9 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
                             break;
                         case 358:
                             actividadesUi.seteSecuencia(ESecuencia.Cierre);
+                            break;
+                        default:
+                            actividadesUi.seteSecuencia(ESecuencia.Inicio);
                             break;
                     }
 
@@ -231,14 +242,16 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
                         case ActividadAprendizaje.ESTADO_HECHO:
                             actividadesUi.seteEstado(EEstado.Hecho);
                             break;
+                        default:
+                            actividadesUi.seteEstado(EEstado.Creado);
+                            break;
                     }
 
                     actividadListPadre.add(actividadesUi);
-                }
         }
 
         for (RecursoDidacticoEventoC recursoDidacticoEvento : mlst_recursoDidacticoEventoPrimero) {
-                recursosUiListPrimero.add(getRecursoEvento(recursoDidacticoEvento));
+                recursosUiListPrimero.add(getRecursoEvento(recursoDidacticoEvento, urlArchivo));
         }
 
         Log.d(TAG, "actividadListPadre Size: " + actividadListPadre.size());
@@ -272,7 +285,13 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
             callback.onLoad(true, actividadesUi);
     }
 
-    private RecursosUi getRecursoEvento(RecursoDidacticoEventoC recursoDidacticoEvento) {
+    @Override
+    public void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList, CallbackSimple callbackSimple) {
+
+    }
+
+
+    private RecursosUi getRecursoEvento(RecursoDidacticoEventoC recursoDidacticoEvento, String urlArchivo) {
         RecursosUi recursosUI = new RecursosUi();
         recursosUI.setRecursoId(recursoDidacticoEvento.getKey());
         recursosUI.setNombreRecurso(recursoDidacticoEvento.getTitulo());
@@ -349,14 +368,14 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
                 recursosUI.setArchivoId(archivo.getKey());
                 recursosUI.setNombreArchivo(archivo.getNombre());
                 recursosUI.setPath(archivo.getLocalpath());
-                recursosUI.setUrl(archivo.getPath());
+                recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                 recursosUI.setFechaCreacionRecuros(archivo.getFechaCreacion());
                 if (TextUtils.isEmpty(archivo.getLocalpath())) {
                     recursosUI.setEstadoFileU(RepositorioEstadoFileU.SIN_DESCARGAR);
                 } else {
                     recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
                 }
-                recursosUI.setUrl(archivo.getPath());
+                recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                 recursosUI.setPath(archivo.getLocalpath());
                 recursosUI.setFechaAccionArchivo(archivo.getFechaAccion());
             } else if (recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO) {
@@ -377,18 +396,18 @@ public class ActividadesLocalDataSource implements ActividadesDataSource {
     }
 
 
-    private List<RecursosUi> getListSubRecurso(List<RecursoDidacticoEventoC> mlst_recursoDidacticoEvento2) {
+    private List<RecursosUi> getListSubRecurso(List<RecursoDidacticoEventoC> mlst_recursoDidacticoEvento2, String urlArchivo) {
         List<RecursosUi> recursosSubRecursoList = new ArrayList<>();
             for (RecursoDidacticoEventoC recursoDidacticoEvento : mlst_recursoDidacticoEvento2)
-                recursosSubRecursoList.add(getRecursoEvento(recursoDidacticoEvento));
+                recursosSubRecursoList.add(getRecursoEvento(recursoDidacticoEvento, urlArchivo));
             return recursosSubRecursoList;
     }
 
     /*Cuando son Actividad de Recursos- Sin Hijos*/
-    private List<RecursosUi> getRecursosListActividad(List<RecursoDidacticoEventoC> mlst_recursoDidacticoEvento) {
+    private List<RecursosUi> getRecursosListActividad(List<RecursoDidacticoEventoC> mlst_recursoDidacticoEvento, String urlArchivo) {
         List<RecursosUi> recursosUiListActividad = new ArrayList<>();
             for (RecursoDidacticoEventoC recursoDidacticoEvento : mlst_recursoDidacticoEvento) {
-                recursosUiListActividad.add(getRecursoEvento(recursoDidacticoEvento));
+                recursosUiListActividad.add(getRecursoEvento(recursoDidacticoEvento, urlArchivo));
             }
             return recursosUiListActividad;
     }

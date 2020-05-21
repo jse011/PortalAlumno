@@ -5,19 +5,19 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.Unida
 
 import java.util.List;
 
-public class GetFireBaseUnidadAprendizajeList {
+public class UpdateFireBaseUnidadAprendizaje {
     private UnidadAprendizajeRepositorio unidadAprendizajeRepositorio;
 
-    public GetFireBaseUnidadAprendizajeList(UnidadAprendizajeRepositorio unidadAprendizajeRepositorio) {
+    public UpdateFireBaseUnidadAprendizaje(UnidadAprendizajeRepositorio unidadAprendizajeRepositorio) {
         this.unidadAprendizajeRepositorio = unidadAprendizajeRepositorio;
     }
 
-    public void execute(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int planCursoId, CallBack callBack){
-        unidadAprendizajeRepositorio.getFirebaseUnidadesList(idCargaCurso, idCalendarioPeriodo, idAnioAcademico, planCursoId, new UnidadAprendizajeRepositorio.Callback<List<UnidadAprendizajeUi>>() {
+    public void execute(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int planCursoId, List<UnidadAprendizajeUi> unidadAprendizajeUiList, CallBack callBack){
+        unidadAprendizajeRepositorio.updateFirebaseUnidadesList(idCargaCurso, idCalendarioPeriodo, idAnioAcademico, planCursoId, unidadAprendizajeUiList,new UnidadAprendizajeRepositorio.Callback() {
             @Override
-            public void onLoad(boolean success, List<UnidadAprendizajeUi> item) {
+            public void onLoad(boolean success) {
                 if(success){
-                    callBack.onSucces(item);
+                    callBack.onSucces();
                 }else {
                     callBack.onError("error");
                 }
@@ -26,7 +26,7 @@ public class GetFireBaseUnidadAprendizajeList {
     }
 
     public interface CallBack{
-        void onSucces(List<UnidadAprendizajeUi> unidadAprendizajeUiList);
+        void onSucces();
         void onError(String error);
     }
 }

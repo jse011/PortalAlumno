@@ -52,6 +52,7 @@ import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoU
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.main.listeners.MenuListener;
 import com.consultoraestrategia.ss_portalalumno.permisos.DialogOnAnyDeniedMultiplePermissionsListener;
+import com.consultoraestrategia.ss_portalalumno.sincronizar.instrumentos.SyncInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -142,12 +143,19 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     protected void setContentView() {
         setContentView(R.layout.activity_main_final);
         ButterKnife.bind(this);
+        limpiarVariableGlobales();
         desbloqOrientation();
         setupTabMenu();
         setupToolbar();
         setupRecyclerProgramas();
         setupAdapter();
         setupValidatePermisos(this);
+        SyncInstrumento.start(this);
+    }
+
+    private void limpiarVariableGlobales() {
+        iCRMEdu.variblesGlobales = new iCRMEdu.VariblesGlobales();
+        iCRMEdu.variblesGlobales.saveData(this);
     }
 
     private void setupAdapter() {
@@ -387,24 +395,29 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser==null){
-            initializingFirebase(usuarioFirebase, passwordFirebase);
+            initializingFirebase(usuarioFirebase, passwordFirebase, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(getTag(), "signInWithEmail:success");
+                        FirebaseUser user = mAuth.getCurrentUser();;
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        createAccountFirebase(usuarioFirebase, passwordFirebase);
+                        Log.w(getTag(), "signInWithEmail:failure", task.getException());
+                    }
+                }
+            });
         }
     }
 
-    private void initializingFirebase(String email, String password){
+    private void initializingFirebase(String email, String password, OnCompleteListener<AuthResult> callback){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(getTag(), "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();;
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            createAccountFirebase(email, password);
-                            Log.w(getTag(), "signInWithEmail:failure", task.getException());
-                        }
+                        if(callback!=null)callback.onComplete(task);
                     }
                 });
     }
@@ -418,7 +431,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(getTag(), "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-
+                            initializingFirebase(email, password, null);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(getTag(), "createUserWithEmail:failure", task.getException());

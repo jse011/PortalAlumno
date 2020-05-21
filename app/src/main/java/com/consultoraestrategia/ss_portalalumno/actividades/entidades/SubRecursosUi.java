@@ -8,13 +8,15 @@ import java.util.List;
 
 public class SubRecursosUi {
     private int conteoSubRecurso;
+    private int actividadId;
     private String nombreSubRecurso;
     private List<RecursosUi> recursosUiList;
 
-    public SubRecursosUi(int conteoSubRecurso, String nombreSubRecurso, List<RecursosUi> recursosUiList) {
+    public SubRecursosUi(int actividadId, int conteoSubRecurso, String nombreSubRecurso, List<RecursosUi> recursosUiList) {
         this.conteoSubRecurso = conteoSubRecurso;
         this.nombreSubRecurso = nombreSubRecurso;
         this.recursosUiList = recursosUiList;
+        this.actividadId = actividadId;
     }
 
     public int getConteoSubRecurso() {
@@ -39,5 +41,13 @@ public class SubRecursosUi {
 
     public void setRecursosUiList(List<RecursosUi> recursosUiList) {
         this.recursosUiList = recursosUiList;
+    }
+
+    public int getActividadId() {
+        return actividadId;
+    }
+
+    public void setActividadId(int actividadId) {
+        this.actividadId = actividadId;
     }
 }

@@ -5,9 +5,10 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.Unida
 import java.util.List;
 
 public interface UnidadAprendizajeRepositorio {
-    public interface Callback<T>{
-        void onLoad(boolean success, T item);
+    interface Callback{
+        void onLoad(boolean success);
     }
     List<UnidadAprendizajeUi> getUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int planCursoId);
-    void getFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int plancursoId, Callback<List<UnidadAprendizajeUi>> callback);
+    void updateFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int plancursoId, List<UnidadAprendizajeUi> unidadAprendizajeUiList, Callback callback);
+    void saveToogleUnidad(UnidadAprendizajeUi unidadAprendizajeUi);
 }

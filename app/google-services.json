@@ -289,6 +289,35 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:292103131694:android:4ad86ac14a0c0dd88545bf",
+        "android_client_info": {
+          "package_name": "com.consultoraestrategia.ss_portalalumno2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "113993595250655306241",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:292103131694:android:364e923b3297b69e",
         "android_client_info": {
           "package_name": "com.consultoraestrategiabeta.ss_crmeducativo"

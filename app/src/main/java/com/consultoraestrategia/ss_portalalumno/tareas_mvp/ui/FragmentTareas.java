@@ -22,7 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadYoutube;
+import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSesion;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSilabo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpPresenter;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpPresenterImpl;
@@ -145,7 +147,10 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
                         new TareasLocalDataSource(),
                         new RemoteMvpDataSource(getContext()))
                 ),
-                new DowloadYoutube(getContext())
+
+                new UpdateFireBaseTareaSilabo(tareasMvpRepository),
+                new UpdateFireBaseTareaSesion(tareasMvpRepository),
+                new OfflineFirebase(getContext())
         );
 
         setPresenter(presenter);

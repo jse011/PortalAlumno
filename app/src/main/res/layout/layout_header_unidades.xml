@@ -14,7 +14,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
         android:paddingEnd="8dp"
-        android:paddingRight="8dp"
+        
         app:cardCornerRadius="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
+            
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -48,10 +48,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
+                
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="28dp"
-                android:layout_marginRight="28dp"
+                
                 android:layout_marginBottom="4dp"
                 android:text="tituloSesisionAprendizajetituloSesisionAprendizajetituloSesisionAprendizaje"
                 android:textSize="13sp"
@@ -103,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        
         android:layout_marginBottom="3dp"
         android:backgroundTint="@color/md_white_1000"
         android:elevation="6dp"

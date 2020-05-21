@@ -6,6 +6,7 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.local.Tar
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.remote.RemoteMvpDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
 
 import java.util.List;
 
@@ -61,4 +62,15 @@ public class TareasMvpRepository implements TareasMvpDataSource {
     public void dowloadImage(String url, String nombre, String carpeta, CallbackProgress<String> stringCallbackProgress) {
         localDataSource.dowloadImage(url, nombre, carpeta, stringCallbackProgress);
     }
+
+    @Override
+    public void updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple) {
+        remoteDataSource.updateFirebaseTarea(idCargaCurso,calendarioPeriodoId, tareasUIList, callbackSimple);
+    }
+
+    @Override
+    public void updateFirebaseTareaSesion(int idCargaCurso, int calendarioPeriodoId, int SesionAprendizajeId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple) {
+        remoteDataSource.updateFirebaseTareaSesion(idCargaCurso, calendarioPeriodoId, SesionAprendizajeId, tareasUIList, callbackSimple);
+    }
+
 }

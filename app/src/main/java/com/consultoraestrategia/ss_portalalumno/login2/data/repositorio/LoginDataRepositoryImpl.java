@@ -74,6 +74,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.UsuarioAcceso;
 import com.consultoraestrategia.ss_portalalumno.entities.UsuarioRolGeoreferencia;
 import com.consultoraestrategia.ss_portalalumno.entities.UsuarioRolGeoreferencia_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.DatosProgressUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
@@ -309,7 +310,7 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                     Transaction transaction = database.beginTransactionAsync(new ITransaction() {
                         @Override
                         public void execute(DatabaseWrapper databaseWrapper) {
-
+                            TransaccionUtils.fastStoreListInsert(Webconfig.class, response.getBeWebConfigs(), databaseWrapper, true);
 
                             TransaccionUtils.fastStoreListInsert(Directivos.class, response.getDirectivos(), databaseWrapper, true);
                             TransaccionUtils.fastStoreListInsert(ParametrosDisenio.class, response.getObtener_parametros_disenio(), databaseWrapper, true);

@@ -5,6 +5,8 @@ import com.consultoraestrategia.ss_portalalumno.actividades.data.source.local.Ac
 import com.consultoraestrategia.ss_portalalumno.actividades.data.source.remote.ActividadesRemoteDataSource;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.ActividadesUi;
 
+import java.util.List;
+
 /**
  * Created by kike on 08/02/2018.
  */
@@ -37,4 +39,10 @@ public class ActividadesRepository implements ActividadesDataSource {
     public void updateActividad(ActividadesUi actividadesUi, Callback<ActividadesUi> callback) {
         localDataSource.updateActividad(actividadesUi, callback);
     }
+
+    @Override
+    public void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList, CallbackSimple callbackSimple) {
+        remoteDataSource.upadteFirebaseActividad(cargaCurso, sesionAprendizajeId, actividadesUiList, callbackSimple);
+    }
+
 }

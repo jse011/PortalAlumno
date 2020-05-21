@@ -15,8 +15,6 @@ public class GlobalSettings extends BaseModel {
     private int id;
     @Column
     private String urlServer;
-    @Column(defaultValue = "ups-prueba")
-    private String firebaseNode;
 
     public GlobalSettings() {
     }
@@ -35,14 +33,6 @@ public class GlobalSettings extends BaseModel {
 
     public void setUrlServer(String urlServer) {
         this.urlServer = urlServer;
-    }
-
-    public String getFirebaseNode() {
-        return firebaseNode;
-    }
-
-    public void setFirebaseNode(String firebaseNode) {
-        this.firebaseNode = firebaseNode;
     }
 
     public @Nullable

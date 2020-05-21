@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
-import com.consultoraestrategia.ss_portalalumno.entities.PlanCursos;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
@@ -18,29 +17,41 @@ import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje_Table;
-import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBSesionAprendizaje;
+import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBUnidadAprendizaje;
+import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
+import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.language.From;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
+import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
+import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeRepositorio {
 
-
     private static final String TAG = UnidadAprendizajeRepositorioImpl.class.getSimpleName();
+
+    public UnidadAprendizajeRepositorioImpl() {
+    }
 
     @Override
     public List<UnidadAprendizajeUi> getUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int planCursoId) {
@@ -66,6 +77,12 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 .and(SilaboEvento_Table.planCursoId.withTable().eq(planCursoId))
                 .queryList();
 
+
+        Date date = Calendar.getInstance().getTime();
+        // Display a date in day, month, year format
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.getDefault());
+        String today = formatter.format(date);
+
         for(UnidadAprendizaje unidadAprendizaje:vlst_unidadAprendizaje ){
             //sesionAprendizajeUiList.clear();
 
@@ -89,13 +106,19 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                     .where(SesionAprendizaje_Table.unidadAprendizajeId.eq(unidadAprendizaje.getUnidadAprendizajeId()))
                     .and(SesionAprendizaje_Table.rolId.eq(6))
                     .and(SesionAprendizaje_Table.estadoId.in(SesionAprendizaje.CREADO_ESTADO,SesionAprendizaje.AUTORIZADO_ESTADO))//297
-                    .orderBy(SesionAprendizaje_Table.fechaEjecucion.asc())
+                    .orderBy(SesionAprendizaje_Table.fechaEjecucion.desc())
                     .queryList();
 
             List<SesionAprendizajeUi>sesionAprendizajeUiList= new ArrayList<>();
 
             for(SesionAprendizaje sesion:sesionAprendizajes ){
 
+                Calendar calendarSesion = Calendar.getInstance();
+                calendarSesion.setTimeInMillis(sesion.getFechaEjecucion());
+                // Display a date in day, month, year format
+                String fehaSesion = formatter.format(calendarSesion.getTime());
+                Log.d(TAG, fehaSesion+"="+today);
+                Log.d(TAG,fehaSesion.equals(today)+"");
                 SesionAprendizajeUi sesionAprendizajeUi = new SesionAprendizajeUi();
                 sesionAprendizajeUi.setSesionAprendizajeId(sesion.getSesionAprendizajeId());
                 sesionAprendizajeUi.setUnidadAprendizajeId(sesion.getUnidadAprendizajeId());
@@ -114,6 +137,7 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 sesionAprendizajeUi.setEstadoEjecucionId(sesion.getEstadoEjecucionId());
                 sesionAprendizajeUi.setProposito(sesion.getProposito());
                 sesionAprendizajeUi.setCantidad_recursos(0);
+                sesionAprendizajeUi.setActual(fehaSesion.equals(today));
                 sesionAprendizajeUiList.add(sesionAprendizajeUi);
             }
 
@@ -124,9 +148,14 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
     }
 
     @Override
-    public void getFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int plancursoId, Callback<List<UnidadAprendizajeUi>> callback) {
-        GlobalSettings globalSettings = GlobalSettings.getCurrentSettings();
-        String nodeFirebase = globalSettings!=null?globalSettings.getFirebaseNode():"sinServer";
+    public void updateFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int plancursoId, List<UnidadAprendizajeUi> unidadAprendizajeUiList, Callback callback) {
+
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
         SilaboEvento silaboEvento = SQLite.select()
                 .from(SilaboEvento.class)
                 .where(SilaboEvento_Table.cargaCursoId.eq(idCargaCurso))
@@ -139,28 +168,86 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 .where(CalendarioPeriodo_Table.calendarioPeriodoId.eq(idCalendarioPeriodo))
                 .querySingle();
 
+        List<Integer> unidadAprendizajeIdList = new ArrayList<>();
+        for (UnidadAprendizajeUi unidadAprendizajeUi : unidadAprendizajeUiList){
+            unidadAprendizajeIdList.add(unidadAprendizajeUi.getUnidadAprendizajeId());
+        }
+
         int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase+"/"+"/AV_Unidad/silid_"+silaboEventoId);
-        ApiRetrofit.Log.d(TAG,  ":)");
-        mDatabase.orderByChild("TipoPeriodoId")
-                .equalTo(tipoPeriodoId)
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
+
+        mDatabase.child("/AV_Sesion/silid_"+silaboEventoId+"/peid_"+tipoPeriodoId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Log.d(TAG, dataSnapshot.getKey()+"");
-                        Log.d(TAG, dataSnapshot.getValue()+"");
-                        final Gson gsons = new Gson();
-                        final String representacionJSON = gsons.toJson(dataSnapshot.getValue());
-                        ApiRetrofit.Log.d(TAG,  representacionJSON);
+                        List<SesionAprendizaje> sesionAprendizajeList = new ArrayList<>();
+                        for (DataSnapshot unidadSnapshot: dataSnapshot.getChildren()){
+                            for (DataSnapshot sesionSnapshot: unidadSnapshot.getChildren()){
+                                FBSesionAprendizaje fbSesionAprendizaje = sesionSnapshot.getValue(FBSesionAprendizaje.class);
+                                SesionAprendizaje sesionAprendizaje = new SesionAprendizaje();
+                                sesionAprendizaje.setSesionAprendizajeId(fbSesionAprendizaje.getSesionAprendizajeId());
+                                sesionAprendizaje.setTitulo(fbSesionAprendizaje.getTitulo());
+                                sesionAprendizaje.setEstadoId(fbSesionAprendizaje.getEstadoId());
+                                sesionAprendizaje.setRolId(6);
+                                sesionAprendizaje.setEstadoId(SesionAprendizaje.AUTORIZADO_ESTADO);
+                                sesionAprendizaje.setNroSesion(fbSesionAprendizaje.getNroSesion());
+                                sesionAprendizaje.setHoras(fbSesionAprendizaje.getHoras());
+                                try {
+                                    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                                    Date todayCalendar = simpleDateFormat1.parse(fbSesionAprendizaje.getFechaEjecucion());
+                                    sesionAprendizaje.setFechaEjecucion(todayCalendar.getTime());
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                                sesionAprendizaje.setUnidadAprendizajeId(fbSesionAprendizaje.getUnidadAprendizajeId());
+                                sesionAprendizaje.setEstadoEjecucionId(fbSesionAprendizaje.getEstadoEjecucionId());
+                                sesionAprendizajeList.add(sesionAprendizaje);
+                            }
+                        }
+
+                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                            @Override
+                            public void execute(DatabaseWrapper databaseWrapper) {
+
+                                TransaccionUtils.deleteTable(SesionAprendizaje.class, SesionAprendizaje_Table.unidadAprendizajeId.in(unidadAprendizajeIdList));
+                                TransaccionUtils.fastStoreListInsert(SesionAprendizaje.class, sesionAprendizajeList, databaseWrapper, false);
+                            }
+                        }).success(new Transaction.Success() {
+                            @Override
+                            public void onSuccess(@NonNull Transaction transaction) {
+                                callback.onLoad(true);
+                            }
+                        }).error(new Transaction.Error() {
+                            @Override
+                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                                error.printStackTrace();
+                                callback.onLoad(false);
+                            }
+                        }).build();
+
+                        transaction.execute();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.d(TAG, databaseError.getMessage()+"");
-                        Log.d(TAG, databaseError.getDetails()+"");
-                        Log.d(TAG, databaseError.getCode()+"");
+                        callback.onLoad(false);
                     }
                 });
+    }
+
+    @Override
+    public void saveToogleUnidad(UnidadAprendizajeUi unidadAprendizajeUi) {
+
+        UnidadAprendizaje unidadAprendizaje = SQLite.select()
+                .from(UnidadAprendizaje.class)
+                .where(UnidadAprendizaje_Table.unidadAprendizajeId.eq(unidadAprendizajeUi.getUnidadAprendizajeId()))
+                .querySingle();
+        if(unidadAprendizaje!=null) {
+            unidadAprendizaje.setToogle(unidadAprendizajeUi.isToogle());
+            unidadAprendizaje.save();
+        }
+
     }
 
 }

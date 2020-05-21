@@ -14,10 +14,12 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.global.offline.Offline;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadImageUseCase;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadYoutube;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.GetTareasUIList;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.MoverArchivosAlaCarpetaTarea;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSesion;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSilabo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateSuccesDowloadArchivo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.ParametroDisenioUi;
@@ -51,22 +53,28 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
     private DowloadImageUseCase dowloadImageUseCase;
     private UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo;
     private MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea;
-    private DowloadYoutube dowloadYoutube;
     private List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList = new ArrayList<>();
     private int anioAcademicoId;
     private int planCursoId;
+    private Offline offline;
+    private UpdateFireBaseTareaSilabo updateFireBaseTareaSilabo;
+    private UpdateFireBaseTareaSesion updateFireBaseTareaSesion;
 
     public TareasMvpPresenterImpl(UseCaseHandler handler, GetTareasUIList getTareasUIList,
                                   DowloadImageUseCase dowloadImageUseCase,
                                   UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo,
                                   MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea,
-                                  DowloadYoutube dowloadYoutube) {
+                                  UpdateFireBaseTareaSilabo updateFireBaseTareaSilabo,
+                                  UpdateFireBaseTareaSesion updateFireBaseTareaSesion,
+                                  Offline offline) {
         this.handler = handler;
         this.getTareasUIList = getTareasUIList;
         this.dowloadImageUseCase = dowloadImageUseCase;
         this.updateSuccesDowloadArchivo = updateSuccesDowloadArchivo;
         this.moverArchivosAlaCarpetaTarea = moverArchivosAlaCarpetaTarea;
-        this.dowloadYoutube = dowloadYoutube;
+        this.updateFireBaseTareaSilabo = updateFireBaseTareaSilabo;
+        this.offline = offline;
+        this.updateFireBaseTareaSesion = updateFireBaseTareaSesion;
     }
 
     @Override
@@ -84,8 +92,8 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
         if (view!=null)view.showProgress();
         int calendarioPeriodoId = 0;
         if(idCalendarioPeriodo != 0)calendarioPeriodoId = idCalendarioPeriodo;
-        handler.execute(getTareasUIList, new GetTareasUIList.RequestValues(0, idCargaCurso, tipoTarea, mSesionAprendizajeId,calendarioPeriodoId, anioAcademicoId, planCursoId),
-                new UseCase.UseCaseCallback<GetTareasUIList.ResponseValue>() {
+
+        getTareasUIList.executeUseCase(new GetTareasUIList.RequestValues(0, idCargaCurso, tipoTarea, mSesionAprendizajeId, calendarioPeriodoId, anioAcademicoId, planCursoId), new GetTareasUIList.Callback() {
             @Override
             public void onSuccess(GetTareasUIList.ResponseValue response) {
                 //#region
@@ -134,12 +142,12 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
                 headerTareasAprendizajeUIList.clear();
                 headerTareasAprendizajeUIList.addAll(response.getHeaderTareasAprendizajeUIList());
                 if (view!=null)view.showTareasUIList(headerTareasAprendizajeUIList, idCurso, parametroDisenioUi);
-                 if(response.getHeaderTareasAprendizajeUIList().isEmpty())if(view!=null)view.showMessage();
+                if(response.getHeaderTareasAprendizajeUIList().isEmpty())if(view!=null)view.showMessage();
                 if(view!=null)view.hideProgress();
             }
 
             @Override
-            public void onError() {
+            public void onError(String error) {
                 if (view!=null)view.hideTareasUIList();
                 if (view!=null)view.showMessage();
                 Log.d(TAG, "Error");
@@ -457,12 +465,7 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
                 if(view!=null)view.showVinculo(repositorioFileUi.getUrl());
                 break;
             case YOUTUBE:
-                if(TextUtils.isEmpty(repositorioFileUi.getPath())){
-                    dowloadYoutube.execute(repositorioFileUi);
-                }else {
-                    if (view != null) view.leerArchivo(repositorioFileUi.getPath());
-                }
-
+                if(view!=null)view.showYoutube(repositorioFileUi.getUrl());
                 break;
             case MATERIALES:
                 break;
@@ -510,6 +513,40 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
         cancelAllDowload();
         setData();
         getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+        if(offline.isConnect()){
+            List<TareasUI> tareasUIList = new ArrayList<>();
+            for (HeaderTareasAprendizajeUI headerTareasAprendizajeUIList: headerTareasAprendizajeUIList){
+                tareasUIList.addAll(headerTareasAprendizajeUIList.getTareasUIList());
+            }
+            if(tipoTarea==0){
+
+                updateFireBaseTareaSilabo.execute(idCargaCurso, idCalendarioPeriodo, tareasUIList, new UpdateFireBaseTareaSilabo.CallBack() {
+                    @Override
+                    public void onSucces() {
+                        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+
+                    }
+                });
+            }else {
+                updateFireBaseTareaSesion.execute(idCargaCurso, idCalendarioPeriodo, mSesionAprendizajeId, tareasUIList, new UpdateFireBaseTareaSesion.CallBack() {
+                    @Override
+                    public void onSucces() {
+                        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+
+                    }
+                });
+            }
+
+
+        }
     }
 
     private void cancelAllDowload() {

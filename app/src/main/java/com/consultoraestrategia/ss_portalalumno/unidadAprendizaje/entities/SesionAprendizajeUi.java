@@ -26,6 +26,7 @@ public class SesionAprendizajeUi implements Serializable {
     private String cantidadEvaluadosSesion;
     private boolean vigente;
     private boolean editar;
+    private boolean actual;
 
 
     public String getCantidadEvaluadosSesion() {
@@ -214,5 +215,13 @@ public class SesionAprendizajeUi implements Serializable {
 
     public void setEditar(boolean editar) {
         this.editar = editar;
+    }
+
+    public void setActual(boolean actual) {
+        this.actual = actual;
+    }
+
+    public boolean isActual() {
+        return actual;
     }
 }

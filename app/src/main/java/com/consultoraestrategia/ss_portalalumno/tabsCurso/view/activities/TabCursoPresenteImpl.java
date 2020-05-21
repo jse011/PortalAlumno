@@ -10,6 +10,7 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPeri
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.GetCalendarioPeriodo;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.UpdateFireBaseUnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.entities.PeriodoUi;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implements TabCursoPresenter {
 
     private GetCalendarioPeriodo getCalendarioPeriodo;
+    private UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje;
     private int anioAcademicoId;
     private int programaEducativoId;
     private PeriodoUi calendarioperiodo;
@@ -31,9 +33,10 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     private String parametroColor2;
     private String parametroColor3;
 
-    public TabCursoPresenteImpl(UseCaseHandler handler, Resources res, GetCalendarioPeriodo getCalendarioPeriodo) {
+    public TabCursoPresenteImpl(UseCaseHandler handler, Resources res, GetCalendarioPeriodo getCalendarioPeriodo, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje) {
         super(handler, res);
         this.getCalendarioPeriodo = getCalendarioPeriodo;
+        this.updateFireBaseUnidadAprendizaje = updateFireBaseUnidadAprendizaje;
     }
 
     @Override
@@ -53,6 +56,25 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         setupCalendarioPerio();
         if(view!=null)view.changeColorToolbar(parametroColor1);
         if(view!=null)view.changeColorFloatButon(parametroColor2);
+        updateFireBaseUnidadAprendizaje();
+    }
+
+    private void updateFireBaseUnidadAprendizaje() {
+
+        updateFireBaseUnidadAprendizaje.execute(cargaCursoId, idCalendarioPeriodo, new UpdateFireBaseUnidadAprendizaje.CallBack() {
+            @Override
+            public void onSucces() {
+                if(view!=null)view.notifyChangeFragment();
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+
+
+
     }
 
     private void setupCalendarioPerio() {

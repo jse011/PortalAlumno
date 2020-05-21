@@ -2,17 +2,41 @@ package com.consultoraestrategia.ss_portalalumno.tabsCurso.data.repositorio;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioAcademico_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodoDetalle;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodoDetalle_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
+import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
+import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO;
+import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
+import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBUnidadAprendizaje;
+import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.entities.PeriodoUi;
+import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.raizlabs.android.dbflow.config.DatabaseDefinition;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Where;
+import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
+import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
+import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -145,4 +169,95 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
         }
         return status;
     }
+
+    @Override
+    public void updateFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, Callback callback) {
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+        SilaboEvento silaboEvento = SQLite.select()
+                .from(SilaboEvento.class)
+                .where(SilaboEvento_Table.cargaCursoId.eq(idCargaCurso))
+                .querySingle();
+
+        int silaboEventoId = silaboEvento!=null?silaboEvento.getSilaboEventoId():0;
+
+        CalendarioPeriodo calendarioPeriodo = SQLite.select()
+                .from(CalendarioPeriodo.class)
+                .where(CalendarioPeriodo_Table.calendarioPeriodoId.eq(idCalendarioPeriodo))
+                .querySingle();
+
+
+        int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
+
+        mDatabase.child("/AV_Unidad/silid_"+silaboEventoId).orderByChild("TipoPeriodoId")
+                .equalTo(tipoPeriodoId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<UnidadAprendizaje> unidadAprendizajeRemoveList = SQLite.select()
+                                .from(UnidadAprendizaje.class)
+                                .queryList();
+                        List<UnidadAprendizaje> unidadAprendizajeList = new ArrayList<>();
+                        List<T_GC_REL_UNIDAD_APREN_EVENTO_TIPO> t_gc_rel_unidad_apren_evento_tipos = new ArrayList<>();
+                        for (DataSnapshot unidadSnapshot: dataSnapshot.getChildren()){
+                            FBUnidadAprendizaje fbUnidadAprendizaje = unidadSnapshot.getValue(FBUnidadAprendizaje.class);
+                            UnidadAprendizaje unidadAprendizaje = new UnidadAprendizaje();
+                            unidadAprendizaje.setUnidadAprendizajeId(fbUnidadAprendizaje.getUnidadAprendizajeId());
+                            unidadAprendizaje.setTitulo(fbUnidadAprendizaje.getTitulo());
+                            unidadAprendizaje.setNroHoras(fbUnidadAprendizaje.getNroHoras());
+                            unidadAprendizaje.setNroSemanas(fbUnidadAprendizaje.getNroSemanas());
+                            unidadAprendizaje.setSilaboEventoId(fbUnidadAprendizaje.getSilaboEventoId());
+                            unidadAprendizaje.setNroUnidad(fbUnidadAprendizaje.getNroUnidad());
+                            for (UnidadAprendizaje unidadAprendizajeRemove: unidadAprendizajeRemoveList){
+                                if(fbUnidadAprendizaje.getUnidadAprendizajeId()==unidadAprendizajeRemove.getUnidadAprendizajeId()){
+                                    unidadAprendizaje.setToogle(unidadAprendizajeRemove.isToogle());
+                                    break;
+                                }
+                            }
+                            unidadAprendizajeList.add(unidadAprendizaje);
+
+                            T_GC_REL_UNIDAD_APREN_EVENTO_TIPO relUnidad = new T_GC_REL_UNIDAD_APREN_EVENTO_TIPO();
+                            relUnidad.setUnidadaprendizajeId(fbUnidadAprendizaje.getUnidadAprendizajeId());
+                            relUnidad.setTipoid(tipoPeriodoId);
+                            t_gc_rel_unidad_apren_evento_tipos.add(relUnidad);
+                        }
+
+                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                            @Override
+                            public void execute(DatabaseWrapper databaseWrapper) {
+                                TransaccionUtils.deleteTable(UnidadAprendizaje.class, UnidadAprendizaje_Table.silaboEventoId.eq(silaboEventoId));
+                                TransaccionUtils.deleteTable(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class, T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.eq(tipoPeriodoId));
+                                TransaccionUtils.fastStoreListInsert(UnidadAprendizaje.class, unidadAprendizajeList, databaseWrapper, false);
+                                TransaccionUtils.fastStoreListInsert(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class, t_gc_rel_unidad_apren_evento_tipos, databaseWrapper, false);
+                            }
+                        }).success(new Transaction.Success() {
+                            @Override
+                            public void onSuccess(@NonNull Transaction transaction) {
+                                callback.onLoad(true);
+                            }
+                        }).error(new Transaction.Error() {
+                            @Override
+                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                                error.printStackTrace();
+                                callback.onLoad(false);
+                            }
+                        }).build();
+
+                        transaction.execute();
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
 }

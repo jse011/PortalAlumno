@@ -12,7 +12,7 @@ import java.util.List;
  * Created by irvinmarin on 03/10/2017.
  */
 
-public class GetTareasUIList extends UseCase<GetTareasUIList.RequestValues, GetTareasUIList.ResponseValue> {
+public class GetTareasUIList {
 
     private TareasMvpRepository repository;
 
@@ -20,26 +20,26 @@ public class GetTareasUIList extends UseCase<GetTareasUIList.RequestValues, GetT
         this.repository = repository;
     }
 
-    @Override
-    protected void executeUseCase(RequestValues requestValues) {
+
+    public void executeUseCase(RequestValues requestValues, Callback callback) {
 
         repository.getTareasUIList(requestValues.getIdUsuario(), requestValues.getIdCargaCurso(), requestValues.getTipoTarea(), requestValues.getmSesionAprendizajeId(), requestValues.getCalendarioPeriodoId(),requestValues.getAnioAcademicoId(), requestValues.getPlanCursoId(),
                 new GetTareasListCallback() {
                     @Override
                     public void onTareasListLoaded(List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList) {
-                        getUseCaseCallback().onSuccess(new ResponseValue(headerTareasAprendizajeUIList));
+                        callback.onSuccess(new ResponseValue(headerTareasAprendizajeUIList));
                     }
 
                     @Override
                     public void onError(String error) {
-
+                        callback.onError(error);
                     }
                 });
 
 
     }
 
-    public static final class RequestValues implements UseCase.RequestValues {
+    public static final class RequestValues  {
         private final int idUsuario;
         private final int idCargaCurso;
         private final int tipoTarea;
@@ -91,7 +91,7 @@ public class GetTareasUIList extends UseCase<GetTareasUIList.RequestValues, GetT
         }
     }
 
-    public static final class ResponseValue implements UseCase.ResponseValue {
+    public static final class ResponseValue {
         private final List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList;
 
         public List<HeaderTareasAprendizajeUI> getHeaderTareasAprendizajeUIList() {
@@ -101,5 +101,11 @@ public class GetTareasUIList extends UseCase<GetTareasUIList.RequestValues, GetT
         public ResponseValue(List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList) {
             this.headerTareasAprendizajeUIList = headerTareasAprendizajeUIList;
         }
+    }
+
+    public interface Callback{
+        void onSuccess(ResponseValue responseValue);
+
+        void onError(String error);
     }
 }

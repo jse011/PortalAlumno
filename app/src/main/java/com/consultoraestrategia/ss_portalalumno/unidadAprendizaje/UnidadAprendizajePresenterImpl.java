@@ -10,15 +10,21 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPeri
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
-import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetFireBaseUnidadAprendizajeList;
+import com.consultoraestrategia.ss_portalalumno.global.offline.Offline;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetUnidadAprendizajeList;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.SaveToogle;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.UpdateFireBaseUnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<UnidadAprendizajeView> implements UnidadAprendizajePresenter {
-    private GetFireBaseUnidadAprendizajeList getFireBaseUnidadAprendizajeList;
+    private Offline offline;
+    private GetUnidadAprendizajeList getUnidadAprendizajeList;
+    private UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje;
+    private SaveToogle saveToogle;
     private int cargaCursoId;
     private int anioAcademicoId;
     private int planCursoId;
@@ -26,10 +32,15 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     private String color1;
     private String color2;
     private String color3;
+    private List<UnidadAprendizajeUi> unidadAprendizajeUiList = new ArrayList<>();
 
-    public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, GetFireBaseUnidadAprendizajeList getFireBaseUnidadAprendizajeList) {
+    public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, Offline offline, GetUnidadAprendizajeList getUnidadAprendizajeList, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje,
+                                          SaveToogle saveToogle) {
         super(handler, res);
-        this.getFireBaseUnidadAprendizajeList = getFireBaseUnidadAprendizajeList;
+        this.offline = offline;
+        this.getUnidadAprendizajeList = getUnidadAprendizajeList;
+        this.updateFireBaseUnidadAprendizaje = updateFireBaseUnidadAprendizaje;
+        this.saveToogle = saveToogle;
     }
 
     @Override
@@ -40,36 +51,26 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     @Override
     public void onViewCreated() {
         super.onViewCreated();
-        setupListUnidades();
+        getListUnidades();
     }
 
-    private void setupListUnidades() {
-       getFireBaseUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId, new GetFireBaseUnidadAprendizajeList.CallBack() {
-            @Override
-            public void onSucces(List<UnidadAprendizajeUi> unidadAprendizajeUiList) {
-                int columnas = 0;//3
-                if(view!=null)columnas = view.getColumnasSesionesList();
-                Log.d(getTag(),"columnas: " + columnas);
-                for (UnidadAprendizajeUi unidadAprendizajeUi: unidadAprendizajeUiList){
-                    List<SesionAprendizajeUi> sesionAprendizajeUiList = unidadAprendizajeUi.getObjectListSesiones();
+    private void getListUnidades(){
+        unidadAprendizajeUiList.clear();
+        unidadAprendizajeUiList.addAll(getUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId));
+        int columnas = 0;//3
+        if(view!=null)columnas = view.getColumnasSesionesList();
+        Log.d(getTag(),"columnas: " + columnas);
+        for (UnidadAprendizajeUi unidadAprendizajeUi: unidadAprendizajeUiList){
+            List<SesionAprendizajeUi> sesionAprendizajeUiList = unidadAprendizajeUi.getObjectListSesiones();
 
-                    if(sesionAprendizajeUiList==null||columnas >= sesionAprendizajeUiList.size()){
-                        unidadAprendizajeUi.setVisibleVerMas(false);
-                    } else {
-                        unidadAprendizajeUi.setVisibleVerMas(true);
-                    }
-                }
-                if(view!=null)view.hideProgress();
-                if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
+            if(sesionAprendizajeUiList==null||columnas >= sesionAprendizajeUiList.size()){
+                unidadAprendizajeUi.setVisibleVerMas(false);
+            } else {
+                unidadAprendizajeUi.setVisibleVerMas(true);
             }
-
-            @Override
-            public void onError(String error) {
-
-            }
-        });
-
-
+        }
+        if(view!=null)view.hideProgress();
+        if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
     }
 
     @Override
@@ -113,7 +114,7 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
             unidadAprendizajeUi.setToogle(true);
         }
         if(view !=null) view.updateItem(unidadAprendizajeUi);
-
+        saveToogle.excute(unidadAprendizajeUi);
     }
 
     @Override
@@ -129,6 +130,19 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     @Override
     public void notifyChangeFragment() {
         setupData();
-        setupListUnidades();
+        getListUnidades();
+        if(offline.isConnect()){
+            updateFireBaseUnidadAprendizaje.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId, unidadAprendizajeUiList,new UpdateFireBaseUnidadAprendizaje.CallBack() {
+                @Override
+                public void onSucces() {
+                    getListUnidades();
+                }
+
+                @Override
+                public void onError(String error) {
+
+                }
+            });
+        }
     }
 }

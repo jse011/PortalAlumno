@@ -135,6 +135,7 @@ public class BEListaPadre {
     private List<Desempenio> desempenio;
     private List<GeoRefOrganigrama> geoRefOrganigrama;
     private List<TipoEntidadGeo> relTipoEntidadGeo;
+    private List<Webconfig> bEWebConfigs;
 
     public List<CargaCursos> getCargaCursos() {
         return cargaCursos;
@@ -366,6 +367,14 @@ public class BEListaPadre {
 
     public void setRecursoArchivo(List<RecursoArchivo> recursoArchivo) {
         this.recursoArchivo = recursoArchivo;
+    }
+
+    public List<Webconfig> getBeWebConfigs() {
+        return bEWebConfigs;
+    }
+
+    public void setBeWebConfigs(List<Webconfig> beWebConfigs) {
+        this.bEWebConfigs = beWebConfigs;
     }
 
     public List<Competencia> getCompetencias() {

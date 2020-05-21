@@ -60,7 +60,13 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         this.repositorioFileUi = repositorioFileUi;
         this.listener = repositorioItemListener;
         txtNombreRecurso.setText(repositorioFileUi.getNombreRecurso());
-        txtdescripcion.setText(repositorioFileUi.getNombreArchivo());
+        if(repositorioFileUi.getTipoFileU()==RepositorioTipoFileU.YOUTUBE&&
+                repositorioFileUi.getTipoFileU()==RepositorioTipoFileU.VINCULO){
+            txtdescripcion.setText(repositorioFileUi.getUrl());
+        }else {
+            txtdescripcion.setText(repositorioFileUi.getDescripcion());
+        }
+
         setupEstado(repositorioFileUi.getEstadoFileU());
         setupIcono(repositorioFileUi.getTipoFileU());
     }

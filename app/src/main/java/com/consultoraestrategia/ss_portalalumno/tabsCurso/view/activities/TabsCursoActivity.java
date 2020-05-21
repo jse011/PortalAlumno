@@ -32,9 +32,11 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
 import com.consultoraestrategia.ss_portalalumno.base.viewpager.ViewpagerAdapter;
+import com.consultoraestrategia.ss_portalalumno.sincronizar.instrumentos.SyncInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.data.repositorio.TabCursoRepositorio;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.data.repositorio.TabCursoRepositorioImpl;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.GetCalendarioPeriodo;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.UpdateFireBaseUnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.entities.PeriodoUi;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.listener.PeriodoListener;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.adapters.PeriodoAdapter;
@@ -100,7 +102,7 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
     @Override
     protected TabCursoPresenter getPresenter() {
         TabCursoRepositorio tabCursoRepositorio = new TabCursoRepositorioImpl();
-        return new TabCursoPresenteImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCalendarioPeriodo(tabCursoRepositorio));
+        return new TabCursoPresenteImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCalendarioPeriodo(tabCursoRepositorio), new UpdateFireBaseUnidadAprendizaje(tabCursoRepositorio));
     }
 
     @Override

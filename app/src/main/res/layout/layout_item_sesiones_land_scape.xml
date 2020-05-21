@@ -149,6 +149,17 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <TextView
+                    android:id="@+id/txt_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/corner_bg_orange"
+                    android:text="Hecho"
+                    android:textColor="@color/md_orange_500"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/lin_titulo_sesion" />
 
                 <View
                     android:id="@+id/lin_titulo_sesion"
