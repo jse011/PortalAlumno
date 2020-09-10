@@ -35,6 +35,9 @@ public class InstrumentoEvaluacionPresenterImpl extends BasePresenterImpl<Instru
     private int cargaCursoId;
     private int cantpregResueltas;
     private boolean offline;
+    private String color1;
+    private String color2;
+    private String color3;
 
     public InstrumentoEvaluacionPresenterImpl(UseCaseHandler handler, Resources res,
                                               GetInstrumento getInstrumento, SaveFirebasInstrumento saveFirebasInstrumento) {
@@ -80,7 +83,13 @@ public class InstrumentoEvaluacionPresenterImpl extends BasePresenterImpl<Instru
         sessionAprendizajeId =  gbSesionAprendizajeUi!=null?gbSesionAprendizajeUi.getSesionAprendizajeId():0;
         instrumentoEvalId = iCRMEdu.variblesGlobales.getInstrumentoId();
         GbCursoUi gbCursoUi = iCRMEdu.variblesGlobales.getGbCursoUi();
-        cargaCursoId = gbCursoUi!=null?gbCursoUi.getCargaCursoId():0;
+        if(gbCursoUi!=null){
+            cargaCursoId = gbCursoUi.getCargaCursoId();
+            color1 = gbCursoUi.getParametroDisenioColor1();
+            color2 = gbCursoUi.getParametroDisenioColor2();
+            color3 = gbCursoUi.getParametroDisenioColor3();
+        }
+
     }
 
     @Override
@@ -127,7 +136,7 @@ public class InstrumentoEvaluacionPresenterImpl extends BasePresenterImpl<Instru
         if(tipoEvaluacionView!=null)tipoEvaluacionView.setProgress(progress);
         if(tipoEvaluacionView!=null)tipoEvaluacionView.setTitulo(variableUi.getNombre());
         if(!TextUtils.isEmpty(variableUi.getPath())){
-            if(tipoEvaluacionView!=null)tipoEvaluacionView.showImage("http://icrmedu.consultoraestrategia.com/prueba/Images/Img_preguntasInstrumento/"+variableUi.getPath());
+            if(tipoEvaluacionView!=null)tipoEvaluacionView.showImage(variableUi.getPath());
         }else {
             if(tipoEvaluacionView!=null)tipoEvaluacionView.hideImage();
         }

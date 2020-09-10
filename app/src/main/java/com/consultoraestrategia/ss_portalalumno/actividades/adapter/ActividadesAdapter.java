@@ -101,18 +101,6 @@ public class ActividadesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged(); // Pinta otra ves la lista
     }
 
-
-    public void addActividades(Object item) {
-        this.itemObjectList.add(item);
-        notifyItemInserted(getItemCount() - 1);
-    }
-
-    public void clearActividades() {
-        this.itemObjectList.clear();
-        notifyDataSetChanged();
-    }
-
-
     public List<RecursosHolder> getListDownloadAdapter() {
         List<RecursosHolder> downloadAdapters = new ArrayList<>();
         try {
@@ -160,6 +148,14 @@ public class ActividadesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if (repositorioFileUi.equals(downloadAdapter.getRepositorioFileUi())) {
                 downloadAdapter.count(count);
             }
+        }
+    }
+
+    public void updateList(ActividadesUi actividadesUi) {
+        int postion =  itemObjectList.indexOf(actividadesUi);
+        if(postion!=-1){
+            itemObjectList.set(postion, actividadesUi);
+            notifyItemChanged(postion);
         }
     }
 }

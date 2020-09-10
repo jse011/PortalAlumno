@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.Login2Presenter;
 import com.google.android.material.textfield.TextInputEditText;
@@ -37,6 +39,9 @@ public class DniFragment extends Fragment implements DniView, TextView.OnEditorA
     ImageView imageView17;
     @BindView(R.id.btn_atras_dni)
     ImageView btnAtrasDni;
+    @BindView(R.id.imageView8)
+    ImageView imageView8;
+
     private Unbinder unbinder;
     private Login2Presenter presenter;
 
@@ -53,9 +58,24 @@ public class DniFragment extends Fragment implements DniView, TextView.OnEditorA
         super.onViewCreated(view, savedInstanceState);
         //   initAdapter();
         edittextDni.setOnEditorActionListener(this);
-        Glide.with(imageView17)
-                .load(R.drawable.docente_mentor)
-                .into(imageView17);
+
+        if(getResources().getString(R.string.app_name).equals("Educar Student")){
+
+            Glide.with(imageView17)
+                    .load(R.drawable.logo_educar)
+                    .into(imageView17);
+            imageView8.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(R.drawable.docente_mentor)
+                    .into(imageView8);
+
+
+        }else{
+            Glide.with(imageView17)
+                    .load(R.drawable.docente_mentor)
+                    .into(imageView17);
+            imageView8.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

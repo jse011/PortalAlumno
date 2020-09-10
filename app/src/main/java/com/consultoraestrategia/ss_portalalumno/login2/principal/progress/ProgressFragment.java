@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,9 @@ import butterknife.Unbinder;
 public class ProgressFragment extends Fragment implements ProgressView {
     @BindView(R.id.animation_view)
     LottieAnimationView animationView;
+    @BindView(R.id.txt_app)
+    TextView txtApp;
+
     private Unbinder unbinder;
     private Login2Presenter presenter;
 
@@ -29,6 +33,7 @@ public class ProgressFragment extends Fragment implements ProgressView {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login_progress, container, false);
         unbinder = ButterKnife.bind(this, view);
+        txtApp.setText(getResources().getString(R.string.app_name));
         return view;
     }
 

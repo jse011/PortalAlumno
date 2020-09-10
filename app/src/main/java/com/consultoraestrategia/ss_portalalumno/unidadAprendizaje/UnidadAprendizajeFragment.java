@@ -19,8 +19,10 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragment;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
-import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
-import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoUnidadView;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity2;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.SesionColumnCountProvider;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.UnidadesAdapter;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.data.repositorio.UnidadAprendizajeRepositorio;
@@ -35,7 +37,7 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeView, UnidadAprendizajePresenter, BaseFragmentListener> implements UnidadAprendizajeView, UnidadesAdapter.UnidadListener {
+public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeView, UnidadAprendizajePresenter, BaseFragmentListener> implements UnidadAprendizajeView, UnidadesAdapter.UnidadListener, TabCursoUnidadView {
     @BindView(R.id.progressBar6)
     ProgressBar progressBar6;
     @BindView(R.id.rv_Unidades)
@@ -53,7 +55,7 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     protected UnidadAprendizajePresenter getPresenter() {
         UnidadAprendizajeRepositorio repositorio = new UnidadAprendizajeRepositorioImpl();
         return new UnidadAprendizajePresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(),
-                new OfflineFirebase(getContext()),
+                new AndroidOnlineImpl(getContext()),
                 new GetUnidadAprendizajeList(repositorio),
                 new UpdateFireBaseUnidadAprendizaje(repositorio),
                 new SaveToogle(repositorio));
@@ -137,7 +139,17 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
 
     @Override
     public void showTabSesionAprendizaje(SesionAprendizajeUi sesionAprendizajeUi) {
-        startActivity(new Intent(getContext(), TabSesionesActivity.class));
+        startActivity(new Intent(getContext(), TabSesionesActivity2.class));
+    }
+
+    @Override
+    public void showMensajeListaVacia() {
+        mensaje.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideMensajeListaVacia() {
+        mensaje.setVisibility(View.GONE);
     }
 
     @Override
@@ -150,7 +162,8 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
         presenter.onClickSesionAprendizaje(sesionAprendizajeUi);
     }
 
-    public void notifyChangeFragment() {
-        presenter.notifyChangeFragment();
+    @Override
+    public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
+        presenter.notifyChangeFragment(finishUpdateUnidadFb);
     }
 }

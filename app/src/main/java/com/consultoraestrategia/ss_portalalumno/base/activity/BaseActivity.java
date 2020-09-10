@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.base.activity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -50,6 +51,7 @@ public abstract class BaseActivity<V extends BaseView<P>, P extends BasePresente
 
     private ProgressBar progressBar;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     public void bloqOrientation(){
         try {
             if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {

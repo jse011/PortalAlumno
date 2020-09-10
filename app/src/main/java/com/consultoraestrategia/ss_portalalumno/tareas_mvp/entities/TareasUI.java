@@ -9,6 +9,11 @@ import java.util.List;
 public class TareasUI  {
     public boolean calendarioVigente;
     public boolean calendarioEditar;
+    private boolean entregaAlumno;
+    private long fechaEntregaAlumno;
+    private boolean retrasoEntrega;
+    private String nota;
+    private int tipoNotaId;
 
     public boolean isCalendarioVigente() {
         return calendarioVigente;
@@ -24,6 +29,46 @@ public class TareasUI  {
 
     public void setCalendarioEditar(boolean calendarioEditar) {
         this.calendarioEditar = calendarioEditar;
+    }
+
+    public void setEntregaAlumno(boolean entregaAlumno) {
+        this.entregaAlumno = entregaAlumno;
+    }
+
+    public boolean getEntregaAlumno() {
+        return entregaAlumno;
+    }
+
+    public void setFechaEntregaAlumno(long fechaEntregaAlumno) {
+        this.fechaEntregaAlumno = fechaEntregaAlumno;
+    }
+
+    public long getFechaEntregaAlumno() {
+        return fechaEntregaAlumno;
+    }
+
+    public boolean isRetrasoEntrega() {
+        return retrasoEntrega;
+    }
+
+    public void setRetrasoEntrega(boolean retrasoEntrega) {
+        this.retrasoEntrega = retrasoEntrega;
+    }
+
+    public void setNota(String nota) {
+        this.nota = nota;
+    }
+
+    public String getNota() {
+        return nota;
+    }
+
+    public void setTipoNotaId(int tipoNotaId) {
+        this.tipoNotaId = tipoNotaId;
+    }
+
+    public int getTipoNotaId() {
+        return tipoNotaId;
     }
 
     //IU

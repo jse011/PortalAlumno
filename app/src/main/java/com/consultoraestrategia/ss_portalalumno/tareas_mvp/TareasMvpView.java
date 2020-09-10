@@ -66,4 +66,5 @@ public interface TareasMvpView extends BaseView<TareasMvpPresenter> {
 
     void showTareaDescripcionActivity();
 
+    void updateTarea(TareasUI tareasUI);
 }

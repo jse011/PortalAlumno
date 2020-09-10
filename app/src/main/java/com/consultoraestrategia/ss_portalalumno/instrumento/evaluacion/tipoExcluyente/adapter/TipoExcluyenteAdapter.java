@@ -87,7 +87,7 @@ public class TipoExcluyenteAdapter extends RecyclerView.Adapter<TipoExcluyenteAd
             txtRespuesta.setText(valorUi.getDescripcion());
             if(!TextUtils.isEmpty(valorUi.getPath())){
                 Glide.with(imgValor)
-                        .load("http://icrmedu.consultoraestrategia.com/prueba/Images/Img_preguntasInstrumento/"+valorUi.getPath())
+                        .load(valorUi.getPath())
                         .apply(new RequestOptions()
                                 .centerInside()
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)

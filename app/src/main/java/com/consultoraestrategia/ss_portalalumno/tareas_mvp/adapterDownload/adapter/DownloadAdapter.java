@@ -30,7 +30,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new DownloadHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_download_repositorio, parent, false));
+        return new DownloadHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_download_tarea, parent, false));
     }
 
     @Override

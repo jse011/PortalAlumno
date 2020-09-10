@@ -10,5 +10,5 @@ public interface UnidadAprendizajePresenter extends BaseFragmentPresenter<Unidad
 
     void onClickSesionAprendizaje(SesionAprendizajeUi sesionAprendizajeUi);
 
-    void notifyChangeFragment();
+    void notifyChangeFragment(boolean finishUpdateUnidadFb);
 }

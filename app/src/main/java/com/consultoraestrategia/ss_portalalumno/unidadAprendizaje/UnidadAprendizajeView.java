@@ -15,4 +15,8 @@ public interface UnidadAprendizajeView extends BaseView<UnidadAprendizajePresent
     void updateItem(UnidadAprendizajeUi unidadAprendizajeUi);
 
     void showTabSesionAprendizaje(SesionAprendizajeUi sesionAprendizajeUi);
+
+    void showMensajeListaVacia();
+
+    void hideMensajeListaVacia();
 }

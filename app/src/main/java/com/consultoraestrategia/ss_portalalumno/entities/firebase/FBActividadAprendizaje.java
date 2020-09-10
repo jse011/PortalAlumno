@@ -13,6 +13,7 @@ public class FBActividadAprendizaje {
     private int SesionAprendizajeId;
     private String TipoActividad;
     private int TipoActividadId;
+    private int InstrumentoEvalId;
     private HashMap<String, FBRecursos> RecursoActividad;
     private HashMap<String, FBActividadAprendizaje>  SubActividad;
 
@@ -94,5 +95,13 @@ public class FBActividadAprendizaje {
 
     public void setSubActividad(HashMap<String, FBActividadAprendizaje> subActividad) {
         SubActividad = subActividad;
+    }
+
+    public int getInstrumentoEvalId() {
+        return InstrumentoEvalId;
+    }
+
+    public void setInstrumentoEvalId(int instrumentoEvalId) {
+        InstrumentoEvalId = instrumentoEvalId;
     }
 }

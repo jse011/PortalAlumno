@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.actividades.adapter.holder;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -52,11 +53,18 @@ public class SubRecursosHolder extends RecyclerView.ViewHolder implements View.O
         this.subRecursosUi = subRecursosUi;
         int positionActual = positionActividad + 1;
         textViewConteoSubRecurso.setText(String.valueOf(positionActual + "." + subRecursosUi.getConteoSubRecurso()));
+        try {
+            textViewConteoSubRecurso.setTextColor(Color.parseColor(subRecursosUi.getColor()));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         textViewNombreSubRecurso.setText(subRecursosUi.getNombreSubRecurso());
+
 
         Log.d(TAG, "subActiidades: " + subRecursosUi.getNombreSubRecurso());
         recyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(false);
         List<Object> objects = new ArrayList<>();
        if (subRecursosUi.getRecursosUiList()!=null)objects.addAll(subRecursosUi.getRecursosUiList());
 

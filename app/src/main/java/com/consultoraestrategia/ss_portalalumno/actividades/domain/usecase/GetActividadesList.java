@@ -12,33 +12,32 @@ import java.util.List;
  * Created by kike on 08/02/2018.
  */
 
-public class GetActividadesList extends UseCase<GetActividadesList.RequestValues, GetActividadesList.ResponseValue> {
+public class GetActividadesList  {
 
     private ActividadesRepository repository;
-
+    private ResponseValue responseValue = null;
     public GetActividadesList(ActividadesRepository repository) {
         this.repository = repository;
     }
 
-    @Override
-    protected void executeUseCase(RequestValues requestValues) {
-        repository.getActividadesList(requestValues.getCargaCursoId(), requestValues.getSesionAprendizajeId(), requestValues.getBackgroundColor(), new ActividadesDataSource.CallbackActividades() {
+    public ResponseValue execute(RequestValues requestValues) {
+        repository.getActividadesList(requestValues.getCargaCursoId(), requestValues.getSesionAprendizajeId(), new ActividadesDataSource.CallbackActividades() {
             @Override
             public void onListeActividades(List<ActividadesUi> actividadesUiList, List<RecursosUi> recursosUiList, int status) {
-                getUseCaseCallback().onSuccess(new ResponseValue(actividadesUiList, recursosUiList));
+                responseValue = new ResponseValue(actividadesUiList, recursosUiList);
             }
         });
+
+        return responseValue;
     }
 
-    public static class RequestValues implements UseCase.RequestValues {
+    public static class RequestValues {
         private int cargaCursoId;
         private int sesionAprendizajeId;
-        private String backgroundColor;
 
-        public RequestValues(int cargaCursoId, int sesionAprendizajeId, String backgroundColor) {
+        public RequestValues(int cargaCursoId, int sesionAprendizajeId) {
             this.cargaCursoId = cargaCursoId;
             this.sesionAprendizajeId = sesionAprendizajeId;
-            this.backgroundColor = backgroundColor;
         }
 
         public int getCargaCursoId() {
@@ -48,13 +47,9 @@ public class GetActividadesList extends UseCase<GetActividadesList.RequestValues
         public int getSesionAprendizajeId() {
             return sesionAprendizajeId;
         }
-
-        public String getBackgroundColor() {
-            return backgroundColor;
-        }
     }
 
-    public static class ResponseValue implements UseCase.ResponseValue {
+    public static class ResponseValue {
         private List<ActividadesUi> actividadesUiList;
         private List<RecursosUi> recursosUiList;
 

@@ -53,7 +53,13 @@ public class UtilsPortalAlumno {
     }
 
     public static String changeTime12Hour(int hr , int min){
-        return  hr%12 + ":" + min + " " + ((hr>=12) ? "PM" : "AM");
+        String format_min = "";
+        if(min<10){
+            format_min = "0"+min;
+        }else {
+            format_min =  String.valueOf(min);
+        }
+        return  hr%12 + ":" + format_min + " " + ((hr>=12) ? "PM" : "AM");
     }
 
     public static String changeTime12Hour(String _24HourTime){
@@ -69,6 +75,8 @@ public class UtilsPortalAlumno {
         }
         return  hora;
     }
+
+
 
     public static String f_fecha_letras(long timesTamp) {
 
@@ -86,6 +94,21 @@ public class UtilsPortalAlumno {
         mstr_fecha = vobj_days[dayOfWeek - 1] + " " + dayOfMonth + " de " + vobj_Meses[month];
 
         return mstr_fecha;
+    }
+
+    public static String f_fecha_Pregunta(long timesTamp) {
+        Calendar calendarActual = Calendar.getInstance();
+        int anhoActual = calendarActual.get(Calendar.YEAR);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timesTamp);
+        int anhio = calendar.get(Calendar.YEAR);
+        //Jue 02 Jul.10:50 AM
+        if(anhio==anhoActual){
+            return f_fecha_letras(timesTamp) + " " + changeTime12Hour(calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE));
+        }else {
+            return  getFechaDiaMesAnho(timesTamp) + " " + changeTime12Hour(calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE));
+        }
     }
 
     public static String getFechaDiaMesAnho(long fecha) {
@@ -155,5 +178,9 @@ public class UtilsPortalAlumno {
             limpio = Normalizer.normalize(limpio, Normalizer.Form.NFC);
         }
         return limpio;
+    }
+
+    public static Double formatearDecimales(Double numero, Integer numeroDecimales) {
+        return Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
     }
 }

@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.global;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.util.Log;
 import com.consultoraestrategia.ss_portalalumno.global.applife.ActivityLifecycleHandler;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
+import com.consultoraestrategia.ss_portalalumno.global.entities.GbPreview;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
@@ -29,7 +31,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
         super.onCreate();
         FlowManager.init(new FlowConfig.Builder(this).build());
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler(this));
-        variblesGlobales = variblesGlobales.getData(getApplicationContext());
+        variblesGlobales = new VariblesGlobales().getData(getApplicationContext());
 
     }
 
@@ -50,6 +52,11 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
     public void onApplicationResumed() {
     }
 
+    @Override
+    public void onActivityCreated(Activity activity, Bundle bundle) {
+        if(variblesGlobales==null)variblesGlobales = new VariblesGlobales().getData(getApplicationContext());
+    }
+
 
     //variables globales
     public static class VariblesGlobales{
@@ -57,6 +64,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
         GbCalendarioPerioUi gbCalendarioPerioUi;
         GbSesionAprendizajeUi gbSesionAprendizajeUi;
         GbTareaUi gbTareaUi;
+        GbPreview gbPreview;
         private int anioAcademicoId;
         private int programEducativoId;
         private int instrumentoId;
@@ -117,6 +125,14 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
             return instrumentoId;
         }
 
+        public GbPreview getGbPreview() {
+            return gbPreview;
+        }
+
+        public void setGbPreview(GbPreview gbPreview) {
+            this.gbPreview = gbPreview;
+        }
+
         public void saveData(Context context) {
             SharedPreferences sharedPreferences = context.getSharedPreferences("shared preferences VariblesGlobales", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -137,9 +153,6 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
             return variblesGlobales;
 
         }
-
-
-
     }
 
 

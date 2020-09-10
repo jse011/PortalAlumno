@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowActionBarOverlay">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -73,5 +74,16 @@
     <style name="ToolbarWhite" parent="AppTheme">
         <item name="android:textColorSecondary">#6B6A6A</item>
         <item name="android:actionMenuTextColor">#6B6A6A</item>
+    </style>
+
+    <style name="ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:displayOptions">homeAsUp</item>
+    </style>
+
+    <style name="DialogKeyBoardStyle" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="colorAccent">@color/md_blue_grey_900</item>
     </style>
 </resources>

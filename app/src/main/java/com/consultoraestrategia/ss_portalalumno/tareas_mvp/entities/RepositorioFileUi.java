@@ -16,6 +16,15 @@ public class RepositorioFileUi implements Serializable {
     private boolean cancel;
     private long fechaCreacionRecuros;
     private long fechaAccionArchivo;
+    private String driveId;
+
+    public String getDriveId() {
+        return driveId;
+    }
+
+    public void setDriveId(String driveId) {
+        this.driveId = driveId;
+    }
 
     public String getRecursoId() {
         return recursoId;

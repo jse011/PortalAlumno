@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.gadgets.justify;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
@@ -10,6 +11,8 @@ import androidx.appcompat.widget.AppCompatTextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
 /* ***********************************************************************
 Copyright 2014 CodesGood
@@ -61,43 +64,58 @@ public class JustifiedTextView extends AppCompatTextView {
     //Default Constructors.
     public JustifiedTextView(Context context) {
         super(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+        }
     }
 
     public JustifiedTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+        }
     }
 
     public JustifiedTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         //This class won't repeat the process of justify text if it's already done.
-        if (!justifiedText.equals(getText().toString())) {
+        //super.onDraw(canvas);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            super.onDraw(canvas);
+        }else {
+            if (!justifiedText.equals(getText().toString())) {
 
-            ViewGroup.LayoutParams params = getLayoutParams();
-            String text = getText().toString();
+                ViewGroup.LayoutParams params = getLayoutParams();
+                String text = getText().toString();
 
-            viewWidth = getMeasuredWidth() - (getPaddingLeft() + getPaddingRight());
+                viewWidth = getMeasuredWidth() - (getPaddingLeft() + getPaddingRight());
 
-            //This class won't justify the text if the TextView has wrap_content as width
-            //and won't justify the text if the view width is 0
-            //AND! won't justify the text if it's empty.
-            if (params.width != ViewGroup.LayoutParams.WRAP_CONTENT && viewWidth > 0 && !text.isEmpty()) {
-                justifiedText = getJustifiedText(text);
+                //This class won't justify the text if the TextView has wrap_content as width
+                //and won't justify the text if the view width is 0
+                //AND! won't justify the text if it's empty.
+                if (params.width != ViewGroup.LayoutParams.WRAP_CONTENT && viewWidth > 0 && !text.isEmpty()) {
+                    justifiedText = getJustifiedText(text);
 
-                if (!justifiedText.isEmpty()) {
-                    setText(justifiedText);
-                    sentences.clear();
-                    currentSentence.clear();
+                    if (!justifiedText.isEmpty()) {
+                        setText(justifiedText);
+                        sentences.clear();
+                        currentSentence.clear();
+                    }
+                } else {
+                    super.onDraw(canvas);
                 }
             } else {
                 super.onDraw(canvas);
             }
-        } else {
-            super.onDraw(canvas);
         }
+
     }
 
     /**

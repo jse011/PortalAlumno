@@ -21,8 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.gadgets.autoColumnGrid.AutoColumnGridLayoutManager;
-import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSesion;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSilabo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
@@ -123,7 +124,7 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
 
         TareasMvpRepository tareasMvpRepository = TareasMvpRepository.getInstace(
                 new TareasLocalDataSource(),
-                new RemoteMvpDataSource(getContext()));
+                new RemoteMvpDataSource(ApiRetrofit.getInstance()));
         presenter = new TareasMvpPresenterImpl(
                 new UseCaseHandler(
                         new UseCaseThreadPoolScheduler()),
@@ -132,13 +133,13 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
                 new UpdateSuccesDowloadArchivo(tareasMvpRepository),
                 new MoverArchivosAlaCarpetaTarea(TareasMvpRepository.getInstace(
                         new TareasLocalDataSource(),
-                        new RemoteMvpDataSource(getContext()))
+                        new RemoteMvpDataSource(ApiRetrofit.getInstance()))
 
                 ),
                 
                 new UpdateFireBaseTareaSilabo(tareasMvpRepository),
                 new UpdateFireBaseTareaSesion(tareasMvpRepository),
-                new OfflineFirebase(getContext()));
+                new AndroidOnlineImpl(getContext()));
 
         setPresenter(presenter);
         Log.d(TAG, "onCreate");
@@ -300,6 +301,11 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
     @Override
     public void showTareaDescripcionActivity() {
         startActivity(new Intent(getContext(), TareaDescripcionActivity.class));
+    }
+
+    @Override
+    public void updateTarea(TareasUI tareasUI) {
+
     }
 
 

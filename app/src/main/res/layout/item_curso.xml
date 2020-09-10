@@ -55,8 +55,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginTop="10dp"
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
@@ -64,7 +63,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Razonamiento Matematico" />
+                    tools:text="Razonamiento Matematico Razonamiento Matematico" />
 
                 <TextView
                     android:id="@+id/txtPeriodo"
@@ -149,10 +148,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    
+
                     android:layout_alignParentBottom="true"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="10dp"
                     android:gravity="bottom"
                     android:text="nombreDocente"
                     android:textColor="#fff"

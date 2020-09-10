@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.actividades.data.source;
 
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.ActividadesUi;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.DownloadCancelUi;
+import com.consultoraestrategia.ss_portalalumno.actividades.entidades.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RecursosUi;
 
 import java.util.List;
@@ -37,9 +38,11 @@ public interface ActividadesDataSource {
         void onPreLoad(DownloadCancelUi isCancel);
     }
 
-    void getActividadesList(int cargaCurso, int sesionAprendizajeId, String backgroundColor, CallbackActividades callbackActividades);
+    void getActividadesList(int cargaCurso, int sesionAprendizajeId, CallbackActividades callbackActividades);
 
     void updateActividad(ActividadesUi actividadesUi, Callback<ActividadesUi> callback);
 
     void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList, CallbackSimple callbackSimple);
+
+    List<InstrumentoUi> getInstrumentos(int sesionAprendizajeId);
 }

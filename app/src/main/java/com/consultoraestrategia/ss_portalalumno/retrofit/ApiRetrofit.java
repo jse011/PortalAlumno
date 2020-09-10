@@ -9,9 +9,13 @@ import com.consultoraestrategia.ss_portalalumno.entities.BEListaPadre;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.Persona;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeUser;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroLogin;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroUpdateCalenPeriodo;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.UsuarioAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
 import com.consultoraestrategia.ss_portalalumno.retrofit.service.Service;
@@ -139,6 +143,35 @@ public class ApiRetrofit {
         return service.flst_getDatosPortalAlumno(apiRequestBody);
     }
 
+    public Call<RestApiResponse<BEDrive>> f_SynckTareaAlumDrive(String tareaId, int alumnoId, String nombre, String url) {
+        ParametroIdDrive parametroIdDrive = new ParametroIdDrive();
+        parametroIdDrive.setPersonaId(alumnoId);//
+        parametroIdDrive.setTareaEventoId(tareaId);//
+        parametroIdDrive.setNombre(nombre);
+        parametroIdDrive.setUrl(url);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroIdDrive> apiRequestBody = new ApiRequestBody<>("f_SynckTareaAlumDrive",parametroIdDrive);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.f_SynckTareaAlumDrive(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<BEDrive>> f_SynckEviSesDrive(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId, String nombre, String url) {
+        ParametroIdDrive parametroIdDrive = new ParametroIdDrive();
+        parametroIdDrive.setPersonaId(alumnoId);//
+        parametroIdDrive.setSilaboEventoId(silaboEventoId);//
+        parametroIdDrive.setUnidadAprendizajeId(unidadAprendizajeId);
+        parametroIdDrive.setSesionAprendizajeId(sesionAprendizajeId);
+        parametroIdDrive.setNombre(nombre);
+        parametroIdDrive.setUrl(url);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroIdDrive> apiRequestBody = new ApiRequestBody<>("f_SynckEviSesDrive",parametroIdDrive);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.f_SynckEviSesDrive(apiRequestBody);
+    }
 
     public class ApiRequestBody<T extends Parameters>{
         @SerializedName("interface")
@@ -258,6 +291,20 @@ public class ApiRetrofit {
         return request.execute().body();
     }
 
+    public Call<ResponseBody> downloadFileByUrl2(String url) {
+        return service.downloadFileByUrl(url);
+    }
+
+    public Call<RestApiResponse<BEDatosAnioAcademico>> flst_getDatosCalendarioPeriodo(int anioAcademicoId, int empledadoId) {
+        ParametroUpdateCalenPeriodo parametroUpdateCalenPeriodo = new ParametroUpdateCalenPeriodo();
+        parametroUpdateCalenPeriodo.setEmpleadoId(empledadoId);
+        parametroUpdateCalenPeriodo.setAnioAcademicoId(anioAcademicoId);
+        ApiRequestBody<ParametroUpdateCalenPeriodo> apiRequestBody = new ApiRequestBody<>("flst_getDatosCalendarioPeriodo",parametroUpdateCalenPeriodo);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.flst_getDatosCalendarioPeriodo(apiRequestBody);
+    }
 }
 
 

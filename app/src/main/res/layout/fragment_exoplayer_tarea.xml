@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_gravity="center"
+    android:visibility="visible"
+    android:background="@color/md_black_1000"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:animateLayoutChanges="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.github.vkay94.dtpv.DoubleTapPlayerView
+            android:id="@+id/previewPlayerTareaView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:background="@android:color/black"
+            app:controller_layout_id="@layout/exo_playback_control_view_yt"
+            app:dtpv_controller="@id/ytOverlayTarea"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+            android:id="@+id/ytOverlayTarea"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#77000000"
+            android:visibility="invisible"
+            app:yt_playerView="@id/previewPlayerTareaView"
+            tools:visibility="visible" />
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

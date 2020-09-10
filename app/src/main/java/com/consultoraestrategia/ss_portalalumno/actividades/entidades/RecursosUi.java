@@ -17,6 +17,8 @@ public class RecursosUi implements Serializable {
     private boolean cancel;
     private long fechaCreacionRecuros;
     private long fechaAccionArchivo;
+    private int actividadId;
+    private String driveId;
 
     public String getRecursoId() {
         return recursoId;
@@ -122,5 +124,21 @@ public class RecursosUi implements Serializable {
 
     public void setFechaAccionArchivo(long fechaAccionArchivo) {
         this.fechaAccionArchivo = fechaAccionArchivo;
+    }
+
+    public void setActividadId(int actividadId) {
+        this.actividadId = actividadId;
+    }
+
+    public int getActividadId() {
+        return actividadId;
+    }
+
+    public void setDriveId(String driveId) {
+        this.driveId = driveId;
+    }
+
+    public String getDriveId() {
+        return driveId;
     }
 }

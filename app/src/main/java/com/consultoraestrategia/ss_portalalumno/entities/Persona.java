@@ -58,27 +58,6 @@ public class Persona extends BaseModel implements Serializable {
     public Persona() {
     }
 
-    public Persona(int personaId) {
-        this.personaId = personaId;
-    }
-
-    public Persona(int personaId, String nombres, String apellidoPaterno, String apellidoMaterno, String celular, String telefono, String foto, String fechaNac, String genero, String estadoCivil, String numDoc, String ocupacion, int estadoId, String correo) {
-        this.personaId = personaId;
-        this.nombres = nombres;
-        this.apellidoPaterno = apellidoPaterno;
-        this.apellidoMaterno = apellidoMaterno;
-        this.celular = celular;
-        this.telefono = telefono;
-        this.foto = foto;
-        this.fechaNac = fechaNac;
-        this.genero = genero;
-        this.estadoCivil = estadoCivil;
-        this.numDoc = numDoc;
-        this.ocupacion = ocupacion;
-        this.estadoId = estadoId;
-        this.correo = correo;
-    }
-
     public String getFoto() {
         return foto;
     }

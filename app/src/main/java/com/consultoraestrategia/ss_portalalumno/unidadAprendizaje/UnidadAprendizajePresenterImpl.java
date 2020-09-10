@@ -6,11 +6,11 @@ import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentPresenterImpl;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
-import com.consultoraestrategia.ss_portalalumno.global.offline.Offline;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.GetUnidadAprendizajeList;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.SaveToogle;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase.UpdateFireBaseUnidadAprendizaje;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<UnidadAprendizajeView> implements UnidadAprendizajePresenter {
-    private Offline offline;
+    private Online online;
     private GetUnidadAprendizajeList getUnidadAprendizajeList;
     private UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje;
     private SaveToogle saveToogle;
@@ -34,10 +34,10 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     private String color3;
     private List<UnidadAprendizajeUi> unidadAprendizajeUiList = new ArrayList<>();
 
-    public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, Offline offline, GetUnidadAprendizajeList getUnidadAprendizajeList, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje,
+    public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, Online online, GetUnidadAprendizajeList getUnidadAprendizajeList, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje,
                                           SaveToogle saveToogle) {
         super(handler, res);
-        this.offline = offline;
+        this.online = online;
         this.getUnidadAprendizajeList = getUnidadAprendizajeList;
         this.updateFireBaseUnidadAprendizaje = updateFireBaseUnidadAprendizaje;
         this.saveToogle = saveToogle;
@@ -51,7 +51,9 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     @Override
     public void onViewCreated() {
         super.onViewCreated();
-        getListUnidades();
+        online.online(success -> {
+            if(!success) getListUnidades();
+        });
     }
 
     private void getListUnidades(){
@@ -128,21 +130,37 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     }
 
     @Override
-    public void notifyChangeFragment() {
+    public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
         setupData();
-        getListUnidades();
-        if(offline.isConnect()){
-            updateFireBaseUnidadAprendizaje.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId, unidadAprendizajeUiList,new UpdateFireBaseUnidadAprendizaje.CallBack() {
-                @Override
-                public void onSucces() {
-                    getListUnidades();
-                }
+        showProgress();
+        online.online(success -> {
+            if(success&&finishUpdateUnidadFb){
+                updateFireBaseUnidadAprendizaje.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId, unidadAprendizajeUiList,new UpdateFireBaseUnidadAprendizaje.CallBack() {
+                    @Override
+                    public void onSucces() {
+                        hideProgress();
+                        getListUnidades();
+                        if(unidadAprendizajeUiList.size()==0){
+                            if (view!=null)view.showMensajeListaVacia();
+                        }else {
+                            if (view!=null)view.hideMensajeListaVacia();
+                        }
+                    }
 
-                @Override
-                public void onError(String error) {
-
+                    @Override
+                    public void onError(String error) {
+                        hideProgress();
+                    }
+                });
+            }else {
+                hideProgress();
+                getListUnidades();
+                if(unidadAprendizajeUiList.size()==0){
+                    if (view!=null)view.showMensajeListaVacia();
+                }else {
+                    if (view!=null)view.hideMensajeListaVacia();
                 }
-            });
-        }
+            }
+        });
     }
 }

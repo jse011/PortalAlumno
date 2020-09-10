@@ -1,8 +1,10 @@
 package com.consultoraestrategia.ss_portalalumno.instrumento.lista.adapter;
 
 import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +13,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.consultoraestrategia.ss_portalalumno.R;
+import com.consultoraestrategia.ss_portalalumno.gadgets.staticProgressBar.CustomProgress;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
 
@@ -62,20 +66,27 @@ public class InstrumentoListAdapter extends RecyclerView.Adapter<InstrumentoList
         TextView txtNombre;
         @BindView(R.id.txt_preguntas)
         TextView txtPreguntas;
-        @BindView(R.id.progressBar5)
-        ProgressBar progressBar5;
+        @BindView(R.id.customProgress)
+        CustomProgress progressBar5;
         @BindView(R.id.anim_alert)
         LottieAnimationView animAlert;
         @BindView(R.id.img_porcentaje)
         ImageView imgPorcentaje;
+        @BindView(R.id.cardView)
+        CardView cardView;
+        @BindView(R.id.icono)
+        ImageView icono;
+        @BindView(R.id.content)
+        CardView content;
+        private float porcentajeSelected = 0;
 
         private Callback callback;
         private InstrumentoUi instrumentoUi;
 
-        public ViewHolder(@NonNull View itemView) {
+        public  ViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
+            content.setOnClickListener(this);
         }
 
         public void bind(InstrumentoUi instrumentoUi, Callback callback) {
@@ -84,13 +95,30 @@ public class InstrumentoListAdapter extends RecyclerView.Adapter<InstrumentoList
             txtNombre.setText(instrumentoUi.getNombre());
             String cantidad = instrumentoUi.getCantidadPregunta() == 1 ? "1 pregunta" : instrumentoUi.getCantidadPregunta() + " preguntas";
             txtPreguntas.setText(cantidad);
+            float porcentaje =  0;
+            if(instrumentoUi.getCantidadPregunta()>0){
+                porcentaje = (float)instrumentoUi.getCantidadPreguntaResueltas()/(float)instrumentoUi.getCantidadPregunta();
+            }
+            progressBar5.setMaximumPercentage(porcentaje);
+            progressBar5.setDisabledMovementProgress(true);
+            if(porcentajeSelected!=porcentaje){
+                porcentajeSelected = porcentaje;
+                progressBar5.updateView();
+            }
+            progressBar5.setProgressBackgroundColor(Color.WHITE);
+            Log.d("InstrumentoList","Progress: " + porcentaje);
+            Drawable school = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_school);
 
-            Drawable progressDrawable = progressBar5.getProgressDrawable().mutate();
-            progressDrawable.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color.color_sesion), PorterDuff.Mode.SRC_IN);
-            progressBar5.setProgressDrawable(progressDrawable);
+            try {
+                progressBar5.setProgressColor(Color.parseColor(instrumentoUi.getColor()));
+                txtNombre.setTextColor(Color.parseColor(instrumentoUi.getColor2()));
+                school.mutate().setColorFilter(Color.parseColor(instrumentoUi.getColor()), PorterDuff.Mode.SRC_ATOP);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
-            progressBar5.setMax(instrumentoUi.getCantidadPregunta());
-            progressBar5.setProgress(instrumentoUi.getCantidadPreguntaResueltas());
+            icono.setImageDrawable(school);
+
             animAlert.setAnimation("error-icon.json");
             animAlert.setRepeatCount(ValueAnimator.INFINITE);
             animAlert.playAnimation();
@@ -99,17 +127,17 @@ public class InstrumentoListAdapter extends RecyclerView.Adapter<InstrumentoList
                 imgPorcentaje.setVisibility(View.GONE);
             }else {
                 imgPorcentaje.setVisibility(View.VISIBLE);
-                if(instrumentoUi.getPorcentaje()<25){
+                if(instrumentoUi.getPorcentaje()<=25){
                     Glide.with(imgPorcentaje)
                             .load(R.drawable.ic_triste)
                             .apply(UtilsGlide.getGlideRequestOptionsSimple())
                             .into(imgPorcentaje);
-                }else if(instrumentoUi.getPorcentaje()<50){
+                }else if(instrumentoUi.getPorcentaje()<=50){
                     Glide.with(imgPorcentaje)
                             .load(R.drawable.ic_neutral)
                             .apply(UtilsGlide.getGlideRequestOptionsSimple())
                             .into(imgPorcentaje);
-                }else if(instrumentoUi.getPorcentaje()<75){
+                }else if(instrumentoUi.getPorcentaje()<=75){
                     Glide.with(imgPorcentaje)
                             .load(R.drawable.ic_contento)
                             .apply(UtilsGlide.getGlideRequestOptionsSimple())

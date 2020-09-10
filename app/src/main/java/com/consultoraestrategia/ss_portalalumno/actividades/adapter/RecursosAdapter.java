@@ -38,7 +38,7 @@ public class RecursosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
         switch (viewType) {
             case RECURSO_ACTIVIDAD:
-                View view1 = layoutInflater.inflate(R.layout.item_download_repositorio, viewGroup, false);
+                View view1 = layoutInflater.inflate(R.layout.item_download_repositorio_actividad, viewGroup, false);
                 viewHolder = new RecursosHolder(view1);
                 break;
             case RECURSO_HIJO:

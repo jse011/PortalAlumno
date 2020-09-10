@@ -5,7 +5,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consultoraestrategia.ss_portalalumno.R;
@@ -23,9 +27,13 @@ import org.zakariya.stickyheaders.SectioningAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnidadesAdapter  extends SectioningAdapter {
-    private static final String TAG= UnidadesAdapter.class.getSimpleName();
+import butterknife.BindView;
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class UnidadesAdapter extends SectioningAdapter {
+    private static final String TAG = UnidadesAdapter.class.getSimpleName();
     private final RecyclerView recyclerView;
+
     private List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList;
     private RecyclerView rvSesionesTareas;
     private UnidadAprendizajeListener listener;
@@ -72,25 +80,26 @@ public class UnidadesAdapter  extends SectioningAdapter {
     RecursoRemoveListener recursoRemoveListener;
 
     @Override
-    public void onBindItemViewHolder(SectioningAdapter.ItemViewHolder viewHolder, int sectionIndex, int itemIndex, int itemType) {
-        Log.d(TAG,"onBindItemViewHolder"+sectionIndex+itemIndex);
+    public void onBindItemViewHolder(ItemViewHolder viewHolder, int sectionIndex, int itemIndex, int itemType) {
+        Log.d(TAG, "onBindItemViewHolder" + sectionIndex + itemIndex);
         HeaderTareasAprendizajeUI headerTareasAprendizajeUI = headerTareasAprendizajeUIList.get(sectionIndex);
         TareasUI tareasUI = headerTareasAprendizajeUI.getTareasUIList().get(itemIndex);
         int total = headerTareasAprendizajeUI.getTareasUIList().size();
-        ((ViewHolderTareas) viewHolder).bind(tareasUI, tareasUIListener, total - itemIndex, headerTareasAprendizajeUI, parametroDisenioUi, false);
+        ((ViewHolderTarea2) viewHolder).bind(tareasUI, tareasUIListener, total - itemIndex, headerTareasAprendizajeUI, parametroDisenioUi, false);
     }
 
     @Override
     public ItemViewHolder onCreateItemViewHolder(ViewGroup parent, int itemUserType) {
         ItemViewHolder holder;
-        View viewTareas = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tareas_unidades, parent, false);
-        holder = new ViewHolderTareas(viewTareas);
+        //View viewTareas = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tareas_unidades, parent, false);
+        View viewTareas = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tarea, parent, false);
+        holder = new ViewHolderTarea2(viewTareas);
         return holder;
     }
 
     @Override
-    public void onBindHeaderViewHolder(SectioningAdapter.HeaderViewHolder viewHolder, int sectionIndex, int headerType) {
-        Log.d(TAG, "onBindHeaderViewHolder"+headerTareasAprendizajeUIList.size());
+    public void onBindHeaderViewHolder(HeaderViewHolder viewHolder, int sectionIndex, int headerType) {
+        Log.d(TAG, "onBindHeaderViewHolder" + headerTareasAprendizajeUIList.size());
         HeaderTareasAprendizajeUI headerTareasAprendizajeUI = headerTareasAprendizajeUIList.get(sectionIndex);
         ViewHolderUnidades hvh = (ViewHolderUnidades) viewHolder;
         hvh.bind(headerTareasAprendizajeUI, tareasUIListener, listener, 0, mIdCurso, parametroDisenioUi, true);
@@ -126,47 +135,46 @@ public class UnidadesAdapter  extends SectioningAdapter {
         List<DownloadAdapter> downloadAdapters = new ArrayList<>();
         try {
 
-            RecursosUI recursosUI = (RecursosUI)repositorioFileUi;
+            RecursosUI recursosUI = (RecursosUI) repositorioFileUi;
             for (int childCount = recyclerView.getChildCount(), i = 0; i < childCount; ++i) {
                 RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
-                if(holder instanceof  ViewHolderTareas){
+                if (holder instanceof ViewHolderTareas) {
                     ViewHolderTareas viewHolderTareas = (ViewHolderTareas) holder;
                     List<RecursosUI> repositorioFileUiList = viewHolderTareas.getRecursosUIList();
-                   int posicion = repositorioFileUiList.indexOf(recursosUI);
-                   if(posicion!=-1){
-                       DownloadAdapter downloadAdapter = viewHolderTareas.getRecursosTareaAdapter();
-                       downloadAdapters.add(downloadAdapter);
-                       break;
-                   }
+                    int posicion = repositorioFileUiList.indexOf(recursosUI);
+                    if (posicion != -1) {
+                        DownloadAdapter downloadAdapter = viewHolderTareas.getRecursosTareaAdapter();
+                        downloadAdapters.add(downloadAdapter);
+                        break;
+                    }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return downloadAdapters;
     }
 
-    public void update(RepositorioFileUi repositorioFileUi){
-        for (DownloadAdapter downloadAdapter : getListDownloadAdapter(repositorioFileUi)){
+    public void update(RepositorioFileUi repositorioFileUi) {
+        for (DownloadAdapter downloadAdapter : getListDownloadAdapter(repositorioFileUi)) {
             downloadAdapter.update(repositorioFileUi);
         }
     }
 
     public void updateProgress(RepositorioFileUi repositorioFileUi, int count) {
-        for (DownloadAdapter downloadAdapter : getListDownloadAdapter(repositorioFileUi)){
+        for (DownloadAdapter downloadAdapter : getListDownloadAdapter(repositorioFileUi)) {
             downloadAdapter.updateProgress(repositorioFileUi, count);
         }
     }
 
 
     public void setTareasUIList(List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList, ParametroDisenioUi parametroDisenioUi) {
-        Log.d(TAG, "setTareasUIList"+headerTareasAprendizajeUIList.size());
+        Log.d(TAG, "setTareasUIList" + headerTareasAprendizajeUIList.size());
         this.headerTareasAprendizajeUIList.clear();
         this.headerTareasAprendizajeUIList.addAll(headerTareasAprendizajeUIList);
         this.parametroDisenioUi = parametroDisenioUi;
         notifyAllSectionsDataSetChanged();
     }
-
 
 
     public void setRecyclerView(RecyclerView recyclerView) {

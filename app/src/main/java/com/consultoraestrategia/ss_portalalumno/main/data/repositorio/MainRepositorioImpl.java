@@ -1,11 +1,18 @@
 package com.consultoraestrategia.ss_portalalumno.main.data.repositorio;
 
+import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.consultoraestrategia.ss_portalalumno.entities.AnioAcademicoAlumno;
 import com.consultoraestrategia.ss_portalalumno.entities.AnioAcademicoAlumno_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Aula;
 import com.consultoraestrategia.ss_portalalumno.entities.Aula_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.CalendarioAcademico;
+import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo;
+import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodoDetalle;
+import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaAcademica;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaAcademica_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaCursoDocente;
@@ -32,26 +39,58 @@ import com.consultoraestrategia.ss_portalalumno.entities.PlanCursos;
 import com.consultoraestrategia.ss_portalalumno.entities.PlanCursos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.PlanEstudios;
 import com.consultoraestrategia.ss_portalalumno.entities.PlanEstudios_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.PreguntaPA;
 import com.consultoraestrategia.ss_portalalumno.entities.ProgramasEducativo;
 import com.consultoraestrategia.ss_portalalumno.entities.ProgramasEducativo_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.RelProgramaEducativoTipoNota;
 import com.consultoraestrategia.ss_portalalumno.entities.Seccion;
 import com.consultoraestrategia.ss_portalalumno.entities.Seccion_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.TipoNotaC;
+import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
+import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.queryCustom.CursoCustom;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
+import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AlumnoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AnioAcademicoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
+import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.raizlabs.android.dbflow.config.DatabaseDefinition;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
+import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
+import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+
 public class MainRepositorioImpl implements MainRepositorio {
 
+    private ApiRetrofit apiRetrofit;
+
+    public MainRepositorioImpl(ApiRetrofit apiRetrofit) {
+        this.apiRetrofit = apiRetrofit;
+    }
 
     private static final String TAG = MainRepositorioImpl.class.getSimpleName();
 
@@ -62,12 +101,25 @@ public class MainRepositorioImpl implements MainRepositorio {
         alumnoUi.setPersonaId(sessionUser.getPersonaId());
         alumnoUi.setPersonaId(sessionUser.getPersonaId());
         alumnoUi.setUsuarioId(sessionUser.getUserId());
+
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_UrlFotos"))
+                .querySingle();
+        String urlFoto = webconfig!=null?webconfig.getContent():"";
+
         Persona persona = SQLite.select()
                 .from(Persona.class)
                 .where(Persona_Table.personaId.eq(sessionUser.getPersonaId()))
                 .querySingle();
-        alumnoUi.setFoto(persona==null?"":persona.getFoto());
-        alumnoUi.setNombre(persona==null?"":UtilsPortalAlumno.capitalize(UtilsPortalAlumno.getFirstWord(persona.getNombreCompleto()))+" "+UtilsPortalAlumno.capitalize(persona.getApellidoPaterno())+" "+UtilsPortalAlumno.capitalize(persona.getApellidoMaterno()));
+        int personaId = persona!=null?persona.getPersonaId():0;
+        //* Se obtine el archivo dela ruta por que alcutilzar los alumno del firebase no tinen ruta solo el nombre archivo*//
+        String fileName = persona!=null?persona.getFoto():"";
+        int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+        fileName = fileName.substring(p + 1);
+
+        alumnoUi.setFoto(urlFoto+personaId+"/"+fileName);
+        alumnoUi.setNombre(persona==null?"":UtilsPortalAlumno.capitalize(UtilsPortalAlumno.getFirstWord(persona.getFirstName()))+" "+UtilsPortalAlumno.capitalize(persona.getApellidoPaterno())+" "+UtilsPortalAlumno.capitalize(persona.getApellidoMaterno()));
 
         AnioAcademicoAlumno anioAcademicoAlumno = SQLite.select()
                 .from(AnioAcademicoAlumno.class)
@@ -256,6 +308,146 @@ public class MainRepositorioImpl implements MainRepositorio {
 
 
         return cursosUiList;
+    }
+
+    @Override
+    public RetrofitCancel updateCalendarioPeriodo(int anioAcademico, SuccessCallback callback) {
+        Call<RestApiResponse<BEDatosAnioAcademico>> responseCall = apiRetrofit.flst_getDatosCalendarioPeriodo(anioAcademico, 0);
+
+        RetrofitCancel<BEDatosAnioAcademico> retrofitCancel = new RetrofitCancelImpl<>(responseCall);
+
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<BEDatosAnioAcademico>() {
+            @Override
+            public void onResponse(final BEDatosAnioAcademico response) {
+                if(response == null){
+                    Log.d(TAG,"response calendarioPeriodo null");
+                }else {
+                    Log.d(TAG,"response calendarioPeriodo true");
+
+                    DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                    Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                        @Override
+                        public void execute(DatabaseWrapper databaseWrapper) {
+                            TransaccionUtils.deleteTable(Webconfig.class);
+
+                            TransaccionUtils.fastStoreListSave(CalendarioPeriodo.class, response.getCalendarioPeriodos(), databaseWrapper, true);
+                            TransaccionUtils.fastStoreListSave(CalendarioPeriodoDetalle.class, response.getCalendarioPeriodoDetalles(), databaseWrapper, true);
+                            //TransaccionUtils.fastStoreListInsert(CargaCursoCalendarioPeriodo.class, response.getCargaCursoCalendarioPeriodo(), databaseWrapper, true);
+                            TransaccionUtils.fastStoreListSave(Tipos.class, response.getTipos(), databaseWrapper, true);
+                            TransaccionUtils.fastStoreListSave(CalendarioAcademico.class, response.getCalendarioAcademico(), databaseWrapper, true);
+                            TransaccionUtils.fastStoreListSave(Webconfig.class, response.getBEWebConfigs(), databaseWrapper, true);
+                            //
+
+                        }
+                    }).success(new Transaction.Success() {
+                        @Override
+                        public void onSuccess(@NonNull Transaction transaction) {
+                            Log.d(TAG,"response calendarioPeriodo Transaction Success");
+                            callback.onLoad(true);
+                        }
+                    }).error(new Transaction.Error() {
+                        @Override
+                        public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                            error.printStackTrace();
+                            Log.d(TAG,"response calendarioPeriodo Transaction Error");
+                            callback.onLoad(false);
+                        }
+                    }).build();
+
+                    transaction.execute();
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+                Log.d(TAG,"response calendarioPeriodo Transaction Failure");
+                callback.onLoad(false);
+            }
+        });
+
+        return retrofitCancel;
+    }
+
+    @Override
+    public void pdateFirebaseTipoNota(int programaEducativoId, SuccessCallback callback) {
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
+        mDatabase.child("AV_TipoNota/pgrid_"+programaEducativoId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<TipoNotaC> tipoNotaCList = new ArrayList<>();
+                        List<ValorTipoNotaC> valorTipoNotaCList = new ArrayList<>();
+                        List<RelProgramaEducativoTipoNota> programaEducativoTipoNotaList = new ArrayList<>();
+                        for (DataSnapshot tipoSnapshot : dataSnapshot.getChildren()){
+                            TipoNotaC tipoNotaC = new TipoNotaC();
+                            tipoNotaC.setKey(UtilsFirebase.convert(tipoSnapshot.child("TipoNotaId").getValue(), ""));
+                            tipoNotaC.setTipoNotaId(tipoNotaC.getKey());
+                            tipoNotaC.setNombre(UtilsFirebase.convert(tipoSnapshot.child("Nombre").getValue(), ""));
+                            tipoNotaC.setTipoId(UtilsFirebase.convert(tipoSnapshot.child("TipoId").getValue(), 0));
+                            tipoNotaCList.add(tipoNotaC);
+                            RelProgramaEducativoTipoNota relProgramaEducativoTipoNota = new RelProgramaEducativoTipoNota();
+                            relProgramaEducativoTipoNota.setTipoNotaId(tipoNotaC.getTipoNotaId());
+                            relProgramaEducativoTipoNota.setProgramaEducativoId(programaEducativoId);
+                            relProgramaEducativoTipoNota.setEstado(true);
+                            programaEducativoTipoNotaList.add(relProgramaEducativoTipoNota);
+                            if(tipoSnapshot.child("Valores").exists()){
+                                for (DataSnapshot valoresDataSnapshot: tipoSnapshot.child("Valores").getChildren()){
+                                    ValorTipoNotaC valorTipoNotaC = new ValorTipoNotaC();
+                                    valorTipoNotaC.setKey(UtilsFirebase.convert(valoresDataSnapshot.child("ValorTipoNotaId").getValue(), ""));
+                                    valorTipoNotaC.setValorTipoNotaId(valorTipoNotaC.getKey());
+                                    valorTipoNotaC.setAlias(UtilsFirebase.convert(valoresDataSnapshot.child("Alias").getValue(), ""));
+                                    valorTipoNotaC.setIcono(UtilsFirebase.convert(valoresDataSnapshot.child("Icono").getValue(), ""));
+                                    valorTipoNotaC.setTipoNotaId(UtilsFirebase.convert(valoresDataSnapshot.child("TipoNotaId").getValue(), ""));
+                                    valorTipoNotaC.setTitulo(UtilsFirebase.convert(valoresDataSnapshot.child("Titulo").getValue(), ""));
+                                    valorTipoNotaC.setValorNumerico(UtilsFirebase.convert(valoresDataSnapshot.child("ValorNumerico").getValue(), 0.0D));
+                                    valorTipoNotaCList.add(valorTipoNotaC);
+                                }
+
+                            }
+                        }
+                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                            @Override
+                            public void execute(DatabaseWrapper databaseWrapper) {
+                                TransaccionUtils.deleteTable(RelProgramaEducativoTipoNota.class);
+                                TransaccionUtils.fastStoreListInsert(RelProgramaEducativoTipoNota.class, programaEducativoTipoNotaList, databaseWrapper, false);
+                                TransaccionUtils.fastStoreListInsert(TipoNotaC.class, tipoNotaCList, databaseWrapper, false);
+                                TransaccionUtils.fastStoreListInsert(ValorTipoNotaC.class, valorTipoNotaCList, databaseWrapper, false);
+                            }
+                        }).success(new Transaction.Success() {
+                            @Override
+                            public void onSuccess(@NonNull Transaction transaction) {
+                                callback.onLoad(true);
+                            }
+                        }).error(new Transaction.Error() {
+                            @Override
+                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                                error.printStackTrace();
+                                callback.onLoad(false);
+                            }
+                        }).build();
+
+                        transaction.execute();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        callback.onLoad(false);
+                    }
+                });
+
+
+
     }
 
 

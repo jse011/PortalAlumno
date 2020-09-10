@@ -10,28 +10,32 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragment;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.instrumento.data.source.InstrumentoRepository;
 import com.consultoraestrategia.ss_portalalumno.instrumento.data.source.InstrumentoRepositoryImpl;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion.InstrumentoEvaluacionActivity;
 import com.consultoraestrategia.ss_portalalumno.instrumento.lista.adapter.InstrumentoListAdapter;
 import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoList;
-import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.UpdateFirebaseInstrumento;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionInstrumentoView;
 
 import java.util.List;
 
 import butterknife.BindView;
 
-public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView, InstrumentoListaPresenter, BaseFragmentListener> implements InstrumentoListaView, InstrumentoListAdapter.Callback {
+public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView, InstrumentoListaPresenter, BaseFragmentListener> implements InstrumentoListaView, InstrumentoListAdapter.Callback, TabSesionInstrumentoView {
 
     @BindView(R.id.rc_lista_instrumento)
     RecyclerView rcListaInstrumento;
+    @BindView(R.id.progressBar14)
+    ProgressBar progressBar14;
     private InstrumentoListAdapter adapter;
 
     @Override
@@ -44,7 +48,7 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
         InstrumentoRepository repository = new InstrumentoRepositoryImpl();
         return new InstrumentoListaPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(),
                 new GetInstrumentoList(repository),
-                new UpdateFirebaseInstrumento(repository));
+                new AndroidOnlineImpl(getContext()));
     }
 
     @Override
@@ -61,9 +65,10 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     protected ViewGroup getRootLayout() {
         return rcListaInstrumento;
     }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view  = super.onCreateView(inflater, container, savedInstanceState);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
         setupAdapter();
         return view;
     }
@@ -72,11 +77,12 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
         adapter = new InstrumentoListAdapter(this);
         rcListaInstrumento.setAdapter(adapter);
         rcListaInstrumento.setLayoutManager(new LinearLayoutManager(getContext()));
+        ((SimpleItemAnimator) rcListaInstrumento.getItemAnimator()).setSupportsChangeAnimations(false);
     }
 
     @Override
     protected ProgressBar getProgressBar() {
-        return null;
+        return progressBar14;
     }
 
     @Override
@@ -111,6 +117,11 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
 
     @Override
     public void showActivityInstrumento() {
-        startActivity(new Intent(getContext(),InstrumentoEvaluacionActivity.class));
+        startActivity(new Intent(getContext(), InstrumentoEvaluacionActivity.class));
+    }
+
+    @Override
+    public void changeList() {
+        if (presenter != null) presenter.notifyChangeFragment();
     }
 }

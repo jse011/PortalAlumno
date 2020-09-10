@@ -237,7 +237,7 @@ public class Login2PresenterImpl extends BasePresenterImpl<Login2View> implement
     private void loginServidorLocal(UsuarioExternoUi usuarioLocalUi) {
         saveUrlSevidorLocal.execute(usuarioLocalUi.getUrlServiceLocal());
         //Cambiar por el de un alumno
-        usuarioLocalUi.setUsuarioIdLocal(7921);
+        //usuarioLocalUi.setUsuarioIdLocal(7921);
         getUsuarioLocal.execute(new GetUsuarioLocal.Request(usuarioLocalUi.getUsuarioIdLocal()), new UseCaseLoginSincrono.Callback<UsuarioUi>() {
             @Override
             public void onResponse(boolean success, final UsuarioUi usuarioUi) {

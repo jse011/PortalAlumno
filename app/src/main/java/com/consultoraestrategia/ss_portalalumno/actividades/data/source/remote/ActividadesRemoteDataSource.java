@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.consultoraestrategia.ss_portalalumno.actividades.data.source.ActividadesDataSource;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.ActividadesUi;
+import com.consultoraestrategia.ss_portalalumno.actividades.entidades.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RecursosUi;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RepositorioEstadoFileU;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RepositorioTipoFileU;
@@ -41,6 +42,7 @@ import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -79,7 +81,7 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
     }
 
     @Override
-    public void getActividadesList(int cargaCurso, int sesionAprendizajeId, String backgroundColor, CallbackActividades callbackActividades) {
+    public void getActividadesList(int cargaCurso, int sesionAprendizajeId, CallbackActividades callbackActividades) {
 
     }
 
@@ -89,7 +91,7 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
     }
 
     @Override
-    public void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList, CallbackSimple callbackSimple) {
+    public void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList2, CallbackSimple callbackSimple) {
         Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
                 .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
@@ -110,30 +112,6 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
                 .querySingle();
         int unidadAprendizajeId = sesionAprendizaje!=null?sesionAprendizaje.getUnidadAprendizajeId():0;
 
-        List<Integer> actividadesIdlist = new ArrayList<>();
-        List<String> recursoIdList = new ArrayList<>();
-        List<String> archivoIdList = new ArrayList<>();
-        for (ActividadesUi actividadesUi : actividadesUiList){
-            actividadesIdlist.add(actividadesUi.getId());
-            if(actividadesUi.getRecursosUiList()!=null){
-                for (RecursosUi recursosUi : actividadesUi.getRecursosUiList()){
-                    recursoIdList.add(recursosUi.getRecursoId());
-                    archivoIdList.add(recursosUi.getArchivoId());
-                }
-            }
-
-            if(actividadesUi.getSubRecursosUiList()!=null){
-                for (SubRecursosUi subRecursosUi : actividadesUi.getSubRecursosUiList()){
-                    actividadesIdlist.add(subRecursosUi.getActividadId());
-                    if(subRecursosUi.getRecursosUiList()!=null){
-                        for (RecursosUi recursosUi : subRecursosUi.getRecursosUiList()){
-                            recursoIdList.add(recursosUi.getRecursoId());
-                            archivoIdList.add(recursosUi.getArchivoId());
-                        }
-                    }
-                }
-            }
-        }
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
 
         mDatabase.child("/AV_Actividad/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/sesid_"+sesionAprendizajeId)
@@ -148,46 +126,47 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
                         List<RecursoArchivo> recursoArchivoList = new ArrayList<>();
 
                         for (DataSnapshot actividadSnapshot : dataSnapshot.getChildren()){
-                           
-                            FBActividadAprendizaje fbActividadAprendizaje = actividadSnapshot.getValue(FBActividadAprendizaje.class);
+
+
+
+
                             ActividadAprendizaje actividadAprendizaje = new ActividadAprendizaje();
-                            actividadAprendizaje.setActividad(fbActividadAprendizaje.getActividad());
-                            actividadAprendizaje.setActividadAprendizajeId(fbActividadAprendizaje.getActividadAprendizajeId());
-                            actividadAprendizaje.setDescripcionActividad(fbActividadAprendizaje.getDescripcionActividad());
-                            actividadAprendizaje.setSesionAprendizajeId(fbActividadAprendizaje.getSesionAprendizajeId());
-                            actividadAprendizaje.setTipoActividadId(fbActividadAprendizaje.getTipoActividadId());
+                            actividadAprendizaje.setActividad(UtilsFirebase.convert(actividadSnapshot.child("Actividad").getValue(),""));
+                            actividadAprendizaje.setActividadAprendizajeId(UtilsFirebase.convert(actividadSnapshot.child("ActividadAprendizajeId").getValue(),0));
+                            actividadAprendizaje.setDescripcionActividad(UtilsFirebase.convert(actividadSnapshot.child("DescripcionActividad").getValue(),""));
+                            actividadAprendizaje.setSesionAprendizajeId(UtilsFirebase.convert(actividadSnapshot.child("SesionAprendizajeId").getValue(),0));
+                            actividadAprendizaje.setTipoActividadId(UtilsFirebase.convert(actividadSnapshot.child("TipoActividadId").getValue(),0));
+                            actividadAprendizaje.setInstrumentoEvalId(UtilsFirebase.convert(actividadSnapshot.child("InstrumentoEvalId").getValue(),0));
                             actividadAprendizajeList.add(actividadAprendizaje);
                             Tipos tipos = new Tipos();
                             tipos.setTipoId(actividadAprendizaje.getTipoActividadId());
-                            tipos.setNombre(fbActividadAprendizaje.getTipoActividad());
+                            tipos.setNombre(UtilsFirebase.convert(actividadSnapshot.child("TipoActividad").getValue(),""));
                             tiposList.add(tipos);
 
-
-                            if(fbActividadAprendizaje.getRecursoActividad()!=null){
-                                for (Map.Entry<String, FBRecursos> mapFbRecursos: fbActividadAprendizaje.getRecursoActividad().entrySet()) {
-                                    getRecursosFirebase(fbActividadAprendizaje.getActividadAprendizajeId(),mapFbRecursos.getValue(), recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
+                            if(actividadSnapshot.child("RecursoActividad").exists()){
+                                for (DataSnapshot recusoActividadSnapshot : actividadSnapshot.child("RecursoActividad").getChildren()){
+                                    getRecursosFirebase(actividadAprendizaje.getActividadAprendizajeId(),recusoActividadSnapshot, recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
                                 }
                             }
 
-                            if(fbActividadAprendizaje.getSubActividad()!=null) {
-                                for (Map.Entry<String, FBActividadAprendizaje> mapfbSubActividadAprendizaje : fbActividadAprendizaje.getSubActividad().entrySet()){
-                                    FBActividadAprendizaje fbSubActividadAprendizaje = mapfbSubActividadAprendizaje.getValue();
+                            if(actividadSnapshot.child("SubActividad").exists()){
+                                for (DataSnapshot subActividadSnapshot : actividadSnapshot.child("SubActividad").getChildren()){
+
                                     ActividadAprendizaje subActividad = new ActividadAprendizaje();
-                                    subActividad.setActividad(fbSubActividadAprendizaje.getActividad());
-                                    subActividad.setActividadAprendizajeId(fbSubActividadAprendizaje.getActividadAprendizajeId());
-                                    subActividad.setDescripcionActividad(fbSubActividadAprendizaje.getDescripcionActividad());
+                                    subActividad.setActividad(UtilsFirebase.convert(subActividadSnapshot.child("Actividad").getValue(),""));
+                                    subActividad.setActividadAprendizajeId(UtilsFirebase.convert(subActividadSnapshot.child("ActividadAprendizajeId").getValue(),0));
+                                    subActividad.setDescripcionActividad(UtilsFirebase.convert(subActividadSnapshot.child("DescripcionActividad").getValue(),""));
                                     subActividad.setParentId(actividadAprendizaje.getActividadAprendizajeId());
+                                    subActividad.setInstrumentoEvalId(UtilsFirebase.convert(subActividadSnapshot.child("InstrumentoEvalId").getValue(),0));
                                     actividadAprendizajeList.add(subActividad);
 
-                                    if(fbSubActividadAprendizaje.getRecursoActividad()!=null){
-                                        for (Map.Entry<String, FBRecursos> mapFbRecursos: fbSubActividadAprendizaje.getRecursoActividad().entrySet()) {
-                                            getRecursosFirebase(fbSubActividadAprendizaje.getActividadAprendizajeId(),mapFbRecursos.getValue(), recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
+                                    if(subActividadSnapshot.child("RecursoActividad").exists()){
+                                        for (DataSnapshot recusoActividadSnapshot : subActividadSnapshot.child("RecursoActividad").getChildren()){
+                                            getRecursosFirebase(subActividad.getActividadAprendizajeId(),recusoActividadSnapshot, recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
                                         }
                                     }
                                 }
-
                             }
-
                         }
 
                         DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
@@ -199,18 +178,20 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
                                         .querySingle();
 
                                 int max = result!=null?result.getRecursoReferenciaId()+1:1;
-                                Log.d(TAG, "max int"+ max);
                                 for(RecursoReferenciaC recursoReferenciaC: recursoReferenciaCList){
                                     max++;
-                                    Log.d(TAG, "max "+ max);
                                     recursoReferenciaC.setRecursoReferenciaId(max);
                                 }
 
+                                List<Integer> actividadAprendizajeIdList = new ArrayList<>();
+                                for (ActividadAprendizaje actividadAprendizaje : actividadAprendizajeList){
+                                    actividadAprendizajeIdList.add(actividadAprendizaje.getActividadAprendizajeId());
+                                }
 
-                                TransaccionUtils.deleteTable(RecursoDidacticoEventoC.class, RecursoDidacticoEventoC_Table.recursoDidacticoId.in(recursoIdList));
-                                TransaccionUtils.deleteTable(RecursoReferenciaC.class, RecursoReferenciaC_Table.recursoDidacticoId.in(recursoIdList));
-                                TransaccionUtils.deleteTable(RecursoArchivo.class, RecursoArchivo_Table.recursoDidacticoId.in(recursoIdList));
-                                TransaccionUtils.deleteTable(ActividadAprendizaje.class, ActividadAprendizaje_Table.actividadAprendizajeId.in(actividadesIdlist));
+                                //TransaccionUtils.deleteTable(RecursoDidacticoEventoC.class, RecursoDidacticoEventoC_Table.recursoDidacticoId.in(recursoIdList));
+                                TransaccionUtils.deleteTable(RecursoReferenciaC.class, RecursoReferenciaC_Table.actividadAprendizajeId.in(actividadAprendizajeIdList));
+                                //TransaccionUtils.deleteTable(RecursoArchivo.class, RecursoArchivo_Table.recursoDidacticoId.in(recursoIdList));
+                                TransaccionUtils.deleteTable(ActividadAprendizaje.class, ActividadAprendizaje_Table.sesionAprendizajeId.eq(sesionAprendizajeId));
 
                                 TransaccionUtils.fastStoreListInsert(ActividadAprendizaje.class, actividadAprendizajeList, databaseWrapper, false);
                                 TransaccionUtils.fastStoreListInsert(Tipos.class, tiposList, databaseWrapper, false);
@@ -244,15 +225,21 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
 
     }
 
+    @Override
+    public List<InstrumentoUi> getInstrumentos(int sesionAprendizajeId) {
+        return null;
+    }
 
-    private void getRecursosFirebase(int actividadAprendizajeId, FBRecursos fbRecursos, List<RecursoDidacticoEventoC> recursoDidacticoEventoList, List<RecursoReferenciaC> recursoReferenciaCList, List<Archivo> archivoList, List<RecursoArchivo> recursoArchivoList){
+
+    private void getRecursosFirebase(int actividadAprendizajeId, DataSnapshot dataSnapshot, List<RecursoDidacticoEventoC> recursoDidacticoEventoList, List<RecursoReferenciaC> recursoReferenciaCList, List<Archivo> archivoList, List<RecursoArchivo> recursoArchivoList){
+
             RecursoDidacticoEventoC recursoDidacticoEventoC = new RecursoDidacticoEventoC();
-            recursoDidacticoEventoC.setRecursoDidacticoId(fbRecursos.getRecursoDidacticoId());
-            recursoDidacticoEventoC.setKey(fbRecursos.getRecursoDidacticoId());
-            recursoDidacticoEventoC.setTipoId(fbRecursos.getTipoId());
-            recursoDidacticoEventoC.setUrl(fbRecursos.getDescripcion());
-            recursoDidacticoEventoC.setTitulo(fbRecursos.getTitulo());
-            recursoDidacticoEventoC.setDescripcion(fbRecursos.getDescripcion());
+            recursoDidacticoEventoC.setRecursoDidacticoId(UtilsFirebase.convert(dataSnapshot.child("RecursoDidacticoId").getValue(),""));
+            recursoDidacticoEventoC.setKey(UtilsFirebase.convert(dataSnapshot.child("RecursoDidacticoId").getValue(),""));
+            recursoDidacticoEventoC.setTipoId(UtilsFirebase.convert(dataSnapshot.child("TipoId").getValue(),0));
+            recursoDidacticoEventoC.setUrl(UtilsFirebase.convert(dataSnapshot.child("Descripcion").getValue(),""));
+            recursoDidacticoEventoC.setTitulo(UtilsFirebase.convert(dataSnapshot.child("Titulo").getValue(),""));
+            recursoDidacticoEventoC.setDescripcion(UtilsFirebase.convert(dataSnapshot.child("Descripcion").getValue(),""));
             recursoDidacticoEventoList.add(recursoDidacticoEventoC);
 
             RecursoReferenciaC recursoReferenciaC = new RecursoReferenciaC();
@@ -277,13 +264,13 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
 
                 Archivo archivo = SQLite.select()
                         .from(Archivo.class)
-                        .where(Archivo_Table.archivoId.eq(fbRecursos.getRecursoDidacticoId()))
+                        .where(Archivo_Table.archivoId.eq(recursoDidacticoEventoC.getRecursoDidacticoId()))
                         .querySingle();
                 if(archivo==null)archivo = new Archivo();
-                archivo.setKey(fbRecursos.getRecursoDidacticoId());
-                archivo.setArchivoId(fbRecursos.getRecursoDidacticoId());
+                archivo.setKey(recursoDidacticoEventoC.getRecursoDidacticoId());
+                archivo.setArchivoId(recursoDidacticoEventoC.getRecursoDidacticoId());
                 archivo.setNombre("");
-                archivo.setPath(fbRecursos.getDescripcion());
+                archivo.setPath(UtilsFirebase.convert(dataSnapshot.child("DriveId").getValue(),""));
                 archivoList.add(archivo);
 
                 RecursoArchivo recursoArchivo = new RecursoArchivo();

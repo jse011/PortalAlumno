@@ -125,6 +125,8 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
         AutoColumnGridLayoutManager autoColumnGridLayoutManager = new AutoColumnGridLayoutManager(itemView.getContext(), OrientationHelper.VERTICAL, false);
         SesionColumnCountProvider columnCountProvider = new SesionColumnCountProvider(itemView.getContext());
         autoColumnGridLayoutManager.setColumnCountProvider(columnCountProvider);
+        rvSesiones.setNestedScrollingEnabled(false);
+        rvSesiones.setHasFixedSize(false);
         rvSesiones.setLayoutManager(autoColumnGridLayoutManager);
         rvSesiones.setAdapter(new AdapterSesiones(unidadAprendizaje.getObjectListSesiones(), false, unidadListener));
 

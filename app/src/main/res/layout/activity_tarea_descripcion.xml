@@ -9,7 +9,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FAFAFA"
         app:layout_constraintStart_toStartOf="parent"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,135 +21,263 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/md_white_1000"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FAFAFA"
             android:theme="@style/ToolbarWhite"
             app:titleTextColor="#6B6A6A"
-            app:title=""
-            app:layout_scrollFlags="scroll|enterAlways">
-
-        </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/md_white_1000"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="24sp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/txt_fecha_tarea"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:textColor="#181818"
-                android:textSize="14sp"
-                tools:text="Fecha de entrega: 16 de noviembre de 2018"/>
-
-            <TextView
-                android:id="@+id/txt_titulo_tarea"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:textColor="#154FC8"
-                android:textSize="20sp"
-                android:layout_marginTop="8dp"
-                tools:text="SEPARATA DEL CURSO">
-
-            </TextView>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/btn_comentario"
+            android:visibility="visible"
+            app:title="">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/msg_error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:paddingStart="0dp"
+                android:layout_gravity="center"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingEnd="8dp">
+                android:visibility="gone"
+                app:cardBackgroundColor="#E3EBFE"
+                app:cardCornerRadius="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Agregar un comentario de la clase"
-                    android:textColor="#181818"
-                    app:layout_constraintStart_toEndOf="@+id/imageView3"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/imageView3"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
                     android:layout_marginBottom="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Modo offline. "
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/txt_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" Volver a cargar."
+                        android:textAllCaps="false"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FAFAFA"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="24sp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/txt_titulo_fecha"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:textColor="#0A2D5C"
+                        android:textSize="14sp"
+                        android:text="Fecha de entrega: "/>
+
+                    <TextView
+                        android:id="@+id/txt_fecha_tarea"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="#181818"
+                        android:textSize="14sp"
+                        tools:text="16 de noviembre de 2018" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_titulo_tarea"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="#0A2D5C"
+                    android:textSize="20sp"
+                    tools:text="SEPARATA DEL CURSO">
+
+                </TextView>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/btn_comentario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_comentario_clase"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Agregar un comentario de la clase"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        app:layout_constraintStart_toEndOf="@+id/img_comentario_clase"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/img_comentario_clase"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_comment" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/txt_linea"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="#154FC8" />
+
+                <TextView
+                    android:id="@+id/txt_descripcion_tarea"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="#181818"
+                    android:textSize="14sp"
+                    android:text="Tarea"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvRecurso"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_comment" />
+                    app:layout_constraintTop_toBottomOf="@+id/cantidad"
+                    tools:itemCount="2"
+                    android:layout_marginBottom="150dp"
+                    tools:listitem="@layout/item_download_tarea" />
+
+
+            </LinearLayout>
+
+
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Adding bottom sheet after main content -->
+        <include
+            layout="@layout/bottom_sheet_tarea_descripcion" />
+
+        <com.consultoraestrategia.ss_portalalumno.lib.cardviewGesture.MovableCardView
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:id="@+id/contentPlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_replay">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="345dp"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/linearLayout4"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:background="@color/md_blue_grey_300"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/btn_close_youtube"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_close_white" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_drag_handle" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <FrameLayout
+                    android:id="@+id/youtube_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:animateLayoutChanges="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="16:9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
+
+                </FrameLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="16dp"
-                android:background="#154FC8" />
+        </com.consultoraestrategia.ss_portalalumno.lib.cardviewGesture.MovableCardView>
 
-            <TextView
-                android:id="@+id/txt_descripcion_tarea"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:textColor="#181818"
-                android:textSize="14sp"
-                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cantidad"
-                tools:itemCount="2"
-                android:layout_marginBottom="150dp"
-                tools:listitem="@layout/item_recursos_mvp" />
-
-
-        </LinearLayout>
-
-
-    </androidx.core.widget.NestedScrollView>
-
-    <!-- Adding bottom sheet after main content -->
-    <include layout="@layout/bottom_sheet_tarea_descripcion" />
+    <ProgressBar
+        android:id="@+id/progressBar13"
+        style="?android:attr/progressBarStyle"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

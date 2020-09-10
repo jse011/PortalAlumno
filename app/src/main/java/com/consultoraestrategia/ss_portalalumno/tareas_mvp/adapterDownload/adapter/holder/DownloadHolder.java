@@ -1,6 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.tareas_mvp.adapterDownload.adapter.holder;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,38 +25,47 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.adapterDownload.adapter.DownloadItemListener;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioEstadoFileU;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioTipoFileU;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
-public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private final ProgressBar progressBar2;
-    private final ImageView imgFondoprogres;
-    private final ImageView imgClose;
-    private final CircularProgressBar progressSucces;
-    private final ImageView imgDownload;
-    private final TextView txtNombreRecurso;
-    private final ImageView imgRecurso;
-    private final TextView txtdescripcion;
+public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    @BindView(R.id.img_fondo_progres)
+    ImageView imgFondoProgres;
+    @BindView(R.id.progressBar2)
+    ProgressBar progressBar2;
+    @BindView(R.id.progress_succes)
+    CircularProgressBar progressSucces;
+    @BindView(R.id.img_close)
+    ImageView imgClose;
+    @BindView(R.id.img_download)
+    ImageView imgDownload;
+    @BindView(R.id.imgRecurso)
+    ImageView imgRecurso;
+    @BindView(R.id.conten_recurso)
+    ConstraintLayout contenRecurso;
+    @BindView(R.id.txtNombreRecurso)
+    TextView txtNombreRecurso;
+    @BindView(R.id.txtdescripcion)
+    TextView txtdescripcion;
+    @BindView(R.id.card_view)
+    CardView cardView;
+
     private RepositorioFileUi repositorioFileUi;
     private DownloadItemListener listener;
 
     public DownloadHolder(View itemView) {
         super(itemView);
-        txtNombreRecurso = (TextView)itemView.findViewById(R.id.txtNombreRecurso);
-        imgRecurso = (ImageView)itemView.findViewById(R.id.imgRecurso);
-        progressBar2 = (ProgressBar)itemView.findViewById(R.id.progressBar2);
-        imgFondoprogres = (ImageView)itemView.findViewById(R.id.img_fondo_progres);
-        imgClose = (ImageView)itemView.findViewById(R.id.img_close);
-        progressSucces = (CircularProgressBar)itemView.findViewById(R.id.progress_succes);
-        imgDownload = (ImageView)itemView.findViewById(R.id.img_download);
-        txtdescripcion = (TextView)itemView.findViewById(R.id.txtdescripcion);
+        ButterKnife.bind(this, itemView);
         imgDownload.setOnClickListener(this);
         imgClose.setOnClickListener(this);
         itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
     }
 
     public void bind(RepositorioFileUi repositorioFileUi, DownloadItemListener repositorioItemListener) {
@@ -69,6 +81,12 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
 
         setupEstado(repositorioFileUi.getEstadoFileU());
         setupIcono(repositorioFileUi.getTipoFileU());
+
+        try {
+            cardView.setCardBackgroundColor(Color.parseColor(((RecursosUI)repositorioFileUi).getColor1()));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -76,7 +94,7 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         hideDowload();
         hiProgress();
         hiProgressSuccess();
-        switch (estadoFileU){
+        /*switch (estadoFileU){
             case SIN_DESCARGAR:
                 showDowload();
                 break;
@@ -92,7 +110,7 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
             case DESCARGA_COMPLETA:
 
                 break;
-        }
+        }*/
     }
 
     private void setupIcono(RepositorioTipoFileU tipoFileU) {
@@ -111,23 +129,6 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
                 break;
             case IMAGEN:
                 imgRecurso.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ext_img));
-                Glide.with(itemView.getContext())
-                        .asBitmap()
-                        .load(repositorioFileUi.getUrl())
-                        .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .centerCrop()
-                        ).listener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        imgRecurso.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ext_img));
-                        return false;
-                    }
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                }).into(imgRecurso);
-
                 break;
             case VINCULO:
                 imgRecurso.setImageResource(R.drawable.ext_link);
@@ -151,34 +152,34 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
     private void showProgress(){
         progressBar2.setVisibility(View.VISIBLE);
         imgClose.setVisibility(View.VISIBLE);
-        imgFondoprogres.setVisibility(View.VISIBLE);
+        imgFondoProgres.setVisibility(View.VISIBLE);
     }
 
     private void hiProgress(){
         progressBar2.setVisibility(View.GONE);
         imgClose.setVisibility(View.GONE);
-        imgFondoprogres.setVisibility(View.GONE);
+        imgFondoProgres.setVisibility(View.GONE);
     }
 
     private void showProgressSuccess(){
         progressSucces.setVisibility(View.VISIBLE);
         imgClose.setVisibility(View.VISIBLE);
-        imgFondoprogres.setVisibility(View.VISIBLE);
+        imgFondoProgres.setVisibility(View.VISIBLE);
     }
 
     private void hiProgressSuccess(){
         progressSucces.setVisibility(View.GONE);
         imgClose.setVisibility(View.GONE);
-        imgFondoprogres.setVisibility(View.GONE);
+        imgFondoProgres.setVisibility(View.GONE);
     }
 
     private void showDowload(){
-        imgFondoprogres.setVisibility(View.VISIBLE);
+        imgFondoProgres.setVisibility(View.VISIBLE);
         imgDownload.setVisibility(View.VISIBLE);
     }
 
     private void hideDowload(){
-        imgFondoprogres.setVisibility(View.GONE);
+        imgFondoProgres.setVisibility(View.GONE);
         imgDownload.setVisibility(View.GONE);
     }
 
@@ -217,8 +218,8 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         if (progressBar2.getVisibility() == View.VISIBLE) {
             progressBar2.setVisibility(View.GONE);
         }
-        if (imgFondoprogres.getVisibility() == View.GONE) {
-            imgFondoprogres.setVisibility(View.VISIBLE);
+        if (imgFondoProgres.getVisibility() == View.GONE) {
+            imgFondoProgres.setVisibility(View.VISIBLE);
         }
         if (imgClose.getVisibility() == View.GONE) {
             imgClose.setVisibility(View.VISIBLE);
@@ -234,41 +235,4 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         return repositorioFileUi;
     }
 
-    @Override
-    public boolean onLongClick(View v) {
-        switch (v.getId()){
-            default:
-                PopupMenu popup = new PopupMenu(itemView.getContext(), itemView);
-                // Inflate the menu from xml
-                popup.getMenu().add(Menu.NONE, 1, 1, "volver a descargar");
-                // Setup menu item selection
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case 1:
-                                switch (repositorioFileUi.getTipoFileU()){
-                                    case VINCULO:
-                                        break;
-                                    case YOUTUBE:
-                                        repositorioFileUi.setPath("");
-                                        listener.onClickArchivo(repositorioFileUi);
-                                        break;
-                                    default:
-                                        repositorioFileUi.setEstadoFileU(RepositorioEstadoFileU.SIN_DESCARGAR);
-                                        onClickDownload();
-                                        break;
-                                }
-                                return true;
-                            default:
-                                return false;
-                        }
-                    }
-                });
-                // Show the menu
-                popup.show();
-                break;
-        }
-
-        return false;
-    }
 }

@@ -13,11 +13,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.Login2Presenter;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.android.material.textfield.TextInputEditText;
 
 import butterknife.BindView;
@@ -37,6 +39,10 @@ public class UsuarioFragment extends Fragment implements UsuarioView, TextView.O
     Button btnSiguienteUser;
     @BindView(R.id.imageView17)
     ImageView imageView17;
+    @BindView(R.id.imageView7)
+    ImageView imageView7;
+    @BindView(R.id.textView89)
+    TextView textView89;
     @BindView(R.id.btn_atras_lst_usu)
     ImageView btnAtrasLstUsu;
     private Unbinder unbinder;
@@ -53,11 +59,24 @@ public class UsuarioFragment extends Fragment implements UsuarioView, TextView.O
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Glide.with(imageView17)
-                .load(R.drawable.docente_mentor)
-                .into(imageView17);
 
-        edittextPasswordUser.setOnEditorActionListener(this);
+        if(getResources().getString(R.string.app_name).equals("Educar Student")){
+
+            Glide.with(imageView17)
+                    .load(R.drawable.logo_educar)
+                    .into(imageView17);
+            edittextPasswordUser.setOnEditorActionListener(this);
+            textView89.setVisibility(View.GONE);
+            imageView7.setVisibility(View.VISIBLE);
+        }else{
+            Glide.with(imageView17)
+                    .load(R.drawable.docente_mentor)
+                    .into(imageView17);
+            textView89.setVisibility(View.GONE);
+            edittextPasswordUser.setOnEditorActionListener(this);
+            imageView7.setVisibility(View.INVISIBLE);
+        }
+
         //   initAdapter();
     }
 

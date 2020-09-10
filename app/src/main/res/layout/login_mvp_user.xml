@@ -28,6 +28,7 @@
                 android:text="@string/app_name"
                 android:textColor="#2d7eea"
                 android:textSize="18sp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView17" />
@@ -36,6 +37,7 @@
                 android:id="@+id/textView90"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:text="Acceder"
                 android:textColor="#222326"
                 android:textSize="14sp"
@@ -60,7 +62,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -111,9 +113,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
                 android:text="Iniciar sesión"
                 android:textAllCaps="false"
                 android:textColor="#2d7eea"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView93" />
 
@@ -143,14 +147,26 @@
             <ImageView
                 android:id="@+id/imageView17"
                 android:layout_width="0dp"
-                android:layout_height="70dp"
+                android:layout_height="85dp"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="52dp"
                 android:layout_marginEnd="32dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/docente_mentor" />
+
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btn_siguiente_user"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView93"
+                app:srcCompat="@drawable/docente_mentor" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

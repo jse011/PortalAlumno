@@ -1,15 +1,19 @@
 package com.consultoraestrategia.ss_portalalumno.actividades.adapter.holder;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.actividades.adapter.RecursosAdapter;
@@ -35,6 +39,12 @@ public class ActividadesHolder extends RecyclerView.ViewHolder implements View.O
     TextView txtDescripcionActDet;
     @BindView(R.id.rv_act_recursos)
     RecyclerView rvActRecursos;
+    @BindView(R.id.conten_actividad)
+    ConstraintLayout contenActividad;
+    @BindView(R.id.constraintLayout2)
+    ConstraintLayout titleActividad;
+    @BindView(R.id.cont_img)
+    ConstraintLayout contImg;
 
     private RecursosAdapter recursosAdapter;
     private final static String[] estado = {"Hecho", "Pendiente"};
@@ -45,7 +55,7 @@ public class ActividadesHolder extends RecyclerView.ViewHolder implements View.O
     public ActividadesHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
-        itemView.setOnClickListener(this);
+        titleActividad.setOnClickListener(this);
     }
 
 
@@ -59,18 +69,27 @@ public class ActividadesHolder extends RecyclerView.ViewHolder implements View.O
         rvActRecursos.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
         rvActRecursos.setHasFixedSize(false);
         rvActRecursos.setNestedScrollingEnabled(false);
+        ((SimpleItemAnimator) rvActRecursos.getItemAnimator()).setSupportsChangeAnimations(false);
         ArrayList<Object> objects = new ArrayList<>();
         objects.addAll(actividadesUi.getRecursosUiList());
         objects.addAll(actividadesUi.getSubRecursosUiList());
         recursosAdapter = new RecursosAdapter(objects, position, downloadItemListener);
         rvActRecursos.setAdapter(recursosAdapter);
-
+        contenActividad.setVisibility(actividadesUi.isToogle()?View.VISIBLE:View.GONE);
+        Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.circle_actividad);
+        try {
+            circle.mutate().setColorFilter(Color.parseColor(actividadesUi.getColor1()), PorterDuff.Mode.SRC_ATOP);
+            txtactividad.setTextColor(Color.parseColor(actividadesUi.getColor2()));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        contImg.setBackground(circle);
 
     }
 
     @Override
     public void onClick(View view) {
-
+        actividadListener.onClickActividad(actividadesUi);
     }
 
 

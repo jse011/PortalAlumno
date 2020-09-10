@@ -30,7 +30,8 @@ public class ActividadAprendizaje extends BaseRelEntity {
     private int estadoId;
     @Column
     private int parentId;
-
+    @Column
+    private  int instrumentoEvalId;
 
     public ActividadAprendizaje() {
     }
@@ -105,5 +106,13 @@ public class ActividadAprendizaje extends BaseRelEntity {
 
     public void setParentId(int parentId) {
         this.parentId = parentId;
+    }
+
+    public int getInstrumentoEvalId() {
+        return instrumentoEvalId;
+    }
+
+    public void setInstrumentoEvalId(int instrumentoEvalId) {
+        this.instrumentoEvalId = instrumentoEvalId;
     }
 }

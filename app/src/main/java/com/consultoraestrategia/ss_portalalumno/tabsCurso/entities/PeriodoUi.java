@@ -5,16 +5,7 @@ package com.consultoraestrategia.ss_portalalumno.tabsCurso.entities;
  */
 
 public class PeriodoUi {
-    private boolean editar;
     private long fechaFin;
-
-    public boolean isEditar() {
-        return editar;
-    }
-
-    public void setEditar(boolean editar) {
-        this.editar = editar;
-    }
 
     public long getFechaFin() {
         return fechaFin;

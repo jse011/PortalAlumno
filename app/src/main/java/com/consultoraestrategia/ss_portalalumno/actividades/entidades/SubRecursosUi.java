@@ -11,12 +11,16 @@ public class SubRecursosUi {
     private int actividadId;
     private String nombreSubRecurso;
     private List<RecursosUi> recursosUiList;
+    private int instrumentoId;
+    private InstrumentoUi instrumentoUi;
+    private String color;
 
-    public SubRecursosUi(int actividadId, int conteoSubRecurso, String nombreSubRecurso, List<RecursosUi> recursosUiList) {
+    public SubRecursosUi(int actividadId, int conteoSubRecurso, String nombreSubRecurso, List<RecursosUi> recursosUiList, int instrumentoId) {
         this.conteoSubRecurso = conteoSubRecurso;
         this.nombreSubRecurso = nombreSubRecurso;
         this.recursosUiList = recursosUiList;
         this.actividadId = actividadId;
+        this.instrumentoId = instrumentoId;
     }
 
     public int getConteoSubRecurso() {
@@ -49,5 +53,29 @@ public class SubRecursosUi {
 
     public void setActividadId(int actividadId) {
         this.actividadId = actividadId;
+    }
+
+    public int getInstrumentoId() {
+        return instrumentoId;
+    }
+
+    public void setInstrumentoId(int instrumentoId) {
+        this.instrumentoId = instrumentoId;
+    }
+
+    public void setInstrumentoUi(InstrumentoUi instrumentoUi) {
+        this.instrumentoUi = instrumentoUi;
+    }
+
+    public InstrumentoUi getInstrumentoUi() {
+        return instrumentoUi;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getColor() {
+        return color;
     }
 }

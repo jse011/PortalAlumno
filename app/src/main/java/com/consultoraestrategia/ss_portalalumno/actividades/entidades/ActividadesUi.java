@@ -7,7 +7,6 @@ import java.util.List;
  */
 
 public class ActividadesUi {
-    private String backgroundColor;
     private String nombreActividad;
     private int cantidadRecursos;
     private int tiempoActividad;
@@ -22,8 +21,13 @@ public class ActividadesUi {
     private List<SubRecursosUi> subRecursosUiList;
     private ESecuencia eSecuencia = ESecuencia.Inicio;
     private int id;
+    private boolean toogle;
+    private int instrumentoId;
+    private String color1;
+    private String color2;
+    private String color3;
 
-    public ActividadesUi(String nombreActividad, int cantidadRecursos, int tiempoActividad, int estadoId, int tiempoActividadDetalle, String nombreaActividadDetalle, String secuenciaNombre, String descripcionActividad, String backgroundColor, List<RecursosUi> recursosUiList, List<SubRecursosUi> subRecursosUiList) {
+    public ActividadesUi(String nombreActividad, int cantidadRecursos, int tiempoActividad, int estadoId, int tiempoActividadDetalle, String nombreaActividadDetalle, String secuenciaNombre, String descripcionActividad, List<RecursosUi> recursosUiList, List<SubRecursosUi> subRecursosUiList) {
         this.nombreActividad = nombreActividad;
         this.cantidadRecursos = cantidadRecursos;
         this.tiempoActividad = tiempoActividad;
@@ -32,7 +36,6 @@ public class ActividadesUi {
         this.nombreaActividadDetalle = nombreaActividadDetalle;
         this.secuenciaNombre = secuenciaNombre;
         this.descripcionActividad = descripcionActividad;
-        this.backgroundColor = backgroundColor;
         this.recursosUiList = recursosUiList;
         this.subRecursosUiList = subRecursosUiList;
     }
@@ -133,10 +136,6 @@ public class ActividadesUi {
         this.eSecuencia = eSecuencia;
     }
 
-    public String getBackgroundColor() {
-        return backgroundColor;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -151,5 +150,45 @@ public class ActividadesUi {
 
     public void seteEstado(EEstado eEstado) {
         this.eEstado = eEstado;
+    }
+
+    public boolean isToogle() {
+        return toogle;
+    }
+
+    public void setToogle(boolean toogle) {
+        this.toogle = toogle;
+    }
+
+    public void setInstrumentoId(int instrumentoId) {
+        this.instrumentoId = instrumentoId;
+    }
+
+    public int getInstrumentoId() {
+        return instrumentoId;
+    }
+
+    public void setColor1(String color1) {
+        this.color1 = color1;
+    }
+
+    public String getColor1() {
+        return color1;
+    }
+
+    public void setColor2(String color2) {
+        this.color2 = color2;
+    }
+
+    public String getColor2() {
+        return color2;
+    }
+
+    public void setColor3(String color3) {
+        this.color3 = color3;
+    }
+
+    public String getColor3() {
+        return color3;
     }
 }

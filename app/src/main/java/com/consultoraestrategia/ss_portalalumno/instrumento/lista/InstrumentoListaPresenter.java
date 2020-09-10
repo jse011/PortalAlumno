@@ -6,4 +6,6 @@ import com.consultoraestrategia.ss_portalalumno.instrumento.entities.Instrumento
 public interface InstrumentoListaPresenter extends BaseFragmentPresenter<InstrumentoListaView> {
 
     void onClick(InstrumentoUi instrumentoUi);
+
+    void notifyChangeFragment();
 }

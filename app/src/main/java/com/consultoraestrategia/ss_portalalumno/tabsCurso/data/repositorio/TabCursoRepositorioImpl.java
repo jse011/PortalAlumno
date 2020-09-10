@@ -11,6 +11,9 @@ import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodoDetall
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodoDetalle_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
+import com.consultoraestrategia.ss_portalalumno.entities.Persona;
+import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
+import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO;
@@ -25,6 +28,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBUnidadAprend
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.entities.PeriodoUi;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,7 +53,7 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
     @Override
     public List<PeriodoUi> getPerioList(int anioAcademicoId, int cargaCursoId, int programaEduId) {
         List<PeriodoUi> periodoUiList = new ArrayList<>();
-        List<CalendarioPeriodo> calendarioPeriodoList = SQLite.select()
+        List<CalendarioPeriodo> calendarioPeriodoList = SQLite.select(UtilsDBFlow.f_allcolumnTable(CalendarioPeriodo_Table.ALL_COLUMN_PROPERTIES))
                 .from(CalendarioPeriodo.class)
                 .innerJoin(CalendarioAcademico.class)
                 .on(CalendarioPeriodo_Table.calendarioAcademicoId.withTable()
@@ -59,36 +64,27 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
 
         Log.d(TAG, "SIZEPERIODO1 : " + calendarioPeriodoList.size());
 
-        boolean seleccionado = false;
-        for (CalendarioPeriodo periodo :
-                calendarioPeriodoList) {
-            Log.d(TAG, "COUNT : " + calendarioPeriodoList.size() + " /  periodoid : " + periodo.getCalendarioPeriodoId() + " / " + periodo.getCalendarioPeriodoId()+ " / " +periodo.getEstadoId());
-
+        for (CalendarioPeriodo periodo : calendarioPeriodoList) {
             Tipos tipo = SQLite.select()
                     .from(Tipos.class)
                     .where(Tipos_Table.tipoId.eq(periodo.getTipoId()))
                     .querySingle();
             if(tipo==null)continue;
-            //Log.d(TAG, "PeriodoUi : " + tipo.getTipoId() + "")
 
             PeriodoUi periodoUi = new PeriodoUi(periodo.getCalendarioPeriodoId(), tipo.getNombre(), "", false);
 
-            boolean isvigente = isVigenteCalendarioCursoPeriodo(periodo.getCalendarioPeriodoId(), cargaCursoId, false);
-            periodoUi.setVigente(isvigente);
             periodoUi.setFechaFin(periodo.getFechaFin());
 
             switch (periodo.getEstadoId()){
                 case CalendarioPeriodo.CALENDARIO_PERIODO_CREADO:
                     periodoUi.setEstado(PeriodoUi.Estado.Creado);
-                    periodoUi.setEditar(true);
                     break;
                 case CalendarioPeriodo.CALENDARIO_PERIODO_VIGENTE:
                     periodoUi.setEstado(PeriodoUi.Estado.Vigente);
-                    periodoUi.setEditar(isvigente);
+                    periodoUi.setVigente(true);
                     break;
                 case CalendarioPeriodo.CALENDARIO_PERIODO_CERRADO:
                     periodoUi.setEstado(PeriodoUi.Estado.Cerrado);
-                    periodoUi.setEditar(isvigente);
                     break;
             }
             periodoUiList.add(periodoUi);
@@ -97,78 +93,68 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
         return periodoUiList;
     }
 
-    public boolean isVigenteCalendarioCursoPeriodo(int calendarioPeridoId, int cargaCursoId, boolean isRubroResultado) {
-        boolean status = false;
-        boolean statusCargaCuros = false;
-        try {
+    @Override
+    public void updateFirebasePersonaList(int idCargaCurso, Callback callback) {
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
 
-            Log.d(TAG, "calendarioPeridoId :"+ calendarioPeridoId);
-            Calendar fechaActual = Calendar.getInstance();
-            fechaActual.set(Calendar.MILLISECOND, 0);
-            fechaActual.set(Calendar.SECOND, 0);
-            fechaActual.set(Calendar.MINUTE, 0);
-            fechaActual.set(Calendar.HOUR_OF_DAY, 0);
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+        SilaboEvento silaboEvento = SQLite.select()
+                .from(SilaboEvento.class)
+                .where(SilaboEvento_Table.cargaCursoId.eq(idCargaCurso))
+                .querySingle();
 
-            Where<CalendarioPeriodo> calendarioPeriodoWhere = SQLite.select()
-                    .from(CalendarioPeriodo.class)
-                    .where(CalendarioPeriodo_Table.calendarioPeriodoId.eq(calendarioPeridoId));
+        int silaboEventoId = silaboEvento!=null?silaboEvento.getSilaboEventoId():0;
 
-            CalendarioPeriodo calendarioPeriodo = calendarioPeriodoWhere.querySingle();
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
+        mDatabase.child("/AV_Persona/silid_"+silaboEventoId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<Persona> personaList = new ArrayList<>();
+                        for (DataSnapshot personaSnapshot: dataSnapshot.getChildren()){
+                            if(UtilsFirebase.convert(personaSnapshot.child("Tipo").getValue(),0)==1){
+                                Persona persona = new Persona();
+                                persona.setPersonaId(UtilsFirebase.convert(personaSnapshot.child("PersonaId").getValue(),0));
+                                persona.setNombres(UtilsFirebase.convert(personaSnapshot.child("Nombres").getValue(),""));
+                                persona.setApellidoMaterno(UtilsFirebase.convert(personaSnapshot.child("ApellidoMaterno").getValue(),""));
+                                persona.setApellidoPaterno(UtilsFirebase.convert(personaSnapshot.child("ApellidoPaterno").getValue(),""));
+                                persona.setNumDoc(UtilsFirebase.convert(personaSnapshot.child("NumDoc").getValue(),""));
+                                persona.setFoto(UtilsFirebase.convert(personaSnapshot.child("Foto").getValue(),""));
+                                personaList.add(persona);
+                            }
+                        }
 
-            Where<CalendarioPeriodoDetalle> where = SQLite.select()
-                    .from(CalendarioPeriodoDetalle.class)
-                    .where(CalendarioPeriodoDetalle_Table.calendarioPeriodoId.eq(calendarioPeridoId));
+                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                            @Override
+                            public void execute(DatabaseWrapper databaseWrapper) {
+                                TransaccionUtils.fastStoreListInsert(Persona.class, personaList, databaseWrapper, false);
+                            }
+                        }).success(new Transaction.Success() {
+                            @Override
+                            public void onSuccess(@NonNull Transaction transaction) {
+                                callback.onLoad(true);
+                            }
+                        }).error(new Transaction.Error() {
+                            @Override
+                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                                error.printStackTrace();
+                                callback.onLoad(false);
+                            }
+                        }).build();
 
-            if(isRubroResultado){
-                where.and(CalendarioPeriodoDetalle_Table.tipoId.eq(493));
-            }else {
-                where.and(CalendarioPeriodoDetalle_Table.tipoId.eq(494));
-            }
+                    }
 
-            CalendarioPeriodoDetalle calendarioPeriodoDetalle =  where.querySingle();
-            if (calendarioPeriodo == null||calendarioPeriodoDetalle==null){
-                Log.d(TAG, "No tiene calendario detalle");
-                return false;
-            }
-            Log.d(TAG, "calendarioPeriodo.getEstadoId() "+ calendarioPeriodo.getEstadoId());
-            if(calendarioPeriodo.getEstadoId()== CalendarioPeriodo.CALENDARIO_PERIODO_VIGENTE ||
-                    calendarioPeriodo.getEstadoId()== CalendarioPeriodo.CALENDARIO_PERIODO_CERRADO ) {
-
-                Calendar fechaDetalleInicio = Calendar.getInstance();
-                fechaDetalleInicio.setTimeInMillis(calendarioPeriodoDetalle.getFechaInicio());
-                fechaDetalleInicio.set(Calendar.MILLISECOND, 0);
-                fechaDetalleInicio.set(Calendar.SECOND, 0);
-                fechaDetalleInicio.set(Calendar.MINUTE, 0);
-                fechaDetalleInicio.set(Calendar.HOUR_OF_DAY, 0);
-
-                Calendar fechaDetalleFin = Calendar.getInstance();
-                fechaDetalleFin.setTimeInMillis(calendarioPeriodoDetalle.getFechaFin());
-                fechaDetalleFin.set(Calendar.MILLISECOND, 0);
-                fechaDetalleFin.set(Calendar.SECOND, 0);
-                fechaDetalleFin.set(Calendar.MINUTE, 0);
-                fechaDetalleFin.set(Calendar.HOUR_OF_DAY, 0);
-
-                int resutDetalleInicio = fechaActual.compareTo(fechaDetalleInicio);
-                int resutDetalleFin = fechaActual.compareTo(fechaDetalleFin);
-
-                Log.d(TAG, "cargaCursoId" + cargaCursoId + " " + " calendarioPeriodoId: " + calendarioPeriodoDetalle.getCalendarioPeriodoDetId());
-
-                if((resutDetalleInicio == 0 || resutDetalleInicio > 0) &&
-                        (resutDetalleFin == 0 || resutDetalleFin < 0)
-                ){
-                    status = true;
-                }
-
-
-
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-            status = false;
-        }finally {
-        }
-        return status;
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        callback.onLoad(false);
+                    }
+                });
     }
+
 
     @Override
     public void updateFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, Callback callback) {
@@ -199,6 +185,24 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        TransaccionUtils.deleteTable(UnidadAprendizaje.class, UnidadAprendizaje_Table.unidadAprendizajeId.eq(SQLite.select(UnidadAprendizaje_Table.unidadAprendizajeId.withTable())
+                                .from(UnidadAprendizaje.class)
+                                .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
+                                .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
+                                        .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
+                                .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
+                                .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId))));
+
+                        TransaccionUtils.deleteTable(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class, T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.eq(tipoPeriodoId), T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.in(SQLite.select(UnidadAprendizaje_Table.unidadAprendizajeId.withTable())
+                                .from(UnidadAprendizaje.class)
+                                .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
+                                .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
+                                        .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
+                                .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
+                                .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId))));
+
+
                         List<UnidadAprendizaje> unidadAprendizajeRemoveList = SQLite.select()
                                 .from(UnidadAprendizaje.class)
                                 .queryList();
@@ -231,8 +235,6 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
                         Transaction transaction = database.beginTransactionAsync(new ITransaction() {
                             @Override
                             public void execute(DatabaseWrapper databaseWrapper) {
-                                TransaccionUtils.deleteTable(UnidadAprendizaje.class, UnidadAprendizaje_Table.silaboEventoId.eq(silaboEventoId));
-                                TransaccionUtils.deleteTable(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class, T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.eq(tipoPeriodoId));
                                 TransaccionUtils.fastStoreListInsert(UnidadAprendizaje.class, unidadAprendizajeList, databaseWrapper, false);
                                 TransaccionUtils.fastStoreListInsert(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class, t_gc_rel_unidad_apren_evento_tipos, databaseWrapper, false);
                             }
@@ -255,7 +257,7 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        callback.onLoad(false);
                     }
                 });
     }

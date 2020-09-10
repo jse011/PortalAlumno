@@ -6,102 +6,124 @@
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:elevation="0dp"
-        app:cardBackgroundColor="@color/md_grey_50"
-        app:cardCornerRadius="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="2dp"
+        app:cardCornerRadius="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="20dp"
-                app:cardElevation="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <com.consultoraestrategia.ss_portalalumno.gadgets.staticProgressBar.CustomProgress
+                android:id="@+id/customProgress"
+                android:layout_centerHorizontal="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_margin="8dp"
-                    app:srcCompat="@drawable/ic_school" />
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/linearLayout2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_img_pregunta"
+                        app:layout_constraintStart_toEndOf="@+id/cardView"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/txt_nombre"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Pratica calificada "
+                            android:textColor="@color/md_light_blue_900"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/txt_preguntas"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="5 preguntas" />
+                    </LinearLayout>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardView"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginStart="16dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <ImageView
+                            android:id="@+id/icono"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/ic_school" />
+                    </androidx.cardview.widget.CardView>
+
+                    <FrameLayout
+                        android:id="@+id/btn_img_pregunta"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/corner_circle_pregunta"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/img_porcentaje"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:layout_gravity="center"
+                            android:visibility="visible"
+                            app:srcCompat="@drawable/ic_contento" />
+
+                    </FrameLayout>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/anim_alert"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:text="sin enviar"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@+id/btn_img_pregunta"
+                        app:layout_constraintEnd_toEndOf="@+id/linearLayout2" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:id="@+id/txt_nombre"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="4dp"
-                android:text="Pratica calificada para el alumno"
-                android:textColor="@color/md_light_blue_900"
-                android:textSize="14dp"
-                app:layout_constraintEnd_toStartOf="@+id/img_porcentaje"
-                app:layout_constraintStart_toEndOf="@+id/cardView"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/txt_preguntas"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="5 preguntas"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/cardView"
-                app:layout_constraintTop_toBottomOf="@+id/txt_nombre"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <ProgressBar
-                android:id="@+id/progressBar5"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="0dp"
-                android:layout_height="5dp"
-                android:foregroundGravity="bottom"
-                android:progress="45"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <ImageView
-                android:id="@+id/img_porcentaje"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginEnd="8dp"
-                android:alpha="0.6"
-                app:layout_constraintBottom_toTopOf="@+id/progressBar5"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:srcCompat="@drawable/ic_contento" />
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/anim_alert"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="16dp"
-                android:text="sin enviar"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt_nombre" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
     </androidx.cardview.widget.CardView>
 

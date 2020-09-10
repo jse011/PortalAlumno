@@ -21,5 +21,7 @@ public interface TabCursoView extends BaseView<TabCursoPresenter> {
 
     void changePeriodo();
 
-    void notifyChangeFragment();
+    void modoOffline();
+
+    void modoOnline();
 }

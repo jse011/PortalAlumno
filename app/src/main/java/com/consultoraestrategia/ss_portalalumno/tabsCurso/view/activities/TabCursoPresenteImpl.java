@@ -6,12 +6,16 @@ import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.GetCalendarioPeriodo;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.UpdateFireBasePersona;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.UpdateFireBaseUnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.entities.PeriodoUi;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoTareaView;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoUnidadView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +27,7 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
 
     private GetCalendarioPeriodo getCalendarioPeriodo;
     private UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje;
+    private UpdateFireBasePersona updateFireBasePersona;
     private int anioAcademicoId;
     private int programaEducativoId;
     private PeriodoUi calendarioperiodo;
@@ -32,11 +37,21 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     private String parametroColor1;
     private String parametroColor2;
     private String parametroColor3;
+    private Online online;
+    private String nombreCurso;
+    private String seccionYPeriodo;
+    private String fotoCurso;
+    private TabCursoTareaView tabCursoTareaView;
+    private TabCursoUnidadView tabCursoUnidadView;
+    private boolean finishUpdateUnidadFb;
 
-    public TabCursoPresenteImpl(UseCaseHandler handler, Resources res, GetCalendarioPeriodo getCalendarioPeriodo, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje) {
+    public TabCursoPresenteImpl(UseCaseHandler handler, Resources res, GetCalendarioPeriodo getCalendarioPeriodo, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje, UpdateFireBasePersona updateFireBasePersona,
+                                Online online) {
         super(handler, res);
         this.getCalendarioPeriodo = getCalendarioPeriodo;
         this.updateFireBaseUnidadAprendizaje = updateFireBaseUnidadAprendizaje;
+        this.updateFireBasePersona = updateFireBasePersona;
+        this.online = online;
     }
 
     @Override
@@ -54,17 +69,42 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         super.onCreate();
         setupVaribleGlobal();
         setupCalendarioPerio();
+        if(view!=null)view.showTitle(nombreCurso);
+        if(view!=null)view.showSubtitle(seccionYPeriodo);
+        if(view!=null)view.showAppbarBackground(fotoCurso, parametroColor1);
         if(view!=null)view.changeColorToolbar(parametroColor1);
         if(view!=null)view.changeColorFloatButon(parametroColor2);
-        updateFireBaseUnidadAprendizaje();
+        online.online(success -> {
+            if(success){
+                updateFireBaseUnidadAprendizaje();
+                if(view!=null)view.modoOnline();
+            }else {
+                if(view!=null)view.modoOffline();
+            }
+        });
     }
 
     private void updateFireBaseUnidadAprendizaje() {
-
+        finishUpdateUnidadFb = false;
         updateFireBaseUnidadAprendizaje.execute(cargaCursoId, idCalendarioPeriodo, new UpdateFireBaseUnidadAprendizaje.CallBack() {
             @Override
             public void onSucces() {
-                if(view!=null)view.notifyChangeFragment();
+                finishUpdateUnidadFb = true;
+               if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
+               if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+            }
+
+            @Override
+            public void onError(String error) {
+                finishUpdateUnidadFb = true;
+                if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
+                if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+            }
+        });
+        updateFireBasePersona.execute(cargaCursoId, new UpdateFireBasePersona.CallBack() {
+            @Override
+            public void onSucces() {
+
             }
 
             @Override
@@ -72,9 +112,6 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
 
             }
         });
-
-
-
     }
 
     private void setupCalendarioPerio() {
@@ -87,7 +124,8 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         //#region Buscar calendario periodo con el estado vigente
         for (PeriodoUi periodo : this.calendarioPeriodoList) {
             // idCalendarioPeriodo = periodo.getIdCalendarioPeriodo();
-            if (periodo.getEstado()== PeriodoUi.Estado.Vigente) {
+            if (periodo.isVigente()) {
+                Log.d(getTag(), "PeriodoUi.Estado.Vigente");
                 periodoSelected = periodo;
                 break;
             }
@@ -137,6 +175,7 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         }
 
         if(periodoSelected!=null){
+            Log.d(getTag(), "periodoSelected "+periodoSelected.getIdPeriodo()+" "+periodoSelected.getEstado());
             periodoSelected.setStatus(true);
             idCalendarioPeriodo = periodoSelected.getIdCalendarioPeriodo();
         }
@@ -156,9 +195,9 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
 
     private void setupVaribleGlobal() {
         GbCursoUi gbCursoUi = iCRMEdu.variblesGlobales.getGbCursoUi();
-        if(view!=null)view.showTitle(gbCursoUi.getNombre());
-        if(view!=null)view.showSubtitle(gbCursoUi.getSeccionyperiodo());
-        if(view!=null)view.showAppbarBackground(gbCursoUi.getParametroDisenioPath(), gbCursoUi.getParametroDisenioColor1());
+        this.nombreCurso = gbCursoUi.getNombre();
+        this.seccionYPeriodo = gbCursoUi.getSeccionyperiodo();
+        this.fotoCurso = gbCursoUi.getParametroDisenioPath();
         this.anioAcademicoId = iCRMEdu.variblesGlobales.getAnioAcademicoId();
         this.programaEducativoId = iCRMEdu.variblesGlobales.getProgramEducativoId();
         this.cargaCursoId = gbCursoUi.getCargaCursoId();
@@ -187,6 +226,74 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         calendarioperiodo = periodoUi;
         idCalendarioPeriodo=periodoUi.getIdCalendarioPeriodo();
         changeVaribleGlobaCalendarioPeriodo(calendarioperiodo);
-        if(view!=null)view.notifyChangeFragment();
+        if(tabCursoTareaView!=null)tabCursoTareaView.showProgress();
+        if(tabCursoUnidadView!=null)tabCursoUnidadView.showProgress();
+        online.online(success -> {
+            if(success){
+                updateFireBaseUnidadAprendizaje();
+                if(view!=null)view.modoOnline();
+            }else {
+                if(view!=null)view.modoOffline();
+                if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+                if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
+            }
+        });
+
+    }
+
+    @Override
+    public void onVolverCargar() {
+        online.restarOnline(success -> {
+            if(success){
+                updateFireBaseUnidadAprendizaje();
+                if(view!=null)view.modoOnline();
+            }else {
+                if(view!=null)view.showMessage("Sin conexión");
+                if(view!=null)view.modoOffline();
+            }
+        });
+    }
+
+    @Override
+    public void attachView(TabCursoTareaView tabCursoTareaView) {
+       this.tabCursoTareaView = tabCursoTareaView;
+       tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+    }
+
+    @Override
+    public void attachView(TabCursoUnidadView tabCursoUnidadView) {
+        this.tabCursoUnidadView = tabCursoUnidadView;
+         tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
+    }
+
+    @Override
+    public void onTabCursoTareaViewDestroyed() {
+        tabCursoTareaView=null;
+    }
+
+    @Override
+    public void onTabCursoUnidadViewDestroyed() {
+        tabCursoUnidadView =null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        finishUpdateUnidadFb = false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        online.online(success -> {
+            if(success){
+                if(!finishUpdateUnidadFb){
+                    updateFireBaseUnidadAprendizaje();
+                }
+                if(view!=null)view.modoOnline();
+            }else {
+                if(view!=null)view.modoOffline();
+            }
+        });
     }
 }

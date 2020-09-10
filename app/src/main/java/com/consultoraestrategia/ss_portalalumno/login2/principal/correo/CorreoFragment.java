@@ -34,6 +34,9 @@ public class CorreoFragment extends Fragment implements CorreoView {
     ImageView imageView17;
     @BindView(R.id.btn_atras_correo)
     ImageView btnAtrasCorreo;
+    @BindView(R.id.imageView8)
+    ImageView imageView8;
+
     private Unbinder unbinder;
     private Login2Presenter presenter;
 
@@ -42,9 +45,23 @@ public class CorreoFragment extends Fragment implements CorreoView {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login_correo, container, false);
         unbinder = ButterKnife.bind(this, view);
-        Glide.with(imageView17)
-                .load(R.drawable.docente_mentor)
-                .into(imageView17);
+        if(getResources().getString(R.string.app_name).equals("Educar Student")){
+
+            Glide.with(imageView17)
+                    .load(R.drawable.logo_educar)
+                    .into(imageView17);
+            imageView8.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(R.drawable.docente_mentor)
+                    .into(imageView8);
+
+
+        }else{
+            Glide.with(imageView17)
+                    .load(R.drawable.docente_mentor)
+                    .into(imageView17);
+            imageView8.setVisibility(View.INVISIBLE);
+        }
         return view;
     }
 

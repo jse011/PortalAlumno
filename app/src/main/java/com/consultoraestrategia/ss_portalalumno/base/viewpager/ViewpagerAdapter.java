@@ -20,7 +20,7 @@ public class ViewpagerAdapter extends FragmentStatePagerAdapter {
 
     private SparseArray<Fragment> registeredFragments = new SparseArray<>();
     public ViewpagerAdapter(FragmentManager fm, int countInitfragment, LifecycleImpl.LifecycleListener lifecycleListener) {
-        super(fm);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         if(lifecycleListener != null)fm.registerFragmentLifecycleCallbacks(new LifecycleImpl(countInitfragment,lifecycleListener),true);
     }
 

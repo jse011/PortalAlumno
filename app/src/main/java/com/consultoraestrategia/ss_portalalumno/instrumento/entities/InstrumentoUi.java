@@ -10,6 +10,8 @@ public class InstrumentoUi {
     private int cantidadPreguntaResueltas;
     private int catidadPreguntasSinEnviar;
     private int porcentaje;
+    private String color;
+    private String color2;
 
     public int getInstrumentoEvalId() {
         return instrumentoEvalId;
@@ -65,5 +67,21 @@ public class InstrumentoUi {
 
     public int getPorcentaje() {
         return porcentaje;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor2(String color2) {
+        this.color2 = color2;
+    }
+
+    public String getColor2() {
+        return color2;
     }
 }

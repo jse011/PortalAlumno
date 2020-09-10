@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.login2.adapter.PersonaAdapter;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
@@ -35,6 +39,8 @@ public class ListaUsuarioFragment extends Fragment implements ListaUsuarioView, 
     private Unbinder unbinder;
     private Login2Presenter presenter;
     private PersonaAdapter usuarioAdapter;
+    @BindView(R.id.imageView13)
+    ImageView imageView13;
 
     @Nullable
     @Override
@@ -51,6 +57,17 @@ public class ListaUsuarioFragment extends Fragment implements ListaUsuarioView, 
         rcContactos.setLayoutManager(new LinearLayoutManager(getContext()));
         this.usuarioAdapter = new PersonaAdapter(new ArrayList<PersonaUi>(), this);
         rcContactos.setAdapter(this.usuarioAdapter);
+        if(getResources().getString(R.string.app_name).equals("Educar Student")){
+
+            Glide.with(imageView13)
+                    .load(R.drawable.logo_educar)
+                    .into(imageView13);
+
+        }else{
+            Glide.with(imageView13)
+                    .load(R.drawable.docente_mentor)
+                    .into(imageView13);
+        }
     }
 
     @Override

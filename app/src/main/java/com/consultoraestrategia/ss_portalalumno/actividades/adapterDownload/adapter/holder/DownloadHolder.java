@@ -75,7 +75,7 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         hideDowload();
         hiProgress();
         hiProgressSuccess();
-        switch (estadoFileU){
+        /*switch (estadoFileU){
             case SIN_DESCARGAR:
                 showDowload();
                 break;
@@ -91,7 +91,7 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
             case DESCARGA_COMPLETA:
 
                 break;
-        }
+        }*/
     }
 
     private void setupIcono(RepositorioTipoFileU tipoFileU) {
@@ -110,23 +110,6 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
                 break;
             case IMAGEN:
                 imgRecurso.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ext_img));
-                Glide.with(itemView.getContext())
-                        .asBitmap()
-                        .load(repositorioFileUi.getUrl())
-                        .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .centerCrop()
-                        ).listener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        imgRecurso.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ext_img));
-                        return false;
-                    }
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                }).into(imgRecurso);
-
                 break;
             case VINCULO:
                 imgRecurso.setImageResource(R.drawable.ext_link);

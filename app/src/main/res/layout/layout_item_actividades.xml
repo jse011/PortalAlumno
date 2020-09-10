@@ -5,6 +5,7 @@
     android:id="@+id/lin_actividad_Det"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/md_white_1000"
     android:orientation="vertical"
     android:visibility="visible">
 
@@ -20,25 +21,9 @@
         app:layout_constraintStart_toStartOf="@+id/txt_tiempo"
         app:layout_constraintTop_toBottomOf="@+id/txt_tiempo" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_act_recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp"
-        android:paddingBottom="8dp"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        yourapp:itemCount="2"
-        yourapp:listitem="@layout/layout_item_sub_recursos" />
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
+        android:background="?android:attr/selectableItemBackground"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,40 +35,41 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:maxLines="2"
             android:text="Actividad de la sesión Actividad de la sesión "
-            android:textColor="@color/md_black_1000"
-            android:textSize="14dp"
+            android:textColor="@color/md_green_600"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/cont_img"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/cont_img"
+            app:layout_constraintTop_toTopOf="@+id/cont_img" />
 
-        <ImageView
-            android:id="@+id/imageView2"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cont_img"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/circle_actividad"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_computadora" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.consultoraestrategia.ss_portalalumno.gadgets.justify.JustifiedTextView
-            android:id="@+id/txt_descripcion_act_det"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="16dp"
-            android:textSize="12sp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toBottomOf="@+id/txt_actividad_det"
-            yourapp:text="Titulo" />
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.238"
+                app:srcCompat="@drawable/ic_book" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -91,26 +77,58 @@
         android:id="@+id/textView4"
         android:layout_width="0dp"
         android:layout_height="0.5dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/md_grey_600"
+        android:background="@color/md_grey_400"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:orientation="vertical"-->
-    <!--android:layout_margin="5dp"-->
-    <!--android:paddingBottom="5dp">-->
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:background="@color/md_grey_400"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!--<android.support.v7.widget.RecyclerView-->
-    <!--android:id="@+id/rv_act_recursos"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
 
-    <!--</LinearLayout>-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/conten_actividad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+        <com.consultoraestrategia.ss_portalalumno.gadgets.justify.JustifiedTextView
+            android:id="@+id/txt_descripcion_act_det"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:textSize="14sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            yourapp:text="Titulo" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_act_recursos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="16dp"
+            android:paddingBottom="8dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_descripcion_act_det"
+            yourapp:itemCount="2"
+            yourapp:listitem="@layout/layout_item_sub_recursos" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

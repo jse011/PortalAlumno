@@ -7,7 +7,7 @@ import com.consultoraestrategia.ss_portalalumno.instrumento.entities.VariableUi;
 import java.util.List;
 
 public interface InstrumentoRepository {
-    void updateFirebaseInstrumento(int sesionAprendizajeId, int cargaCursoId, int alumnoId, CallbackSimple callbackSimple);
+
     void saveFirebaseInstrumento(int cargaCursoId, int sesionAprensizajeId, VariableUi variableUi, CallbackSimple callbackSimple);
     List<InstrumentoUi> getInstrumentos(int sesionAprendizajeId);
     InstrumentoUi getInstrumento(int instrumentoId);

@@ -52,222 +52,6 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
     private String TAG = InstrumentoRepositoryImpl.class.getSimpleName();
 
     @Override
-    public void updateFirebaseInstrumento(int sesionAprendizajeId, int cargaCursoId, int alumnoId, CallbackSimple callbackSimple) {
-        Webconfig webconfig = SQLite.select()
-                .from(Webconfig.class)
-                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
-                .querySingle();
-
-        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
-
-        SilaboEvento silaboEvento = SQLite.select()
-                .from(SilaboEvento.class)
-                .where(SilaboEvento_Table.cargaCursoId.eq(cargaCursoId))
-                .querySingle();
-
-        int silaboEventoId = silaboEvento!=null?silaboEvento.getSilaboEventoId():0;
-
-
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
-        mDatabase.child("/AV_Instrumento/Pregunta/silid_"+silaboEventoId+"/sesid_" + sesionAprendizajeId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        List<InstrumentoEvaluacion> instrumentoEvaluacionList = new ArrayList<>();
-                        List<Variable> variableList = new ArrayList<>();
-                        List<Valor> valorList = new ArrayList<>();
-                        for (DataSnapshot instrumentoSnapshot : dataSnapshot.getChildren()){
-                            FBInstrumento fbInstrumento = instrumentoSnapshot.getValue(FBInstrumento.class);
-                            if(fbInstrumento==null) continue;
-                            InstrumentoEvaluacion instrumentoEvaluacion = new InstrumentoEvaluacion();
-                            instrumentoEvaluacion.setInstrumentoEvalId(fbInstrumento.getInstrumentoEvalId());
-                            instrumentoEvaluacion.setCantidadPreguntas(fbInstrumento.getCantidadPreguntas());
-                            instrumentoEvaluacion.setIcono(fbInstrumento.getIcono());
-                            instrumentoEvaluacion.setImagen(fbInstrumento.getImagen());
-                            instrumentoEvaluacion.setNombre(fbInstrumento.getNombre());
-                            instrumentoEvaluacion.setSesionId(fbInstrumento.getSesionAprendizajeId());
-                            instrumentoEvaluacion.setSilaboId(fbInstrumento.getSilaboEventoId());
-                            instrumentoEvaluacionList.add(instrumentoEvaluacion);
-                            if(fbInstrumento.getVariables()!=null)
-                                for (Map.Entry<String, FBInstrumento.FBVariables> mapFbVariable: fbInstrumento.getVariables().entrySet()) {
-                                    FBInstrumento.FBVariables fbVariables = mapFbVariable.getValue();
-                                    Variable variable = new Variable();
-                                    variable.setVariableId(fbVariables.getVariableId());
-                                    variable.setBancoPreguntaId(fbVariables.getBancoPreguntaId());
-                                    variable.setDimensionId(fbVariables.getDimensionId());
-                                    variable.setDisenioPreguntaId(fbVariables.getDisenioPreguntaId());
-                                    variable.setEtiqueta(fbVariables.getEtiqueta());
-                                    variable.setIconoVariable(fbVariables.getIconoVariable());
-                                    variable.setInputRespuesta(fbVariables.getInputRespuesta());
-                                    variable.setInstrumentoEvalId(fbVariables.getInstrumentoEvalId());
-                                    variable.setLongitudPaso(fbVariables.getLongitudPaso());
-                                    variable.setMedidaId(fbVariables.getMedidaId());
-                                    variable.setNivelPreguntaId(fbVariables.getNivelPreguntaId());
-                                    variable.setNombre(fbVariables.getNombre());
-                                    //variable.setOrden(fbVariables.getOrden());
-                                    variable.setParentId(fbVariables.getParentId());
-                                    variable.setPath(fbVariables.getPath());
-                                    variable.setPeso(fbVariables.getPeso());
-                                    variable.setPuntaje(fbVariables.getPuntaje());
-                                    variable.setTipoInputRespuestaId(fbVariables.getTipoInputRespuestaId());
-                                    variable.setTipoPreguntaId(fbVariables.getTipoPreguntaId());
-                                    variable.setTipoRespuestaId(fbVariables.getTipoRespuestaId());
-                                    variable.setTipoVariableId(fbVariables.getTipoVariableId());
-                                    variable.setValorMaximo(fbVariables.getValorMaximo());
-                                    variable.setValorMinimo(fbVariables.getValorMinimo());
-                                    variableList.add(variable);
-                                    if(fbVariables.getValores()!=null)
-                                        for (Map.Entry<String, FBInstrumento.FBValores> mapFbValores: fbVariables.getValores().entrySet()){
-                                            FBInstrumento.FBValores fbValores = mapFbValores.getValue();
-                                            Valor valor = new Valor();
-                                            valor.setValorId(fbValores.getValorId());
-                                            valor.setDescripcion(fbValores.getDescripcion());
-                                            valor.setEtiqueta(fbValores.getEtiqueta());
-                                            valor.setInputRespuesta(fbValores.getInputRespuesta());
-                                            valor.setPath(fbValores.getPath());
-                                            valor.setPuntaje(fbValores.getPuntaje());
-                                            valor.setInputRespuesta(fbValores.getInputRespuesta());
-                                            valor.setValor(fbValores.getValor());
-                                            valor.setVariableId(fbValores.getVariableId());
-                                            valorList.add(valor);
-                                        }
-
-                                }
-                        }
-
-                        SessionUser sessionUser = SessionUser.getCurrentUser();
-                        int alumnoIdFinal =  sessionUser!=null?sessionUser.getPersonaId():0;
-                        Log.d(TAG, "alumnoId: "+alumnoIdFinal);
-
-                        mDatabase.child("/AV_Instrumento/Respuesta/silid_"+silaboEventoId+"/sesid_" + sesionAprendizajeId+"/aluid_"+alumnoIdFinal+"/Instrumentos")
-                             .addListenerForSingleValueEvent(new ValueEventListener() {
-                                 @Override
-                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                     List<InstrumentoEvaluacionObservado> instrumentoEvaluacionObsList = new ArrayList<>();
-                                     List<VariableObservado> variableObservadoList = new ArrayList<>();
-                                     List<VariableObservado> variableObservadosRemove = SQLite.select()
-                                             .from(VariableObservado.class)
-                                             .where(VariableObservado_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
-                                             .and(VariableObservado_Table.syncFlag.in(BaseEntity.FLAG_ADDED, BaseEntity.FLAG_UPDATED))
-                                             .queryList();
-
-                                     for (DataSnapshot instrumentoObservadoSnapshot : dataSnapshot.getChildren()){
-                                         FBInstrumento fbInstrumentoObservado = instrumentoObservadoSnapshot.getValue(FBInstrumento.class);
-                                         if(fbInstrumentoObservado==null) continue;
-                                         InstrumentoEvaluacionObservado instrumentoEvaluacionObservado = new InstrumentoEvaluacionObservado();
-                                         instrumentoEvaluacionObservado.setKey(fbInstrumentoObservado.getInstrumentoObservadoId());
-                                         instrumentoEvaluacionObservado.setInstrumentoObservadoId(fbInstrumentoObservado.getInstrumentoObservadoId());
-                                         instrumentoEvaluacionObservado.setInstrumentoEvalId(fbInstrumentoObservado.getInstrumentoEvalId());
-                                         instrumentoEvaluacionObservado.setPersonaId(alumnoIdFinal);
-                                         instrumentoEvaluacionObsList.add(instrumentoEvaluacionObservado);
-                                         Log.d(TAG, fbInstrumentoObservado.toString());
-
-                                         if(fbInstrumentoObservado.getVariables()!=null)
-                                             for (Map.Entry<String, FBInstrumento.FBVariables> mapFbVariable: fbInstrumentoObservado.getVariables().entrySet()){
-                                                 FBInstrumento.FBVariables fbVariablesObserda = mapFbVariable.getValue();
-                                                 VariableObservado variableObservadoRemove = null;
-                                                 for (VariableObservado item: variableObservadosRemove){
-                                                     if(item.getInstrumentoObservadoId().equals(fbInstrumentoObservado.getInstrumentoObservadoId())
-                                                             &&item.getVariableId()==fbVariablesObserda.getVariableId()){
-                                                         variableObservadoRemove = item;
-                                                         break;
-                                                     }
-                                                 }
-                                                 if(variableObservadoRemove!=null){
-                                                     variableObservadoList.add(variableObservadoRemove);
-                                                 }else if(fbVariablesObserda.getRespondida()==1){
-                                                     VariableObservado variableObservado = new VariableObservado();
-                                                     variableObservado.setKey(IdGenerator.generateId());
-                                                     variableObservado.setVariableObservadaId(variableObservado.getKey());
-                                                     variableObservado.setInstrumentoObservadoId(fbInstrumentoObservado.getInstrumentoObservadoId());
-                                                     variableObservado.setVariableId(fbVariablesObserda.getVariableId());
-                                                     variableObservado.setPuntajeObtenido(fbVariablesObserda.getPuntajeObtenido());
-                                                     variableObservado.setValorId(fbVariablesObserda.getValorId());
-                                                     variableObservado.setRespuestaActual(fbVariablesObserda.getRespuestaActual());
-                                                     variableObservado.setSesionAprendizajeId(sesionAprendizajeId);
-                                                     variableObservado.setSilaboEventoId(silaboEventoId);
-                                                     variableObservado.setInstrumentoEvalId(fbInstrumentoObservado.getInstrumentoEvalId());
-                                                     variableObservadoList.add(variableObservado);
-                                                 }
-
-                                             }
-                                     }
-
-                                     DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
-                                     Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-                                         @Override
-                                         public void execute(DatabaseWrapper databaseWrapper) {
-                                            List<InstrumentoEvaluacion> instrumentoEvaluacions = SQLite.select()
-                                                    .from(InstrumentoEvaluacion.class)
-                                                    .where(InstrumentoEvaluacion_Table.SesionId.eq(sesionAprendizajeId))
-                                                    .queryList(databaseWrapper);
-
-                                            List<Integer> instrumentoEvaluacionIdList = new ArrayList<>();
-                                            for (InstrumentoEvaluacion instrumentoEvaluacion : instrumentoEvaluacions)instrumentoEvaluacionIdList.add(instrumentoEvaluacion.getInstrumentoEvalId());
-                                             List<Variable> variables = SQLite.select()
-                                                     .from(Variable.class)
-                                                     .where(Variable_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList))
-                                                     .queryList(databaseWrapper);
-                                             List<Integer> variableIdList = new ArrayList<>();
-                                             for (Variable variable : variables)variableIdList.add(variable.getVariableId());
-
-                                             TransaccionUtils.deleteTable(InstrumentoEvaluacion.class, InstrumentoEvaluacion_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList));
-                                             TransaccionUtils.deleteTable(Variable.class, Variable_Table.VariableId.in(variableIdList));
-                                             TransaccionUtils.deleteTable(Valor.class, Valor_Table.ValorId.in(variableIdList));
-
-                                             List<InstrumentoEvaluacionObservado> instrumentoEvaluacionObservados = SQLite.select()
-                                                     .from(InstrumentoEvaluacionObservado.class)
-                                                     .where(InstrumentoEvaluacionObservado_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList))
-                                                     .queryList(databaseWrapper);
-
-                                             List<String> instrumentoEvaluacionObservadaIdList = new ArrayList<>();
-                                             for (InstrumentoEvaluacionObservado instrumentoEvaluacionObs : instrumentoEvaluacionObservados)instrumentoEvaluacionObservadaIdList.add(instrumentoEvaluacionObs.getInstrumentoObservadoId());
-
-                                             TransaccionUtils.deleteTable(InstrumentoEvaluacionObservado.class, InstrumentoEvaluacionObservado_Table.InstrumentoObservadoId.in(instrumentoEvaluacionObservadaIdList));
-                                             TransaccionUtils.deleteTable(VariableObservado.class, VariableObservado_Table.InstrumentoObservadoId.in(instrumentoEvaluacionObservadaIdList));
-
-
-                                             TransaccionUtils.fastStoreListInsert(InstrumentoEvaluacion.class, instrumentoEvaluacionList, databaseWrapper, false);
-                                             TransaccionUtils.fastStoreListInsert(Variable.class, variableList, databaseWrapper, false);
-                                             TransaccionUtils.fastStoreListInsert(Valor.class, valorList, databaseWrapper, false);
-                                             TransaccionUtils.fastStoreListInsert(InstrumentoEvaluacionObservado.class, instrumentoEvaluacionObsList, databaseWrapper, false);
-                                             TransaccionUtils.fastStoreListInsert(VariableObservado.class, variableObservadoList, databaseWrapper, false);
-                                         }
-                                     }).success(new Transaction.Success() {
-                                         @Override
-                                         public void onSuccess(@NonNull Transaction transaction) {
-                                             callbackSimple.onLoad(true);
-                                         }
-                                     }).error(new Transaction.Error() {
-                                         @Override
-                                         public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
-                                             error.printStackTrace();
-                                             callbackSimple.onLoad(false);
-                                         }
-                                     }).build();
-
-                                     transaction.execute();
-
-                                 }
-
-                                 @Override
-                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                     callbackSimple.onLoad(false);
-                                 }
-                             });
-
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        callbackSimple.onLoad(false);
-                    }
-                });
-    }
-
-    @Override
     public void saveFirebaseInstrumento(int cargaCursoId, int sesionAprensizajeId, VariableUi variableUi, CallbackSimple callbackSimple) {
         Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
@@ -473,6 +257,14 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
 
     @Override
     public InstrumentoUi getInstrumento(int instrumentoId) {
+
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_PathImgPreguntasInstrumento"))
+                .querySingle();
+
+        String pathValores = webconfig!=null?webconfig.getContent():"";
+
         List<Variable> variableList = SQLite.select()
                 .from(Variable.class)
                 .where(Variable_Table.InstrumentoEvalId.eq(instrumentoId))
@@ -503,7 +295,7 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
             //variableUi.setTipoRespuestaId(variable.getTipoRespuestaId()==11?12:variable.getTipoRespuestaId());
             variableUi.setTipoRespuestaId(variable.getTipoRespuestaId());
             variableUi.setPuntaje(variable.getPuntaje());
-            variableUi.setPath(variable.getPath());
+            variableUi.setPath(!TextUtils.isEmpty(variable.getPath())?pathValores+variable.getPath():"");
             if(variableObservado!=null){
                 variableUi.setPuntajeObtenido(variableObservado.getPuntajeObtenido());
                 variableUi.setVariableObservadaId(variableObservado.getVariableObservadaId());
@@ -524,7 +316,7 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
                 valorUi.setIconoValor(valor.getIconoValor());
                 valorUi.setEtiqueta(valor.getEtiqueta());
                 valorUi.setInputRespuesta(valor.getInputRespuesta());
-                valorUi.setPath(valor.getPath());
+                valorUi.setPath(!TextUtils.isEmpty(valor.getPath())?pathValores+valor.getPath():"");
                 valorUi.setPuntaje(valor.getPuntaje());
                 valorUi.setTipoInputRespuestaId(valor.getTipoInputRespuestaId());
                 valorUi.setVariableId(valor.getVariableId());

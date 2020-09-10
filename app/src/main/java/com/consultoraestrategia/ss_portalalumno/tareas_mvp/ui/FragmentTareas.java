@@ -22,7 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
-import com.consultoraestrategia.ss_portalalumno.global.offline.OfflineFirebase;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoTareaView;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSesion;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSilabo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
@@ -60,7 +62,7 @@ import butterknife.Unbinder;
  * Created by irvinmarin on 10/11/2017.
  */
 
-public class FragmentTareas extends Fragment implements TareasMvpView, UnidadAprendizajeListener, TareasUIListener {
+public class FragmentTareas extends Fragment implements TareasMvpView, UnidadAprendizajeListener, TareasUIListener, TabCursoTareaView {
 
     private static final String TAG = FragmentTareas.class.getSimpleName();
     View viewPadre;
@@ -136,7 +138,7 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
 
         TareasMvpRepository tareasMvpRepository = TareasMvpRepository.getInstace(
                 new TareasLocalDataSource(),
-                new RemoteMvpDataSource(getContext()));
+                new RemoteMvpDataSource(ApiRetrofit.getInstance()));
         presenter = new TareasMvpPresenterImpl(
                 new UseCaseHandler(
                         new UseCaseThreadPoolScheduler()),
@@ -145,12 +147,12 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
                 new UpdateSuccesDowloadArchivo(tareasMvpRepository),
                 new MoverArchivosAlaCarpetaTarea(TareasMvpRepository.getInstace(
                         new TareasLocalDataSource(),
-                        new RemoteMvpDataSource(getContext()))
+                        new RemoteMvpDataSource(ApiRetrofit.getInstance()))
                 ),
 
                 new UpdateFireBaseTareaSilabo(tareasMvpRepository),
                 new UpdateFireBaseTareaSesion(tareasMvpRepository),
-                new OfflineFirebase(getContext())
+                new AndroidOnlineImpl(getContext())
         );
 
         setPresenter(presenter);
@@ -333,6 +335,11 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
         startActivity(new Intent(getContext(), TareaDescripcionActivity.class));
     }
 
+    @Override
+    public void updateTarea(TareasUI tareasUI) {
+        unidadesAdapter.notifyAllSectionsDataSetChanged();
+    }
+
 
     @Override
     public void onResume() {
@@ -438,7 +445,8 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
         presenter.onClickArchivo(repositorioFileUi);
     }
 
-    public void notifyChangeFragment() {
-        presenter.notifyChangeFragment();
+    @Override
+    public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
+        presenter.notifyChangeFragment(finishUpdateUnidadFb);
     }
 }

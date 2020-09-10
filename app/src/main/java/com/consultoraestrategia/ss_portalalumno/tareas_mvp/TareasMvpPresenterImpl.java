@@ -1,7 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.tareas_mvp;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -9,12 +8,13 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCase;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasC;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasC_Table;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
+import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
-import com.consultoraestrategia.ss_portalalumno.global.offline.Offline;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadImageUseCase;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.GetTareasUIList;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.MoverArchivosAlaCarpetaTarea;
@@ -56,9 +56,10 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
     private List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList = new ArrayList<>();
     private int anioAcademicoId;
     private int planCursoId;
-    private Offline offline;
+    private Online online;
     private UpdateFireBaseTareaSilabo updateFireBaseTareaSilabo;
     private UpdateFireBaseTareaSesion updateFireBaseTareaSesion;
+    private FirebaseCancel firebasTarea;
 
     public TareasMvpPresenterImpl(UseCaseHandler handler, GetTareasUIList getTareasUIList,
                                   DowloadImageUseCase dowloadImageUseCase,
@@ -66,14 +67,14 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
                                   MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea,
                                   UpdateFireBaseTareaSilabo updateFireBaseTareaSilabo,
                                   UpdateFireBaseTareaSesion updateFireBaseTareaSesion,
-                                  Offline offline) {
+                                  Online online) {
         this.handler = handler;
         this.getTareasUIList = getTareasUIList;
         this.dowloadImageUseCase = dowloadImageUseCase;
         this.updateSuccesDowloadArchivo = updateSuccesDowloadArchivo;
         this.moverArchivosAlaCarpetaTarea = moverArchivosAlaCarpetaTarea;
         this.updateFireBaseTareaSilabo = updateFireBaseTareaSilabo;
-        this.offline = offline;
+        this.online = online;
         this.updateFireBaseTareaSesion = updateFireBaseTareaSesion;
     }
 
@@ -114,8 +115,9 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
                                             for (RecursosUI newrepositorioFileUi : newtareasUI.getRecursosUIList()){
 
                                                 for (RecursosUI repositorioFileUi : tareasUI.getRecursosUIList()){
-
-                                                    if(repositorioFileUi.getArchivoId().equals(newrepositorioFileUi.getArchivoId())){
+                                                    String recurso1 = !TextUtils.isEmpty(repositorioFileUi.getArchivoId())?repositorioFileUi.getArchivoId():"";
+                                                    String recurso2 = !TextUtils.isEmpty(newrepositorioFileUi.getArchivoId())?newrepositorioFileUi.getArchivoId():"";
+                                                    if(recurso1.equals(recurso2)&&!TextUtils.isEmpty(recurso1)&&!TextUtils.isEmpty(recurso2)){
                                                         newtareasUI.getRecursosUIList().set(pocision, repositorioFileUi);
                                                     }
 
@@ -142,7 +144,6 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
                 headerTareasAprendizajeUIList.clear();
                 headerTareasAprendizajeUIList.addAll(response.getHeaderTareasAprendizajeUIList());
                 if (view!=null)view.showTareasUIList(headerTareasAprendizajeUIList, idCurso, parametroDisenioUi);
-                if(response.getHeaderTareasAprendizajeUIList().isEmpty())if(view!=null)view.showMessage();
                 if(view!=null)view.hideProgress();
             }
 
@@ -180,6 +181,7 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        if(firebasTarea!=null)firebasTarea.cancel();
     }
 
     @Override
@@ -189,21 +191,13 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
     @Override
     public void setExtras(Bundle extras) {
-
         this.tipoTarea = extras.getInt(FragmentTareas.tipoTareas,0);
-
-
         setData();
-        if(view!=null)view.showProgress();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(view!=null)view.hideProgress();
+        online.online(success -> {
+            if(!success){
                 getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
             }
-        }, 1000);
-
-
+        });
     }
 
     private void setData() {
@@ -509,44 +503,78 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
     }
 
     @Override
-    public void notifyChangeFragment() {
+    public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
         cancelAllDowload();
         setData();
-        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-        if(offline.isConnect()){
-            List<TareasUI> tareasUIList = new ArrayList<>();
-            for (HeaderTareasAprendizajeUI headerTareasAprendizajeUIList: headerTareasAprendizajeUIList){
-                tareasUIList.addAll(headerTareasAprendizajeUIList.getTareasUIList());
-            }
-            if(tipoTarea==0){
+        if(view!=null)view.showProgress();
+        if(firebasTarea!=null)firebasTarea.cancel();
+        online.online(success -> {
+            if(success&&finishUpdateUnidadFb){
+                List<TareasUI> tareasUIList = new ArrayList<>();
+                for (HeaderTareasAprendizajeUI headerTareasAprendizajeUIList: headerTareasAprendizajeUIList){
+                    tareasUIList.addAll(headerTareasAprendizajeUIList.getTareasUIList());
+                }
+                if(tipoTarea==0){
 
-                updateFireBaseTareaSilabo.execute(idCargaCurso, idCalendarioPeriodo, tareasUIList, new UpdateFireBaseTareaSilabo.CallBack() {
-                    @Override
-                    public void onSucces() {
-                        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-                    }
+                   firebasTarea = updateFireBaseTareaSilabo.execute(idCargaCurso, idCalendarioPeriodo, tareasUIList, new UpdateFireBaseTareaSilabo.CallBack() {
+                        @Override
+                        public void onSucces() {
+                            getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                        }
 
-                    @Override
-                    public void onError(String error) {
+                        @Override
+                        public void onError(String error) {
+                            if(view!=null)view.hideProgress();
+                        }
 
-                    }
-                });
+                       @Override
+                       public void onChangeTarea(String tareaId, String nota, int tipoNotaId) {
+                                //Aqui
+                          for (HeaderTareasAprendizajeUI headerTareasAprendizajeUI: headerTareasAprendizajeUIList){
+                              for (TareasUI tareasUI : headerTareasAprendizajeUI.getTareasUIList()){
+                                  if(tareasUI.getKeyTarea().equals(tareaId)){
+                                        tareasUI.setNota(nota);
+                                        tareasUI.setTipoNotaId(tipoNotaId);
+                                        if(view!=null)view.updateTarea(tareasUI);
+                                        break;
+                                  }
+                              }
+                          }
+                       }
+                   });
+                }else {
+                    updateFireBaseTareaSesion.execute(idCargaCurso, idCalendarioPeriodo, mSesionAprendizajeId, tareasUIList, new UpdateFireBaseTareaSesion.CallBack() {
+                        @Override
+                        public void onSucces() {
+                            getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                            if(view!=null)view.hideProgress();
+                            if(headerTareasAprendizajeUIList.isEmpty()){
+                                if(view!=null)view.showMessage();
+                            }else {
+                                if(view!=null)view.hideMessage();
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            if(view!=null)view.hideProgress();
+                        }
+                    });
+                }
             }else {
-                updateFireBaseTareaSesion.execute(idCargaCurso, idCalendarioPeriodo, mSesionAprendizajeId, tareasUIList, new UpdateFireBaseTareaSesion.CallBack() {
-                    @Override
-                    public void onSucces() {
-                        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                if(tipoTarea==0){
+                    getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                }else {
+                    getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+                    if(view!=null)view.hideProgress();
+                    if(headerTareasAprendizajeUIList.isEmpty()){
+                        if(view!=null)view.showMessage();
+                    }else {
+                        if(view!=null)view.hideMessage();
                     }
-
-                    @Override
-                    public void onError(String error) {
-
-                    }
-                });
+                }
             }
-
-
-        }
+        });
     }
 
     private void cancelAllDowload() {
@@ -572,4 +600,5 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
             e.printStackTrace();
         }
     }
+
 }

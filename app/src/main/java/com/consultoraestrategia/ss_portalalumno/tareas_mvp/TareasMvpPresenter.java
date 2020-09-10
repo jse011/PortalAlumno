@@ -46,6 +46,6 @@ public interface TareasMvpPresenter extends BasePresenter<TareasMvpView> {
 
     void onClickTarea(TareasUI tareasUI);
 
-    void notifyChangeFragment();
+    void notifyChangeFragment(boolean finishUpdateUnidadFb);
 
 }

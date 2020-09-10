@@ -4,6 +4,7 @@ package com.consultoraestrategia.ss_portalalumno.actividades.data.source;
 import com.consultoraestrategia.ss_portalalumno.actividades.data.source.local.ActividadesLocalDataSource;
 import com.consultoraestrategia.ss_portalalumno.actividades.data.source.remote.ActividadesRemoteDataSource;
 import com.consultoraestrategia.ss_portalalumno.actividades.entidades.ActividadesUi;
+import com.consultoraestrategia.ss_portalalumno.actividades.entidades.InstrumentoUi;
 
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class ActividadesRepository implements ActividadesDataSource {
     }
 
     @Override
-    public void getActividadesList(int cargaCurso, int sesionAprendizajeId, String backgroundColor, CallbackActividades callbackActividades) {
-        localDataSource.getActividadesList(cargaCurso, sesionAprendizajeId, backgroundColor, callbackActividades);
+    public void getActividadesList(int cargaCurso, int sesionAprendizajeId, CallbackActividades callbackActividades) {
+        localDataSource.getActividadesList(cargaCurso, sesionAprendizajeId, callbackActividades);
     }
 
     @Override
@@ -43,6 +44,11 @@ public class ActividadesRepository implements ActividadesDataSource {
     @Override
     public void upadteFirebaseActividad(int cargaCurso, int sesionAprendizajeId, List<ActividadesUi> actividadesUiList, CallbackSimple callbackSimple) {
         remoteDataSource.upadteFirebaseActividad(cargaCurso, sesionAprendizajeId, actividadesUiList, callbackSimple);
+    }
+
+    @Override
+    public List<InstrumentoUi> getInstrumentos(int sesionAprendizajeId) {
+        return localDataSource.getInstrumentos(sesionAprendizajeId);
     }
 
 }

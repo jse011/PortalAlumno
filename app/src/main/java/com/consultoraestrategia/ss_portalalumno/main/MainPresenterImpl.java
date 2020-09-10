@@ -9,14 +9,18 @@ import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalendarioPeriodo;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AlumnoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AnioAcademicoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
@@ -30,10 +34,18 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     private AnioAcademicoUi anioAcademicoUi;
     private String usuario;
     private String firebaseNode;
+    private UpdateCalendarioPeriodo calendarioPeriodo;
+    private UpdateFirebaseTipoNota updateFirebaseTipoNota;
+    private RetrofitCancel cancel;
+    private Online online;
 
-    public MainPresenterImpl(UseCaseHandler handler, Resources res, GetCursos getCursos) {
+    public MainPresenterImpl(UseCaseHandler handler, Resources res, GetCursos getCursos, UpdateCalendarioPeriodo calendarioPeriodo, UpdateFirebaseTipoNota updateFirebaseTipoNota,
+                             Online online) {
         super(handler, res);
         this.getCursos = getCursos;
+        this.calendarioPeriodo = calendarioPeriodo;
+        this.updateFirebaseTipoNota = updateFirebaseTipoNota;
+        this.online = online;
     }
 
     @Override
@@ -75,8 +87,34 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         setupProgramaEducativo(response.getProgramaEduactivoUIList());
         this.cursosUiList.addAll(response.getCursosUiList());
         setupCurso();
+        updateFirebaseTipoNota();
+        cancel = calendarioPeriodo.execute(anioAcademicoUi.getAnioAcademicoId(), new UpdateCalendarioPeriodo.Callback() {
+            @Override
+            public void onSucess() {
 
+            }
 
+            @Override
+            public void onError() {
+
+            }
+        });
+
+    }
+
+    private void updateFirebaseTipoNota() {
+        if(programaEducativo!=null)
+            updateFirebaseTipoNota.execute(programaEducativo.getIdPrograma(), new UpdateFirebaseTipoNota.CallBack() {
+                @Override
+                public void onSucces() {
+
+                }
+
+                @Override
+                public void onError(String error) {
+
+                }
+            });
     }
 
     private void setupCurso(){
@@ -190,10 +228,10 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     @Override
     public void onClickBtnConfiguracion() {
         List<ConfiguracionUi> configuracionUiList = new ArrayList<>();
-        configuracionUiList.add(ConfiguracionUi.INFORMACION);
+        //configuracionUiList.add(ConfiguracionUi.INFORMACION);
         //configuracionUiList.add(ConfiguracionUi.BORRAR_CACHE);
         //configuracionUiList.add(ConfiguracionUi.CONTACTOS);
-        configuracionUiList.add(ConfiguracionUi.ALARMA);
+        //configuracionUiList.add(ConfiguracionUi.ALARMA);
         configuracionUiList.add(ConfiguracionUi.CERRAR_SESION);
 
 
@@ -210,4 +248,17 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         if(view!=null)view.cerrarSesion();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(cancel!=null)cancel.cancel();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        online.restarOnline(success -> {
+
+        });
+    }
 }

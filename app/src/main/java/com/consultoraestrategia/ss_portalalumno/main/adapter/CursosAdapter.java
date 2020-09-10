@@ -1,6 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.main.adapter;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,13 +97,23 @@ public class CursosAdapter extends RecyclerView.Adapter<CursosAdapter.ViewHolder
 
             txtSalon.setText(cursosUi.getSalon());
 
-            Glide.with(itemView.getContext())
-                    .load(cursosUi.getFotoProfesor())
-                    .apply(UtilsGlide.getGlideRequestOptions())
-                    .into(imgProfesor);
-            String docente = "Docente: "+cursosUi.getProfesor();
-            txtNombreDocente.setText(docente);
+            if(!TextUtils.isEmpty(cursosUi.getFotoProfesor())){
+                Glide.with(itemView.getContext())
+                        .load(cursosUi.getFotoProfesor())
+                        .apply(UtilsGlide.getGlideRequestOptions())
+                        .into(imgProfesor);
+                imgProfesor.setVisibility(View.VISIBLE);
+            }else{
+                imgProfesor.setVisibility(View.GONE);
+            }
 
+            if(!TextUtils.isEmpty(cursosUi.getProfesor())){
+                String docente = "Docente: "+cursosUi.getProfesor();
+                txtNombreDocente.setText(docente);
+                txtNombreDocente.setVisibility(View.VISIBLE);
+            }else{
+                txtNombreDocente.setVisibility(View.INVISIBLE);
+            }
 
             fondo.setAlpha((float) 0.2);
 

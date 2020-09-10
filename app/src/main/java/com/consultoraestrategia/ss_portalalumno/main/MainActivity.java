@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,6 +39,7 @@ import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
@@ -46,12 +49,15 @@ import com.consultoraestrategia.ss_portalalumno.main.adapter.MenuAdapter;
 import com.consultoraestrategia.ss_portalalumno.main.data.repositorio.MainRepositorio;
 import com.consultoraestrategia.ss_portalalumno.main.data.repositorio.MainRepositorioImpl;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalendarioPeriodo;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.main.listeners.MenuListener;
 import com.consultoraestrategia.ss_portalalumno.permisos.DialogOnAnyDeniedMultiplePermissionsListener;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.sincronizar.instrumentos.SyncInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
@@ -102,6 +108,12 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     ConstraintLayout navBarContentProfileHijo;
     @BindView(R.id.nav_bar_imagen_profile_hijo)
     CircleImageView navBarImagenProfileHijo;
+    @BindView(R.id.txt_nombre_app)
+    TextView txtNombreApp;
+    @BindView(R.id.imageView11)
+    ImageView imageView11;
+    @BindView(R.id.imageView10)
+    ImageView imageView10;
 
     private MenuAdapter menuAdapter;
     private CursosAdapter adapter;
@@ -120,8 +132,11 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
 
     @Override
     protected MainPresenter getPresenter() {
-        MainRepositorio mainRepositorio = new MainRepositorioImpl();
-        return new MainPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCursos(mainRepositorio));
+        MainRepositorio mainRepositorio = new MainRepositorioImpl(ApiRetrofit.getInstance());
+        return new MainPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCursos(mainRepositorio),
+                new UpdateCalendarioPeriodo(mainRepositorio),
+                new UpdateFirebaseTipoNota(mainRepositorio),
+                new AndroidOnlineImpl(this));
     }
 
     @Override
@@ -154,8 +169,8 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     }
 
     private void limpiarVariableGlobales() {
-        iCRMEdu.variblesGlobales = new iCRMEdu.VariblesGlobales();
-        iCRMEdu.variblesGlobales.saveData(this);
+        //iCRMEdu.variblesGlobales = new iCRMEdu.VariblesGlobales();
+        //iCRMEdu.variblesGlobales.saveData(this);
     }
 
     private void setupAdapter() {
@@ -187,7 +202,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.md_white_1000));
+            window.setStatusBarColor(Color.parseColor("#FAFAFAFA"));
         }
 
         setSupportActionBar(toolbar);
@@ -221,6 +236,20 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     }
 
     private void setupTabMenu() {
+
+        if(getResources().getString(R.string.app_name).equals("Educar Student")){
+            Glide.with(imageView11)
+                    .load(R.drawable.logo_educar)
+                    .into(imageView11);
+            imageView11.setVisibility(View.VISIBLE);
+            txtNombreApp.setVisibility(View.INVISIBLE);
+            imageView10.setVisibility(View.VISIBLE);
+        }else{
+            imageView11.setVisibility(View.GONE);
+            txtNombreApp.setVisibility(View.VISIBLE);
+            imageView10.setVisibility(View.GONE);
+        }
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

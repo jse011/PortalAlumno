@@ -90,7 +90,7 @@ class ViewHolderTareas extends SectioningAdapter.ItemViewHolder implements  View
         //constraintLayoutContenido.setOnClickListener(this);
     }
 
-    @SuppressLint("SetTextI18n")
+   // layout item_tareas_unidades
     public void bind(final TareasUI tareasUI,
                      final TareasUIListener listener,
                      final int position,

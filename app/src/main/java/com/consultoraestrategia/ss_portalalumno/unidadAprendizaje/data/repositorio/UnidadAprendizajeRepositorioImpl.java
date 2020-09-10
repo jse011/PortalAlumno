@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.CargaCursos;
+import com.consultoraestrategia.ss_portalalumno.entities.CargaCursos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
@@ -168,11 +170,6 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 .where(CalendarioPeriodo_Table.calendarioPeriodoId.eq(idCalendarioPeriodo))
                 .querySingle();
 
-        List<Integer> unidadAprendizajeIdList = new ArrayList<>();
-        for (UnidadAprendizajeUi unidadAprendizajeUi : unidadAprendizajeUiList){
-            unidadAprendizajeIdList.add(unidadAprendizajeUi.getUnidadAprendizajeId());
-        }
-
         int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
 
@@ -180,6 +177,16 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        TransaccionUtils.deleteTable(SesionAprendizaje.class, SesionAprendizaje_Table.unidadAprendizajeId.in(SQLite.select(UnidadAprendizaje_Table.unidadAprendizajeId.withTable())
+                                .from(UnidadAprendizaje.class)
+                                .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
+                                .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
+                                        .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
+                                .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
+                                .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId))));
+
+
                         List<SesionAprendizaje> sesionAprendizajeList = new ArrayList<>();
                         for (DataSnapshot unidadSnapshot: dataSnapshot.getChildren()){
                             for (DataSnapshot sesionSnapshot: unidadSnapshot.getChildren()){
@@ -209,8 +216,6 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                         Transaction transaction = database.beginTransactionAsync(new ITransaction() {
                             @Override
                             public void execute(DatabaseWrapper databaseWrapper) {
-
-                                TransaccionUtils.deleteTable(SesionAprendizaje.class, SesionAprendizaje_Table.unidadAprendizajeId.in(unidadAprendizajeIdList));
                                 TransaccionUtils.fastStoreListInsert(SesionAprendizaje.class, sesionAprendizajeList, databaseWrapper, false);
                             }
                         }).success(new Transaction.Success() {

@@ -25,7 +25,7 @@ import java.util.List;
  * Created by irvinmarin on 27/02/2017.
  */
 
-public class TareasAdapter extends RecyclerView.Adapter<ViewHolderTareas> {
+public class TareasAdapter extends RecyclerView.Adapter<ViewHolderTarea2> {
     private static final String TAG = TareasAdapter.class.getSimpleName();
 
 
@@ -58,14 +58,14 @@ public class TareasAdapter extends RecyclerView.Adapter<ViewHolderTareas> {
     }
 
     @Override
-    public ViewHolderTareas onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolderTarea2 onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tareas_unidades, parent, false);
-        return new ViewHolderTareas(v);
+        return new ViewHolderTarea2(v);
     }
 
 
     @Override
-    public void onBindViewHolder(final ViewHolderTareas vh, final int position) {
+    public void onBindViewHolder(final ViewHolderTarea2 vh, final int position) {
         //vh.bind(tareasUIList.get(position), listener, imageLoader, position, spinnerListener, headerTareasAprendizajeUI, parametroDisenioUi);
         TareasUI tareasUI = tareasUIList.get(position);
         int total = headerTareasAprendizajeUI.getTareasUIList().size();

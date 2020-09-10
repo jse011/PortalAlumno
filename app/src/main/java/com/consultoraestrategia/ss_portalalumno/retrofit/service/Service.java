@@ -4,10 +4,14 @@ import com.consultoraestrategia.ss_portalalumno.entities.AdminService;
 import com.consultoraestrategia.ss_portalalumno.entities.BEListaPadre;
 import com.consultoraestrategia.ss_portalalumno.entities.Persona;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeUser;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroLogin;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroUpdateCalenPeriodo;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
 
 import java.util.List;
@@ -36,4 +40,10 @@ public interface Service {
     @Streaming
     @GET
     Call<ResponseBody> downloadFileByUrl(@Url String fileUrl);
+    @POST(" ")
+    Call<RestApiResponse<BEDatosAnioAcademico>> flst_getDatosCalendarioPeriodo(@Body ApiRetrofit.ApiRequestBody<ParametroUpdateCalenPeriodo> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<BEDrive>> f_SynckTareaAlumDrive(@Body ApiRetrofit.ApiRequestBody<ParametroIdDrive> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<BEDrive>> f_SynckEviSesDrive(@Body ApiRetrofit.ApiRequestBody<ParametroIdDrive> apiRequestBody);
 }

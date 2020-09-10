@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/md_white_1000"
+    android:clickable="true"
+    android:focusable="false"
+    android:orientation="vertical"
+    android:id="@+id/dragView">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/slider_up_document"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:background="#BBBBBB">
+
+        <WebView
+            android:id="@+id/webview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+        </WebView>
+
+        <FrameLayout
+            android:id="@+id/backPrincipal_document"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/circle_transparent_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_back_white" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/btnDownload_document"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/circle_transparent_2"
+            app:layout_constraintBottom_toTopOf="@+id/btnOpen_document"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_file_download" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/btnOpen_document"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="64dp"
+            android:background="@drawable/circle_transparent_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_google_drive_logo" />
+        </FrameLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/msg_succes_progress_document"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="64dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#BC000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="Descarga completada"
+                    android:textColor="@color/md_white_1000"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Ver archivo"
+                    android:textColor="@color/md_yellow_800" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/msg_progress_document"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="64dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#BC000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="Descarga en proceso..."
+                    android:layout_gravity="center"
+                    android:textColor="@color/md_white_1000"/>
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+        <ProgressBar
+            android:id="@+id/progress_bar_archivo"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/webview" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/slider_up_multimedia"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/content_exo_player"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <FrameLayout
+                android:id="@+id/exo_player_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@color/md_black_1000"
+                android:visibility="visible">
+
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/content_exo_player_detalle"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:background="@color/md_white_1000"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/txt_titulo_exo_player"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="2"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_action_exo_player"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="DANI LIT KILLAH Y EL DEMENTE EN GTA V - CLIPS" />
+
+                <TextView
+                    android:id="@+id/txt_descripcion_exo_player"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_action_exo_player"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_titulo_exo_player"
+                    tools:text="www.exo_player.com/vis=122432532" />
+
+                <FrameLayout
+                    android:id="@+id/btn_close_exo_player"
+                    android:layout_width="50dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/img_close_exo_player"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        app:srcCompat="@drawable/ic_close_youtube"
+                        tools:ignore="VectorDrawableCompat" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/btn_action_exo_player"
+                    android:layout_width="50dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_close_exo_player">
+
+                    <ImageView
+                        android:id="@+id/img_action_exo_player"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        app:srcCompat="@drawable/ic_play_youtube"
+                        tools:ignore="VectorDrawableCompat" />
+
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/list_exo_player"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="visible">
+
+            <FrameLayout
+                android:id="@+id/cont_preview_exo_player"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </FrameLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/slider_up_youtube"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/content_youtube"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <FrameLayout
+                android:id="@+id/youtube_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:visibility="visible">
+
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/content_youtube_detalle"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:background="@color/md_white_1000"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/txt_titulo_youtube"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="2"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_action_youtube"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="DANI LIT KILLAH Y EL DEMENTE EN GTA V - CLIPS" />
+
+                <TextView
+                    android:id="@+id/txt_descripcion_youtube"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_action_youtube"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txt_titulo_youtube"
+                    tools:text="www.youtube.com/vis=122432532" />
+
+                <FrameLayout
+                    android:id="@+id/btn_close_youtube"
+                    android:layout_width="50dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        app:srcCompat="@drawable/ic_close_youtube"
+                        tools:ignore="VectorDrawableCompat" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/btn_action_youtube"
+                    android:layout_width="50dp"
+                    android:layout_height="55dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_close_youtube">
+
+                    <ImageView
+                        android:id="@+id/img_action_youtube"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        app:srcCompat="@drawable/ic_play_youtube"
+                        tools:ignore="VectorDrawableCompat" />
+
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="visible">
+
+            <FrameLayout
+                android:id="@+id/cont_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </FrameLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>

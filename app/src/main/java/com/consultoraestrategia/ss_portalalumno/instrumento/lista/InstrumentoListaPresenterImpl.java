@@ -5,20 +5,18 @@ import android.os.Bundle;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentPresenterImpl;
+import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoList;
-import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.UpdateFirebaseInstrumento;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.ParametroDisenioUi;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<InstrumentoListaView> implements InstrumentoListaPresenter {
-    private UpdateFirebaseInstrumento updateFirebaseInstrumento;
     private GetInstrumentoList getInstrumentoList;
     private List<InstrumentoUi> instrumentoUiList = new ArrayList<>();
     private int anioAcademicoId;
@@ -32,11 +30,12 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
     private String color2;
     private String color3;
     private boolean initFragment;
+    private Online online;
 
-    public InstrumentoListaPresenterImpl(UseCaseHandler handler, Resources res, GetInstrumentoList getInstrumentoList, UpdateFirebaseInstrumento updateFirebaseInstrumento) {
+    public InstrumentoListaPresenterImpl(UseCaseHandler handler, Resources res, GetInstrumentoList getInstrumentoList, Online online) {
         super(handler, res);
         this.getInstrumentoList = getInstrumentoList;
-        this.updateFirebaseInstrumento = updateFirebaseInstrumento;
+        this.online = online;
     }
 
     @Override
@@ -58,20 +57,14 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
     public void setExtras(Bundle extras) {
         super.setExtras(extras);
         setData();
-        updateFirebaseInstrumento();
-    }
-
-    private void updateFirebaseInstrumento() {
-        getInstrumentoList();
-        updateFirebaseInstrumento.execute(sesionAprendizajeId, idCargaCurso, 0, new UpdateFirebaseInstrumento.CallBack() {
+        showProgress();
+        online.online(new Online.Callback() {
             @Override
-            public void onSucces() {
-                getInstrumentoList();
-            }
-
-            @Override
-            public void onError(String error) {
-                getInstrumentoList();
+            public void onLoad(boolean success) {
+                if(!success){
+                    getInstrumentoList();
+                }
+                hideProgress();
             }
         });
     }
@@ -87,7 +80,11 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
 
     private void getInstrumentoList(){
         instrumentoUiList.clear();
-        instrumentoUiList.addAll(getInstrumentoList.execute(sesionAprendizajeId));
+        for (InstrumentoUi instrumentoUi : getInstrumentoList.execute(sesionAprendizajeId)){
+            instrumentoUi.setColor(color1);
+            instrumentoUi.setColor2(color2);
+            instrumentoUiList.add(instrumentoUi);
+        }
         if(view!=null)view.showListInstrumento(instrumentoUiList);
     }
 
@@ -120,5 +117,11 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
             if(view!=null)view.showMessage("La evaluación ya fue completada");
         }
 
+    }
+
+    @Override
+    public void notifyChangeFragment() {
+        setData();
+        getInstrumentoList();
     }
 }

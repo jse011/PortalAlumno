@@ -50,6 +50,8 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
          * Called right after the application has been resumed (come to the foreground).
          */
         void onApplicationResumed();
+
+        void onActivityCreated(Activity activity, Bundle bundle);
     }
 
     private LifecycleListener listener;
@@ -63,6 +65,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
+        listener.onActivityCreated(activity, bundle);
     }
 
     @Override
@@ -101,6 +104,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
     }
 
     @Override

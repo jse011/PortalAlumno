@@ -26,22 +26,34 @@ import com.consultoraestrategia.ss_portalalumno.entities.Seccion;
 import com.consultoraestrategia.ss_portalalumno.entities.Seccion_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.TareaAlumno;
+import com.consultoraestrategia.ss_portalalumno.entities.TareaAlumnoArchivos;
+import com.consultoraestrategia.ss_portalalumno.entities.TareaAlumnoArchivos_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.TareaAlumno_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasC;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasRecursosC;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasRecursosC_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.TipoNotaC;
+import com.consultoraestrategia.ss_portalalumno.entities.TipoNotaC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC;
+import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
+import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
+import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancel;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.TareasMvpDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.DownloadCancelUi;
@@ -50,10 +62,12 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioEstadoFileU;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioTipoFileU;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RubroEvalProcesoUi;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
+import com.consultoraestrategia.ss_portalalumno.util.DriveUrlParser;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
+import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -65,9 +79,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.ResponseBody;
 
@@ -197,7 +216,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                         recursosUI.setArchivoId(archivo.getKey());
                         recursosUI.setNombreArchivo(archivo.getNombre());
                         recursosUI.setPath(archivo.getLocalpath());
-                        recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
+                        //recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
                         recursosUI.setFechaAccionArchivo(archivo.getFechaAccion());
                         //recursosUI.setDescripcion(recursoDidacticoEvento.getDescripcion());
                         if (TextUtils.isEmpty(archivo.getLocalpath())) {
@@ -205,7 +224,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                         } else {
                             recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
                         }
-                        recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
+                        recursosUI.setDriveId(archivo.getPath());
                         recursosUI.setPath(archivo.getLocalpath());
                     } else if (recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO) {
                         recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
@@ -231,22 +250,190 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
     }
 
     @Override
+    public List<TareaArchivoUi> getArchivoTareaAlumno(String tareaId) {
+        SessionUser sessionUser = SessionUser.getCurrentUser();
+        int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
+        TareaAlumno tareaAlumno = SQLite.select()
+                .from(TareaAlumno.class)
+                .where(TareaAlumno_Table.tareaId.eq(tareaId))
+                .and(TareaAlumno_Table.alumnoId.eq(alumnoId))
+                .querySingle();
+
+        boolean entregado = tareaAlumno != null && tareaAlumno.isEntregado();
+        List<TareaAlumnoArchivos> tareaAlumnoArchivosList = SQLite.select()
+                .from(TareaAlumnoArchivos.class)
+                .where(TareaAlumnoArchivos_Table.alumnoId.eq(alumnoId))
+                .and(TareaAlumnoArchivos_Table.tareaId.eq(tareaId))
+                .queryList();
+        List<TareaArchivoUi> tareaArchivoUiList = new ArrayList<>();
+        for (TareaAlumnoArchivos tareaAlumnoArchivos : tareaAlumnoArchivosList){
+            TareaArchivoUi tareaArchivoUi = new TareaArchivoUi();
+            tareaArchivoUi.setId(tareaAlumnoArchivos.getTareaAlumnoArchivoId());
+            tareaArchivoUi.setNombre(tareaAlumnoArchivos.getNombre());
+            tareaArchivoUi.setPath(!TextUtils.isEmpty(tareaAlumnoArchivos.getPath())?tareaAlumnoArchivos.getPath():"");
+            tareaArchivoUi.setEntregado(entregado);
+            if(tareaAlumnoArchivos.isRepositorio()){
+                tareaArchivoUi.setTipo(TareaArchivoUi.getType(tareaArchivoUi.getPath()));
+                tareaArchivoUi.setDescripcion(tareaArchivoUi.getTipo().getNombre());
+            }else {
+                String idYoutube = YouTubeUrlParser.getVideoId(tareaArchivoUi.getPath());
+                String idDrive = DriveUrlParser.getDocumentId(tareaArchivoUi.getPath());
+                if(!TextUtils.isEmpty(idYoutube)){
+                    tareaArchivoUi.setTipo(TareaArchivoUi.Tipo.YOUTUBE);
+                }else if(!TextUtils.isEmpty(idDrive)){
+                    tareaArchivoUi.setTipo(TareaArchivoUi.Tipo.DRIVE);
+                }else {
+                    tareaArchivoUi.setTipo(TareaArchivoUi.Tipo.LINK);
+                }
+
+                tareaArchivoUi.setDescripcion(tareaArchivoUi.getPath());
+            }
+
+            tareaArchivoUiList.add(tareaArchivoUi);
+        }
+        return tareaArchivoUiList;
+    }
+
+    @Override
+    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, StorageCallback<TareaArchivoUi> callbackStorage) {
+        return null;
+    }
+
+    @Override
+    public void deleteStorageFB(String tareaId,  TareaArchivoUi tareaArchivoUi,CallbackSimple callbackSimple) {
+
+    }
+
+    @Override
+    public void publicarTareaAlumno(String tareaId, CallbackSimple callbackSimple) {
+
+    }
+
+    @Override
+    public TareasUI isEntregadoTareaAlumno(String tareaId) {
+        SessionUser sessionUser = SessionUser.getCurrentUser();
+        int personaId = sessionUser!=null?sessionUser.getPersonaId():0;
+        TareaAlumno tareaAlumno = SQLite.select()
+                .from(TareaAlumno.class)
+                .where(TareaAlumno_Table.tareaId.eq(tareaId))
+                .and(TareaAlumno_Table.alumnoId.eq(personaId))
+                .querySingle();
+        TareasC tareasC = SQLite.select()
+                .from(TareasC.class)
+                .where(TareasC_Table.tareaId.eq(tareaId))
+                .querySingle();
+        long fechaEntrega = tareasC!=null?tareasC.getFechaEntrega():0;
+        String horaEntrega = tareasC!=null?tareasC.getHoraEntrega():"";
+        TareasUI tareasUI = new TareasUI();
+        tareasUI.setEntregaAlumno(tareaAlumno != null && tareaAlumno.isEntregado());
+        tareasUI.setFechaEntregaAlumno(tareaAlumno!=null?tareaAlumno.getFechaEntrega():0);
+        tareasUI.setRetrasoEntrega(comparaFechasTareaEntregada(fechaEntrega, horaEntrega, tareasUI.getFechaEntregaAlumno()));
+        return tareasUI;
+    }
+
+    @Override
+    public void updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, String tareaId, CallbackSimple callback) {
+
+    }
+
+    @Override
+    public TareasUI getTarea(String tareaId) {
+        TareasC tareasC = SQLite.select()
+                .from(TareasC.class)
+                .where(TareasC_Table.tareaId.eq(tareaId))
+                .querySingle();
+        TareasUI tareasUI = new TareasUI();
+        if(tareasC!=null){
+            tareasUI.setKeyTarea(tareasC.getKey());
+            tareasUI.setTituloTarea(tareasC.getTitulo());
+            tareasUI.setDescripcion(tareasC.getInstrucciones());
+            tareasUI.setFechaCreacionTarea(tareasC.getFechaCreacion());
+            tareasUI.setFechaLimite(tareasC.getFechaEntrega());
+            tareasUI.setHoraEntrega(tareasC.getHoraEntrega());
+            tareasUI.setIdUnidaddAprendizaje(tareasC.getUnidadAprendizajeId());
+        }
+        return tareasUI;
+    }
+
+    @Override
+    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, CallbackSimple simple) {
+
+    }
+
+
+    private boolean comparaFechasTareaEntregada(long vstr_FechaEntrega, String vstr_HoraEntrega, long vlong_FechaEntregaAlumno) {
+
+        if (!TextUtils.isEmpty(vstr_HoraEntrega)) {
+            Date date = null;
+            try {
+                Date date1 = new Date(vstr_FechaEntrega);
+                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+                String output = outputFormatter.format(date1); // Output : 01/20/2012
+
+                DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+                date = format.parse(output + " " + vstr_HoraEntrega);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            if (date!=null) {
+                boolean isbefore = date.before(new Date(vlong_FechaEntregaAlumno));//Validar si la tarea se entrego antes
+                //return isbefore ? "Entregado con retraso" : "Tarea entregada";
+                //                            true              false
+                return !isbefore;
+            } else {
+                //return "Tarea entregada";// si la fecha es erronea
+                return true;
+            }
+        } else{
+            Date m_alumno = null;
+            try {
+                Date date = new Date(vlong_FechaEntregaAlumno);
+                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+                String output = outputFormatter.format(date); // Output : 01/20/2012
+
+                DateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                m_alumno = format.parse(output);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Date m = new Date(vstr_FechaEntrega);
+
+            if(m_alumno!=null){
+                boolean isbefore = m.before(m_alumno);//Validar si la tarea se entrego antes
+                //return isbefore ? "Entregado con retraso" : "Tarea entregada" ;
+                //                          true                    false
+                return !isbefore;
+            }else {
+                //return "Tarea entregada";// si la fecha es erronea
+                return true;
+            }
+        }
+
+    }
+
+    @Override
     public void getTareasUIList(int idUsuario, int idCargaCurso, int tipoTarea, int sesionAprendizajeId, int calendarioPeriodoId, int anioAcademicoId, int planCursoId,GetTareasListCallback callback) {
         DatabaseDefinition appDatabase = FlowManager.getDatabase(AppDatabase.class);
         DatabaseWrapper databaseWrapper = appDatabase.getWritableDatabase();
         try {
             databaseWrapper.beginTransaction();
-            Webconfig webconfig = SQLite.select()
-                    .from(Webconfig.class)
-                    .where(Webconfig_Table.nombre.eq("wstr_UrlArchivo"))
-                    .querySingle();
 
-            String urlArchivo  = webconfig!=null?webconfig.getContent():"";
             String nombreCurso = getNombreCurso(idCargaCurso);
             List<UnidadAprendizaje> unidadAprendizajeList = new ArrayList<>();
             List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList = new ArrayList<>();
             Log.d(TAG, "idCargaCurso: "+ idCargaCurso + " calendarioPeriodoId: " + calendarioPeriodoId);
 
+            Webconfig webconfig = SQLite.select()
+                    .from(Webconfig.class)
+                    .where(Webconfig_Table.nombre.eq("wstr_UrlExpresiones"))
+                    .querySingle();
+
+            String pathValores = webconfig!=null?webconfig.getContent():"";
+
+            SessionUser sessionUser = SessionUser.getCurrentUser();
+            int personaId = sessionUser!=null?sessionUser.getPersonaId():0;
             if(tipoTarea==0){
                 unidadAprendizajeList.addAll(SQLite
                         .select(UtilsDBFlow.f_allcolumnTable(UnidadAprendizaje_Table.ALL_COLUMN_PROPERTIES))
@@ -332,6 +519,40 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                     tareasUI.setHoraEntrega(tareas.getHoraEntrega());
                     tareasUI.setIdUnidaddAprendizaje(tareas.getUnidadAprendizajeId());
                     tareasUI.setNombreCurso(nombreCurso);
+
+                    TareaAlumno tareaAlumno = SQLite.select()
+                            .from(TareaAlumno.class)
+                            .where(TareaAlumno_Table.tareaId.eq(tareas.getKey()))
+                            .and(TareaAlumno_Table.alumnoId.eq(personaId))
+                            .querySingle();
+
+                    if(tareaAlumno!=null){
+                        TipoNotaC tipoNotaC = SQLite.select()
+                                .from(TipoNotaC.class)
+                                .innerJoin(ValorTipoNotaC.class)
+                                .on(TipoNotaC_Table.tipoNotaId.withTable()
+                                        .eq(ValorTipoNotaC_Table.tipoNotaId.withTable()))
+                                .where(ValorTipoNotaC_Table.valorTipoNotaId.withTable()
+                                        .eq(tareaAlumno.getValorTipoNotaId()))
+                                .querySingle();
+
+                        ValorTipoNotaC valorTipoNotaC= SQLite.select()
+                                .from(ValorTipoNotaC.class)
+                                .where(ValorTipoNotaC_Table.valorTipoNotaId.eq(tareaAlumno.getValorTipoNotaId()))
+                                .querySingle();
+
+                        int tipoId = tipoNotaC!=null?tipoNotaC.getTipoId():0;
+                        String nota = "";
+                        if(tipoId==TipoNotaC.SELECTOR_ICONOS){
+                            nota = valorTipoNotaC!=null? pathValores + valorTipoNotaC.getIcono():"";
+                        }else{
+                            nota = valorTipoNotaC!=null?valorTipoNotaC.getTitulo():"";
+                        }
+
+                        tareasUI.setTipoNotaId(tipoId);
+                        tareasUI.setNota(nota);
+                    }
+
                     List<TareasRecursosC> tareasRecursosList = SQLite.select()
                             .from(TareasRecursosC.class)
                             .where(TareasRecursosC_Table.tareaId.is(tareas.getKey()))
@@ -428,7 +649,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                                     recursosUI.setArchivoId(archivo.getKey());
                                     recursosUI.setNombreArchivo(archivo.getNombre());
                                     recursosUI.setPath(archivo.getLocalpath());
-                                    recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
+
                                     recursosUI.setFechaAccionArchivo(archivo.getFechaAccion());
                                     //recursosUI.setDescripcion(recursoDidacticoEvento.getDescripcion());
                                     if(TextUtils.isEmpty(archivo.getLocalpath())){
@@ -436,7 +657,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                                     }else {
                                         recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
                                     }
-                                    recursosUI.setUrl(urlArchivo+"/"+archivo.getPath());
+                                    recursosUI.setDriveId(archivo.getPath());
                                     recursosUI.setPath(archivo.getLocalpath());
                                 }else if(recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO){
                                     recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
@@ -606,8 +827,8 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
     }
 
     @Override
-    public void updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple) {
-
+    public FirebaseCancel updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackTareaAlumno callbackSimple) {
+        return null;
     }
 
     @Override
@@ -615,7 +836,17 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
 
     }
 
+    @Override
+    public void updateFirebaseTareaAlumno(String tareaId, CallbackSimple callbackSimple) {
 
+    }
+
+    @Override
+    public TareasUI updateEvaluacion(String tareaId) {
+
+
+        return null;
+    }
 }
 
 

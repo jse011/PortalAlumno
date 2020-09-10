@@ -6,6 +6,9 @@ import java.util.List;
 
 public interface TabCursoRepositorio {
     List<PeriodoUi> getPerioList(int anioAcademicoId, int cargaCursoId, int programaEduId);
+
+    void updateFirebasePersonaList(int idCargaCurso, Callback callback);
+
     interface Callback{
         void onLoad(boolean success);
     }
