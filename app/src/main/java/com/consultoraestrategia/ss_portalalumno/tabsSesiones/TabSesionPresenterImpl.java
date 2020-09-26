@@ -205,6 +205,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
         tabSesionEvidenciaView = null;
     }
 
+
     private void updateFirebaseInstrumento() {
         online.online(success -> {
             if(success){

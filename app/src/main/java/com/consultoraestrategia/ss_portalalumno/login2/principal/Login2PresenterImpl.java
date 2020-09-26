@@ -20,6 +20,7 @@ import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.ProgramaEducativoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.UsuarioExternoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.UsuarioUi;
+import com.consultoraestrategia.ss_portalalumno.login2.principal.bloqueo.BloqueoView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.correo.CorreoView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.dni.DniView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.listaUsuario.ListaUsuarioView;
@@ -59,6 +60,8 @@ public class Login2PresenterImpl extends BasePresenterImpl<Login2View> implement
     private String nombreAnio;
     private List<ProgramaEducativoUi> cursoUiList;
     private int cantidadCursos;
+    private BloqueoView bloqueoView;
+    private PersonaUi personaUi;
 
     public Login2PresenterImpl(UseCaseHandler handler, Resources res, GetUsuarioExterno getUsuarioExterno, SaveUrlSevidorLocal saveUrlSevidorLocal, GetUsuarioPorCorreoLocal getUsuarioPorCorreoLocal, GetUsuarioPorDniLocal getUsuarioPorDniLocal, GetUsuarioLocal getUsuarioLocal, GetPersonaLocal getPersonaLocal, LoginPreferentRepository loginPreferentRepository, GetDatosInicioSesion getDatosServidorLocal) {
         super(handler, res);
@@ -254,48 +257,43 @@ public class Login2PresenterImpl extends BasePresenterImpl<Login2View> implement
                     }
 
                     if(rolapp){
-                        getPersonaLocal.execute(new GetPersonaLocal.Request(usuarioUi.getUserName()), new UseCaseLoginSincrono.Callback<PersonaUi>() {
-                            @Override
-                            public void onResponse(boolean success, PersonaUi personaUi) {
-                                if(success){
-                                    if(personaUi == null){
-                                        showImportantMessage("Error al guardar persona");
+                        personaUi = usuarioUi.getPersonaUi();
+                        personaUi.setUsuario(usuario);
+                        personaUi.setCorreo(correo);
+                        personaUi.setDni(dni);
+                        personaUi.setInstitucionUrl(usuarioUi.getInstitucionUrl());
+                        saveUsuarioPreferents(personaUi);
+
+                        if(usuarioUi.getHabilitarAcceso()){
+                            if(view!=null)view.showDialogProgress();
+                            getDatosServidorLocal.execute(new GetDatosInicioSesion.Request(usuarioUi.getUsuarioId()), new UseCaseLoginSincrono.Callback<GetDatosInicioSesion.Response>() {
+                                @Override
+                                public void onResponse(boolean success, GetDatosInicioSesion.Response value) {
+                                    if(success){
+                                        if(value instanceof GetDatosInicioSesion.RequestRetrofitCancel){
+
+                                        }else {
+                                            //if(view!=null)view.goToActivity(usuarioUi.getUsuarioId());
+                                            //getInformacionPreFastData(usuarioUi.getUsuarioId(), value.getAnioAcademicoId());
+                                            //if(view!=null)view.showFastData();
+                                            //getTodosCurso(usuarioUi.getUsuarioId(), value.getAnioAcademicoId());
+                                            if(view!=null)view.goToActivity(usuarioUi.getUsuarioId());
+                                        }
+
                                     }else {
-                                        personaUi.setUsuario(usuario);
-                                        personaUi.setCorreo(correo);
-                                        personaUi.setDni(dni);
-                                        personaUi.setInstitucionUrl(usuarioUi.getInstitucionUrl());
-                                        saveUsuarioPreferents(personaUi);
-                                        if(view!=null)view.showDialogProgress();
-
-
-                                        getDatosServidorLocal.execute(new GetDatosInicioSesion.Request(usuarioUi.getUsuarioId()), new UseCaseLoginSincrono.Callback<GetDatosInicioSesion.Response>() {
-                                            @Override
-                                            public void onResponse(boolean success, GetDatosInicioSesion.Response value) {
-                                                if(success){
-                                                    if(value instanceof GetDatosInicioSesion.RequestRetrofitCancel){
-
-                                                    }else {
-                                                        //if(view!=null)view.goToActivity(usuarioUi.getUsuarioId());
-                                                        //getInformacionPreFastData(usuarioUi.getUsuarioId(), value.getAnioAcademicoId());
-                                                        //if(view!=null)view.showFastData();
-                                                        //getTodosCurso(usuarioUi.getUsuarioId(), value.getAnioAcademicoId());
-                                                        if(view!=null)view.goToActivity(usuarioUi.getUsuarioId());
-                                                    }
-
-                                                }else {
-                                                    if(view!=null)view.showUser(false);
-                                                    showImportantMessage(res.getString(R.string.login_msg_red_error));
-                                                }
-                                            }
-                                        });
-
+                                        if(view!=null)view.showUser(true);
+                                        showImportantMessage(res.getString(R.string.login_msg_red_error));
                                     }
-                                }else {
-                                    showImportantMessage("PersonaUi: " + res.getString(R.string.login_msg_red_error));
                                 }
-                            }
-                        });
+                            });
+                        }else {
+                            if(usuarioView!=null)usuarioView.hideProgress();
+                            if(passwordView!=null)passwordView.hideProgress();
+                            if(correoView!=null)correoView.hideProgress();
+                            if(view!=null)view.enableddOnClick();
+                            if(view!=null)view.showBloqueo(true);
+                        }
+
 
                     }else {
                         hideProgress();
@@ -477,8 +475,37 @@ public class Login2PresenterImpl extends BasePresenterImpl<Login2View> implement
     }
 
     @Override
+    public void attachView(BloqueoView bloqueoView) {
+        this.bloqueoView = bloqueoView;
+        if(personaUi!=null){
+            bloqueoView.showFoto(personaUi.getImagenUrl());
+        }
+    }
+
+    @Override
+    public void onBloqueoViewDestroyed() {
+        this.bloqueoView = null;
+    }
+
+    @Override
+    public void onClickVolverLogin() {
+        if(view!=null)view.onBackPressed();
+    }
+
+    @Override
+    public void onClickPagoLinea() {
+        if(personaUi!=null){
+            if(view!=null)view.onShowPagoEnLinea(personaUi.getId(), personaUi.getNumDoc());
+        }
+    }
+
+    @Override
+    public void onClickBloqueoAtras() {
+        if(view!=null)view.onBackPressed();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
 }

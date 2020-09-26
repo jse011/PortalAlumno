@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.login2.principal;
 
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenter;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
+import com.consultoraestrategia.ss_portalalumno.login2.principal.bloqueo.BloqueoView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.correo.CorreoView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.dni.DniView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.listaUsuario.ListaUsuarioView;
@@ -48,4 +49,14 @@ public interface Login2Presenter extends BasePresenter<Login2View> {
     void onClickPasswordSiguiente(String password);
 
     void onClickPasswordAtras();
+
+    void attachView(BloqueoView bloqueoView);
+
+    void onBloqueoViewDestroyed();
+
+    void onClickVolverLogin();
+
+    void onClickPagoLinea();
+
+    void onClickBloqueoAtras();
 }

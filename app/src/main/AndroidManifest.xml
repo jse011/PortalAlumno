@@ -69,6 +69,18 @@
             android:screenOrientation="sensor"
             android:name=".exoPlayer.MainActivity" />
 
+        <activity
+            android:label="Pago en línea"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="sensor"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:name=".estadocuenta2.EstadoCuenta2Activity" />
+        <activity
+            android:label=""
+            android:theme="@style/Theme.Transparent"
+            android:launchMode="singleTask"
+            android:name=".userbloqueo.UserBloqueoActivity" />
+
         <provider
             android:name=".provider.GenericFileProvider"
             android:authorities="${applicationId}.provider"

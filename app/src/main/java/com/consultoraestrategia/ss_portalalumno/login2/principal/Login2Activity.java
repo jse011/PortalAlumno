@@ -23,6 +23,7 @@ import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
+import com.consultoraestrategia.ss_portalalumno.estadocuenta2.EstadoCuenta2Activity;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.login2.data.preferent.LoginPreferentRepositoryImpl;
 import com.consultoraestrategia.ss_portalalumno.login2.data.repositorio.LoginDataRepository;
@@ -34,6 +35,8 @@ import com.consultoraestrategia.ss_portalalumno.login2.domain.useCase.servidorDa
 import com.consultoraestrategia.ss_portalalumno.login2.domain.useCase.servidorlogin.GetUsuarioExterno;
 import com.consultoraestrategia.ss_portalalumno.login2.domain.useCase.servidorlogin.GetUsuarioPorCorreoLocal;
 import com.consultoraestrategia.ss_portalalumno.login2.domain.useCase.servidorlogin.GetUsuarioPorDniLocal;
+import com.consultoraestrategia.ss_portalalumno.login2.principal.bloqueo.BloqueoFragment;
+import com.consultoraestrategia.ss_portalalumno.login2.principal.bloqueo.BloqueoView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.correo.CorreoFragment;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.correo.CorreoView;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.dni.DniFragment;
@@ -64,6 +67,7 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
     private PasswordFragment passwordFragment;
     private ProgressFragment progressFragment;
     private UsuarioFragment usuarioFragment;
+    private BloqueoFragment bloqueoFragment;
 
     @Override
     protected String getTag() {
@@ -212,6 +216,7 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
         if(correoFragment!=null)transaction.remove(correoFragment);
         if(dniFragment!=null)transaction.remove(dniFragment);
         if(progressFragment!=null)transaction.remove(progressFragment);
+        if(bloqueoFragment!=null)transaction.remove(bloqueoFragment);
         transaction.commit();
     }
 
@@ -276,6 +281,8 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
             presenter.onListaUsuarioViewDestroyed();
         }else if (f instanceof PasswordView) {
             presenter.onPasswordViewDestroyed();
+        }else if (f instanceof BloqueoView) {
+            presenter.onBloqueoViewDestroyed();
         }
     }
 
@@ -296,6 +303,9 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
         }else if (f instanceof PasswordView) {
             presenter.attachView((PasswordView) f);
             ((PasswordView)f).onAttach(presenter);
+        }else if (f instanceof BloqueoView) {
+            presenter.attachView((BloqueoView) f);
+            ((BloqueoView)f).onAttach(presenter);
         }
 
     }
@@ -310,6 +320,17 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void showBloqueo(boolean backStack) {
+        bloqueoFragment = new BloqueoFragment();
+        setContent(bloqueoFragment, backStack);
+    }
+
+    @Override
+    public void onShowPagoEnLinea(int personaId, String numDoc) {
+        EstadoCuenta2Activity.start(this, personaId, numDoc);
     }
 
 }

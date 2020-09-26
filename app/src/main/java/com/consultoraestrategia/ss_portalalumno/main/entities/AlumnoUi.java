@@ -6,6 +6,7 @@ public class AlumnoUi {
     private String nombre;
     private String foto;
     private String fotoApoderado;
+    private boolean habilitarAcceso;
 
     public int getPersonaId() {
         return personaId;
@@ -45,5 +46,13 @@ public class AlumnoUi {
 
     public String getFotoApoderado() {
         return fotoApoderado;
+    }
+
+    public void setHabilitarAcceso(boolean habilitarAcceso) {
+        this.habilitarAcceso = habilitarAcceso;
+    }
+
+    public boolean getHabilitarAcceso() {
+        return habilitarAcceso;
     }
 }

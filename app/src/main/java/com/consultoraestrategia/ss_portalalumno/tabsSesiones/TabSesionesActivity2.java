@@ -44,6 +44,8 @@ import com.consultoraestrategia.ss_portalalumno.base.viewpager.ViewpagerAdapter;
 import com.consultoraestrategia.ss_portalalumno.colaborativa.ColaborativaFragment;
 import com.consultoraestrategia.ss_portalalumno.evidencia.EvidenciaFragment;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.global.ICRMEduListener;
+import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.instrumento.lista.InstrumentoListaFragment;
 import com.consultoraestrategia.ss_portalalumno.pregunta.lista.PreguntaFragment;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.data.source.TabSesionesRepositorio;
@@ -61,6 +63,7 @@ import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFireb
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebaseInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebasePreguntas;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebaseReunionVirtual;
+import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.tabs.TabLayout;

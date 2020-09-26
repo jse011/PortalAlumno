@@ -305,6 +305,16 @@ public class ApiRetrofit {
         Log.d(TAG, "apiRequestBody : " + representacionJSON);
         return service.flst_getDatosCalendarioPeriodo(apiRequestBody);
     }
+
+    public Call<RestApiResponse<Boolean>> f_isHabilitadoUsuario(int usuarioId) {
+        ParametroChangeUser parametroChangeUser = new ParametroChangeUser();
+        parametroChangeUser.setUsuarioId(usuarioId);//
+        ApiRequestBody< ParametroChangeUser> apiRequestBody = new ApiRequestBody<>("f_isHabilitadoUsuario",parametroChangeUser);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.f_isHabilitadoUsuario(apiRequestBody);
+    }
 }
 
 

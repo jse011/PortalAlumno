@@ -40,10 +40,12 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.global.ICRMEduListener;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.Login2Activity;
+import com.consultoraestrategia.ss_portalalumno.login2.service.BloqueoRealTime;
 import com.consultoraestrategia.ss_portalalumno.main.adapter.CursosAdapter;
 import com.consultoraestrategia.ss_portalalumno.main.adapter.MenuAdapter;
 import com.consultoraestrategia.ss_portalalumno.main.data.repositorio.MainRepositorio;
@@ -60,6 +62,7 @@ import com.consultoraestrategia.ss_portalalumno.permisos.DialogOnAnyDeniedMultip
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.sincronizar.instrumentos.SyncInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
+import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -306,6 +309,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtras(new Bundle());
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -314,22 +318,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     }
 
     @Override
-    public void showTabCursoActivity(CursosUi cursosUi, int anioAcademicoId, int idPrograma) {
-        GbCursoUi gbCursoUi = new GbCursoUi();
-        gbCursoUi.setCursoId(cursosUi.getCursoId());
-        gbCursoUi.setCargaCursoId(cursosUi.getCargaCursoId());
-        gbCursoUi.setParametroDisenioColor1(cursosUi.getBackgroundSolidColor());
-        gbCursoUi.setParametroDisenioColor2(cursosUi.getBackgroundSolidColor2());
-        gbCursoUi.setParametroDisenioColor3(cursosUi.getBackgroundSolidColor3());
-        gbCursoUi.setNombre(cursosUi.getNombre());
-        gbCursoUi.setSalon(cursosUi.getSalon());
-        gbCursoUi.setParametroDisenioPath(cursosUi.getUrlBackgroundItem());
-        gbCursoUi.setSeccionyperiodo(cursosUi.getSeccionyperiodo());
-        gbCursoUi.setPlanCursoId(cursosUi.getPlanCursoId());
-        iCRMEdu.variblesGlobales.setGbCursoUi(gbCursoUi);
-        iCRMEdu.variblesGlobales.setAnioAcademicoId(anioAcademicoId);
-        iCRMEdu.variblesGlobales.setProgramEducativoId(idPrograma);
-        iCRMEdu.variblesGlobales.setProgramEducativoId(idPrograma);
+    public void showTabCursoActivity() {
         startActivity(new Intent(this, TabsCursoActivity.class));
     }
 
@@ -441,6 +430,20 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         }
     }
 
+    @Override
+    public void showActivtyBloqueo() {
+        Intent intent = new Intent(this, UserBloqueoActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+    }
+
+    @Override
+    public void initBloqueo() {
+        BloqueoRealTime.Companion.getInstance(this);
+    }
+
     private void initializingFirebase(String email, String password, OnCompleteListener<AuthResult> callback){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -490,5 +493,11 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                 )
                 .withListener(dialogMultiplePermissionsListener)
                 .check();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

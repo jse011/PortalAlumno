@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.util;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -8,6 +9,7 @@ import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class UtilsPortalAlumno {
@@ -182,5 +184,34 @@ public class UtilsPortalAlumno {
 
     public static Double formatearDecimales(Double numero, Integer numeroDecimales) {
         return Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
+    }
+
+    /**
+     * Checks if an Activity is on the Top of the Application
+     *
+     * @param context
+     * @param className
+     * @return boolean
+     */
+    public static boolean isActivityOnTop(Context context, Class<?> className) {
+        boolean onTop = false;
+        String activityName;
+
+        if (context != null) {
+            activityName = className.getName();
+
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+
+            for (ActivityManager.RunningTaskInfo object : taskInfo) {
+                if (object.topActivity.getClassName().equals(activityName)) {
+                    onTop = true;
+
+                    break;
+                }
+            }
+        }
+
+        return onTop;
     }
 }

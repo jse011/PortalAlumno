@@ -22,6 +22,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.CargaAcademica;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaCursoDocente;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaCursoDocenteDet;
 import com.consultoraestrategia.ss_portalalumno.entities.CargaCursos;
+import com.consultoraestrategia.ss_portalalumno.entities.ColborativaPA;
+import com.consultoraestrategia.ss_portalalumno.entities.ColborativaPA_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Competencia;
 import com.consultoraestrategia.ss_portalalumno.entities.Contrato;
 import com.consultoraestrategia.ss_portalalumno.entities.Cursos;
@@ -57,11 +59,13 @@ import com.consultoraestrategia.ss_portalalumno.entities.Relaciones;
 import com.consultoraestrategia.ss_portalalumno.entities.Rol;
 import com.consultoraestrategia.ss_portalalumno.entities.Seccion;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
+import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionEventoCompetenciaDesempenioIcd;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionEventoDesempenioIcdCampotematico;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
+import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_COMPETENCIA_SESION_EVENTO;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_EVENTO_COMPETENCIA_DESEMPENIO_ICD;
@@ -74,9 +78,14 @@ import com.consultoraestrategia.ss_portalalumno.entities.UnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.UsuarioAcceso;
 import com.consultoraestrategia.ss_portalalumno.entities.UsuarioRolGeoreferencia;
 import com.consultoraestrategia.ss_portalalumno.entities.UsuarioRolGeoreferencia_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Usuario_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
+import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
+import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
+import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.DatosProgressUi;
+import com.consultoraestrategia.ss_portalalumno.login2.entities.HabilitarAccesoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.UsuarioExternoUi;
@@ -86,6 +95,13 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiRespons
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -480,7 +496,15 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                             }
                         }
                         usuarioUi.setRolIdList(rolIdList);
+                        usuarioUi.setHabilitarAcceso(usuario.isHabilitarAcceso());
 
+                        PersonaUi personaUi = new PersonaUi();
+                        personaUi.setId(usuario.getPersonaId());
+                        personaUi.setNombres(usuario.getNombres());
+                        personaUi.setApellidos(UtilsPortalAlumno.capitalize(usuario.getApellidoPaterno()) + " " + UtilsPortalAlumno.capitalize(usuario.getApellidoMaterno()));
+                        personaUi.setImagenUrl(usuario.getFotoPersona());
+                        personaUi.setNumDoc(usuario.getNumDoc());
+                        usuarioUi.setPersonaUi(personaUi);
                         DatabaseDefinition appDatabase = FlowManager.getDatabase(AppDatabase.class);
                         appDatabase.beginTransactionAsync(new ITransaction() {
                             @Override
@@ -538,6 +562,17 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                                 sessionUser.setTimestampLastSeen(new Date().getTime());
                                 sessionUser.setState(SessionUser.STATE_ACTIVE);
                                 sessionUser.save();
+
+                                Persona persona = new Persona();
+                                persona.setPersonaId(usuario.getPersonaId());
+                                persona.setNombres(usuario.getNombres());
+                                persona.setApellidoMaterno(usuario.getApellidoMaterno());
+                                persona.setApellidoPaterno(usuario.getApellidoPaterno());
+                                persona.setFoto(usuario.getFotoPersona());
+                                persona.setNumDoc(usuario.getNumDoc());
+                                persona.save();
+
+
                             }
 
                         }).success(new Transaction.Success() {
@@ -608,6 +643,71 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
             e.getStackTrace();
         }
         return success;
+    }
+
+    @Override
+    public FirebaseCancel ishabilitadoAcceso(Callback<HabilitarAccesoUi> callback) {
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+        SessionUser sessionUser = SessionUser.getCurrentUser();
+        int usuarioId = sessionUser!=null?sessionUser.getUserId():0;
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
+        Usuario usuario = SQLite.select()
+                .from(Usuario.class)
+                .where(Usuario_Table.usuarioId.eq(usuarioId))
+                .querySingle();
+
+        HabilitarAccesoUi habilitarAccesoUi = new HabilitarAccesoUi();
+        habilitarAccesoUi.setHabilitar(usuario != null && usuario.isHabilitarAcceso());
+        habilitarAccesoUi.setUsuarioId(usuarioId);
+        return new FirebaseCancelImpl(mDatabase.child("/AV_Movil/Bloqueo/user_" + usuarioId),
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+                        apiRetrofit.changeSetTime(10,15,15,TimeUnit.SECONDS);
+                        RetrofitCancel<Boolean> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.f_isHabilitadoUsuario(usuarioId));
+                        retrofitCancel.enqueue(new RetrofitCancel.Callback<Boolean>() {
+                            @Override
+                            public void onResponse(Boolean response) {
+
+                                if(response!=null){
+                                    Log.d(TAG,"isSuccessful usuarioId: " + usuarioId);
+                                    //habilitado = UtilsFirebase.convert(dataSnapshot.child("habilitado").getValue(), false);
+                                    boolean habilitado = response;
+                                    habilitarAccesoUi.setModifiado(habilitarAccesoUi.isHabilitar()!=habilitado);
+
+                                    SQLite.update(Usuario.class)
+                                            .set(Usuario_Table.habilitarAcceso.eq(habilitado))
+                                            .where(Usuario_Table.usuarioId.eq(usuarioId))
+                                            .execute();
+                                    habilitarAccesoUi.setHabilitar(habilitado);
+                                    callback.onResponse(true, habilitarAccesoUi);
+                                }else {
+                                    callback.onResponse(false, habilitarAccesoUi);
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                t.printStackTrace();
+                                callback.onResponse(false, habilitarAccesoUi);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        callback.onResponse(false, habilitarAccesoUi);
+                    }
+                });
     }
 
 

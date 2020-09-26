@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
@@ -38,7 +39,8 @@ import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListen
 import com.consultoraestrategia.ss_portalalumno.base.viewpager.LifecycleImpl;
 import com.consultoraestrategia.ss_portalalumno.base.viewpager.ViewpagerAdapter;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.global.ICRMEduListener;
+import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.data.repositorio.TabCursoRepositorio;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.data.repositorio.TabCursoRepositorioImpl;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.domain.useCase.GetCalendarioPeriodo;
@@ -51,6 +53,8 @@ import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoUnidadVie
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.adapters.PeriodoAdapter;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.ui.FragmentTareas;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.UnidadAprendizajeFragment;
+import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
+import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoDialog;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -353,10 +357,10 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
 
     @Override
     public void onFragmentViewCreated(Fragment f, View view, Bundle savedInstanceState) {
-        if(f instanceof TabCursoTareaView){
-            presenter.attachView((TabCursoTareaView)f);
-        }else if(f instanceof TabCursoUnidadView){
-            presenter.attachView((TabCursoUnidadView)f);
+        if (f instanceof TabCursoTareaView) {
+            presenter.attachView((TabCursoTareaView) f);
+        } else if (f instanceof TabCursoUnidadView) {
+            presenter.attachView((TabCursoUnidadView) f);
         }
     }
 
@@ -367,9 +371,9 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
 
     @Override
     public void onFragmentViewDestroyed(Fragment f) {
-        if(f instanceof TabCursoTareaView){
+        if (f instanceof TabCursoTareaView) {
             presenter.onTabCursoTareaViewDestroyed();
-        }else if(f instanceof TabCursoUnidadView){
+        } else if (f instanceof TabCursoUnidadView) {
             presenter.onTabCursoUnidadViewDestroyed();
         }
     }
@@ -377,6 +381,17 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
     @Override
     public void onFragmentActivityCreated(Fragment f, Bundle savedInstanceState) {
 
+    }
+
+    @OnClick(R.id.txtNombreCurso)
+    public void onClickNombreCurso() {
+       // UserBloqueoDialog userBloqueoDialog = new UserBloqueoDialog();
+        //userBloqueoDialog.show(getSupportFragmentManager(), "UserBloqueoDialog");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     public static class ToolsTitleToolbar {

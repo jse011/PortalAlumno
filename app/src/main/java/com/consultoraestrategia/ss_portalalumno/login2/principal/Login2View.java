@@ -24,4 +24,8 @@ public interface Login2View  extends BaseView<Login2Presenter> {
     void onBackPressed();
 
     void goToActivity(int idUsuario);
+
+    void showBloqueo(boolean backStack);
+
+    void onShowPagoEnLinea(int personaId, String numDoc);
 }

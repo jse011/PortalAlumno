@@ -27,6 +27,13 @@ public class Usuario extends BaseModel {
     @Column
     boolean estado;
 
+    private String nombres;
+    private String apellidoPaterno;
+    private String apellidoMaterno;
+    public String numDoc;
+    @Column
+    private boolean habilitarAcceso;
+
     private List<Entidad> entidades;
 
     private List<Georeferencia> georeferencias;
@@ -150,5 +157,45 @@ public class Usuario extends BaseModel {
 
     public void setAccesos(List<UsuarioAcceso> accesos) {
         this.accesos = accesos;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getNumDoc() {
+        return numDoc;
+    }
+
+    public void setNumDoc(String numDoc) {
+        this.numDoc = numDoc;
+    }
+
+    public boolean isHabilitarAcceso() {
+        return habilitarAcceso;
+    }
+
+    public void setHabilitarAcceso(boolean habilitarAcceso) {
+        this.habilitarAcceso = habilitarAcceso;
     }
 }

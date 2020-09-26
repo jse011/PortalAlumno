@@ -13,7 +13,7 @@ public interface MainView extends BaseView<MainPresenter> {
 
     void showListCurso(List<CursosUi> cursosUiList);
 
-    void showTabCursoActivity(CursosUi cursosUi, int anioAcademicoId, int idPrograma);
+    void showTabCursoActivity();
 
     void changeNombreUsuario(String nombre);
 
@@ -28,4 +28,8 @@ public interface MainView extends BaseView<MainPresenter> {
     void changeFotoUsuarioApoderado(String fotoApoderado);
 
     void validateFirebase(String usuarioFirebase, String passwordFirebase);
+
+    void showActivtyBloqueo();
+
+    void initBloqueo();
 }

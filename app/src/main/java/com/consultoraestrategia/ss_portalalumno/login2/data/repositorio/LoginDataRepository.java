@@ -1,9 +1,11 @@
 package com.consultoraestrategia.ss_portalalumno.login2.data.repositorio;
 
+import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.ActualizarUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.AlarmaUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.CalendarioPeriodoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.DatosProgressUi;
+import com.consultoraestrategia.ss_portalalumno.login2.entities.HabilitarAccesoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.ProgramaEducativoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.ServiceEnvioUi;
@@ -33,6 +35,8 @@ public interface LoginDataRepository {
     String getNombreAnioActual(int anioAcademicoId);
 
     boolean savePlanSinck(int hora, int minute);
+
+    FirebaseCancel ishabilitadoAcceso(Callback<HabilitarAccesoUi> booleanCallback);
 
     interface Callback<S>{
         void onResponse(boolean success, S value);

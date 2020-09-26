@@ -46,4 +46,6 @@ public interface Service {
     Call<RestApiResponse<BEDrive>> f_SynckTareaAlumDrive(@Body ApiRetrofit.ApiRequestBody<ParametroIdDrive> apiRequestBody);
     @POST(" ")
     Call<RestApiResponse<BEDrive>> f_SynckEviSesDrive(@Body ApiRetrofit.ApiRequestBody<ParametroIdDrive> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<Boolean>> f_isHabilitadoUsuario(@Body ApiRetrofit.ApiRequestBody<ParametroChangeUser> apiRequestBody);
 }

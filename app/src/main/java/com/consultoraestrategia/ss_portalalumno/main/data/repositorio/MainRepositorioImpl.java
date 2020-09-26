@@ -50,6 +50,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.TipoNotaC;
 import com.consultoraestrategia.ss_portalalumno.entities.Tipos;
+import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
+import com.consultoraestrategia.ss_portalalumno.entities.Usuario_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
@@ -140,6 +142,11 @@ public class MainRepositorioImpl implements MainRepositorio {
 
         alumnoUi.setFotoApoderado(apoderado==null?"":apoderado.getFoto());
 
+        Usuario usuario = SQLite.select()
+                .from(Usuario.class)
+                .where(Usuario_Table.usuarioId.eq(alumnoUi.getUsuarioId()))
+                .querySingle();
+        alumnoUi.setHabilitarAcceso(usuario != null && usuario.isHabilitarAcceso());
         return alumnoUi;
     }
 

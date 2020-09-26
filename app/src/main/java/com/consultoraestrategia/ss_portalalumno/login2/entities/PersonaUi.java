@@ -13,6 +13,7 @@ public class PersonaUi {
     private String dni;
     private int opcion;
     private String institucionUrl;
+    private String numDoc;
 
     public void setId(int id) {
         this.id = id;
@@ -141,5 +142,13 @@ public class PersonaUi {
 
     public String getInstitucionUrl() {
         return institucionUrl;
+    }
+
+    public void setNumDoc(String numDoc) {
+        this.numDoc = numDoc;
+    }
+
+    public String getNumDoc() {
+        return numDoc;
     }
 }

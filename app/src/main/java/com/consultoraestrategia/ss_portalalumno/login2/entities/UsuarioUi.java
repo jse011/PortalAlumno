@@ -10,6 +10,8 @@ public class UsuarioUi {
     private String personaImagenUrl;
     private String institucionUrl;
     private List<Integer> rolIdList;
+    private PersonaUi personaUi;
+    private boolean habilitarAcceso;
 
 
     public int getUsuarioId() {
@@ -76,5 +78,21 @@ public class UsuarioUi {
 
     public List<Integer> getRolIdList() {
         return rolIdList;
+    }
+
+    public void setPersonaUi(PersonaUi personaUi) {
+        this.personaUi = personaUi;
+    }
+
+    public PersonaUi getPersonaUi() {
+        return personaUi;
+    }
+
+    public void setHabilitarAcceso(boolean habilitarAcceso) {
+        this.habilitarAcceso = habilitarAcceso;
+    }
+
+    public boolean getHabilitarAcceso() {
+        return habilitarAcceso;
     }
 }

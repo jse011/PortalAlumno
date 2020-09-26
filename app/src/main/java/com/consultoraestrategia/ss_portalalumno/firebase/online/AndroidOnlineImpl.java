@@ -39,7 +39,9 @@ public class AndroidOnlineImpl implements Online {
             callback.onLoad(false);
             Log.d(TAG, "modo offline");
         }else if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
-            AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, false)  );
+            //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, false)  );
+            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Response(true));
+            simpleCounterAsync.execute();
         } else {
             Log.d(TAG, "No network available!");
             Log.d(TAG, "onLoad: "+false);
@@ -60,7 +62,9 @@ public class AndroidOnlineImpl implements Online {
         }
 
         if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
-            AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, true) );
+            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Response(true));
+            simpleCounterAsync.execute();
+            //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, true) );
         } else {
             Log.d(TAG, "No network available!");
             Log.d(TAG, "onLoad: "+false);
@@ -68,7 +72,60 @@ public class AndroidOnlineImpl implements Online {
         }
     }
 
+    private static class SimpleCounterAsync extends CourtineAsync<Boolean>{
+        private Callback callback;;
+        private Response response;
+        //private boolean success;
 
+        public SimpleCounterAsync(Callback callback, Response response) {
+            this.callback = callback;
+            this.response = response;
+        }
+
+        @Override
+        public Boolean onExecute() {
+            boolean status = false;
+            long time = new Date().getTime();
+            long result = time - (consultTime!=null?consultTime:0);
+            if((result>1000)||response.isRestart()){
+                consultTime = time;
+                //success = false;
+                //autoCancel();
+                try {
+                    HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
+                    urlc.setRequestProperty("User-Agent", "Test");
+                    urlc.setRequestProperty("Connection", "close");
+                    urlc.setConnectTimeout(1500);
+                    urlc.connect();
+                    consultOnline = (urlc.getResponseCode() == 200);
+                    Log.d(TAG, "onLoad: "+consultOnline);
+                    status = consultOnline;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error checking internet connection", e);
+                    consultOnline= false;
+                    Log.d(TAG, "onLoad: "+false);
+                   //return false;
+                }
+            }else {
+                boolean online = consultOnline!=null?consultOnline:false;
+                Log.d(TAG, "onLoad cache: "+online);
+                status = online;
+            }
+            //success = true;
+            return status;
+        }
+
+        @Override
+        public void onPreExecute() {
+
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            callback.onLoad(consultOnline);
+        }
+    }
+    /*
     private static class SimpleCounterAsync extends AsyncTask<Response, Boolean, Void> {
         private Callback callback;
         private boolean success;
@@ -142,22 +199,23 @@ public class AndroidOnlineImpl implements Online {
         }
     };
 
+*/
     private static class Response{
-        private Callback callback;;
+        //private Callback callback;;//
         private boolean restart;
 
-        public Response(Callback callback, boolean restart) {
-            this.callback = callback;
+        public Response(/*Callback callback,*/ boolean restart) {
+            //this.callback = callback;
             this.restart = restart;
         }
-
+        /*
         public Callback getCallback() {
             return callback;
         }
 
         public void setCallback(Callback callback) {
             this.callback = callback;
-        }
+        }*/
 
         public boolean isRestart() {
             return restart;

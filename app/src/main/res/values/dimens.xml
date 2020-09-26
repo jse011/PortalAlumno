@@ -4,4 +4,5 @@
     <dimen name="margin_rigth_fragment_cal_periodo">25dp</dimen>
     <dimen name="player_minimized_height">110dp</dimen>
     <dimen name="player_minimized_width">190dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

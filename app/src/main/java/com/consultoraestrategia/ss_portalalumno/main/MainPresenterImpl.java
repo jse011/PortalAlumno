@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.main;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
+import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalendarioPeriodo;
@@ -21,6 +23,7 @@ import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
+import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     private UpdateFirebaseTipoNota updateFirebaseTipoNota;
     private RetrofitCancel cancel;
     private Online online;
+    private AlumnoUi alumnoUi;
 
     public MainPresenterImpl(UseCaseHandler handler, Resources res, GetCursos getCursos, UpdateCalendarioPeriodo calendarioPeriodo, UpdateFirebaseTipoNota updateFirebaseTipoNota,
                              Online online) {
@@ -66,6 +70,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
             if(view!=null)view.showActivityLogin();
             return;
         }
+
         usuario = SessionUser.getCurrentUser().getUsername();
         Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
@@ -74,7 +79,15 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         firebaseNode = webconfig!=null?webconfig.getContent():"sinServer";
 
         GetCursos.Response response = getCursos.execute();
-        AlumnoUi alumnoUi = response.getAlumnoUi();
+        alumnoUi = response.getAlumnoUi();
+        iCRMEdu.variblesGlobales.setHabilitarAcceso(alumnoUi.getHabilitarAcceso());
+        iCRMEdu.variblesGlobales.setBloqueoAcceso(!alumnoUi.getHabilitarAcceso());
+        //Por si se crea una actividad es remplasada se crea la actidad bloque de usuario
+        if(view!=null)view.initBloqueo();
+        if(!alumnoUi.getHabilitarAcceso()){
+            if(view!=null)view.showActivtyBloqueo();
+        }
+
 
         if(view!=null)view.changeNombreUsuario(alumnoUi.getNombre());
         if(view!=null)view.changeFotoUsuario(alumnoUi.getFoto());
@@ -240,13 +253,29 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
 
     @Override
     public void onClickCurso(CursosUi cursosUi) {
-        if(programaEducativo!=null)if(view!=null)view.showTabCursoActivity(cursosUi, anioAcademicoUi.getAnioAcademicoId(), programaEducativo.getIdPrograma());
+        GbCursoUi gbCursoUi = new GbCursoUi();
+        gbCursoUi.setCursoId(cursosUi.getCursoId());
+        gbCursoUi.setCargaCursoId(cursosUi.getCargaCursoId());
+        gbCursoUi.setParametroDisenioColor1(cursosUi.getBackgroundSolidColor());
+        gbCursoUi.setParametroDisenioColor2(cursosUi.getBackgroundSolidColor2());
+        gbCursoUi.setParametroDisenioColor3(cursosUi.getBackgroundSolidColor3());
+        gbCursoUi.setNombre(cursosUi.getNombre());
+        gbCursoUi.setSalon(cursosUi.getSalon());
+        gbCursoUi.setParametroDisenioPath(cursosUi.getUrlBackgroundItem());
+        gbCursoUi.setSeccionyperiodo(cursosUi.getSeccionyperiodo());
+        gbCursoUi.setPlanCursoId(cursosUi.getPlanCursoId());
+        iCRMEdu.variblesGlobales.setGbCursoUi(gbCursoUi);
+        iCRMEdu.variblesGlobales.setAnioAcademicoId(anioAcademicoUi.getAnioAcademicoId());
+        iCRMEdu.variblesGlobales.setProgramEducativoId(programaEducativo.getIdPrograma());
+        //iCRMEdu.variblesGlobales.setProgramEducativoId(idPrograma);
+        if(programaEducativo!=null)if(view!=null)view.showTabCursoActivity();
     }
 
     @Override
     public void onClickDialogoCerrarSesion() {
         if(view!=null)view.cerrarSesion();
     }
+
 
     @Override
     public void onDestroy() {

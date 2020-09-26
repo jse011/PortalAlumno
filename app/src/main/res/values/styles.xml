@@ -86,4 +86,14 @@
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="colorAccent">@color/md_blue_grey_900</item>
     </style>
+
+    <style name="Theme.Transparent" parent="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
 </resources>
