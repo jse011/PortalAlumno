@@ -22,7 +22,8 @@ public class AppDatabase {
     //public static final int VERSION = 5;//Agrgaront tablas para la tarea
     //public static final int VERSION = 6;Agregaron Evidencias
     //public static final int VERSION = 7;//Aregar el campo habilitar acceso
-    public static final int VERSION = 8;
+    //public static final int VERSION = 8;//Agregar la tabla Bloueo Usuario
+    public static final int VERSION = 9;
 
 
     @Migration(version = 8, database = AppDatabase.class)

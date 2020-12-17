@@ -80,13 +80,13 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
 
         GetCursos.Response response = getCursos.execute();
         alumnoUi = response.getAlumnoUi();
-        iCRMEdu.variblesGlobales.setHabilitarAcceso(alumnoUi.getHabilitarAcceso());
-        iCRMEdu.variblesGlobales.setBloqueoAcceso(!alumnoUi.getHabilitarAcceso());
+        //iCRMEdu.variblesGlobales.setHabilitarAcceso(alumnoUi.getHabilitarAcceso());
+        //iCRMEdu.variblesGlobales.setBloqueoAcceso(!alumnoUi.getHabilitarAcceso());
         //Por si se crea una actividad es remplasada se crea la actidad bloque de usuario
         if(view!=null)view.initBloqueo();
-        if(!alumnoUi.getHabilitarAcceso()){
-            if(view!=null)view.showActivtyBloqueo();
-        }
+        //if(!alumnoUi.getHabilitarAcceso()){
+           // if(view!=null)view.showActivtyBloqueo();
+        //}
 
 
         if(view!=null)view.changeNombreUsuario(alumnoUi.getNombre());

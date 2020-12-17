@@ -50,6 +50,8 @@ class BloqueoRealTime private constructor(private val context: Context) {
                 }else{
                     if(!isRunning) startTimer()
                 }
+            }else{
+                iCRMEdu.variblesGlobales.bloqueoAcceso = true
             }
 
             if (!habilitarAccesoUi.isHabilitar) {

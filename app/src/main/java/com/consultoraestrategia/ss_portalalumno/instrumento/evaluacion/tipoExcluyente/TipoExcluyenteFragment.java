@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.ValorUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion.InstrumentoEvaluacionPresenter;
@@ -35,6 +39,9 @@ public class TipoExcluyenteFragment extends Fragment implements TipoEvaluacionVi
     Button button;
     @BindView(R.id.rc_valores)
     RecyclerView rcValores;
+    @BindView(R.id.img_titulo)
+    ImageView imgTitulo;
+
     private Unbinder unbinder;
     private InstrumentoEvaluacionPresenter presenter;
     private TipoExcluyenteAdapter adapter;
@@ -73,12 +80,19 @@ public class TipoExcluyenteFragment extends Fragment implements TipoEvaluacionVi
 
     @Override
     public void showImage(String path) {
-
+        Glide.with(imgTitulo)
+                .load(path)
+                .apply(new RequestOptions()
+                        .centerInside()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .error(R.drawable.ic_error_outline_black))
+                .into(imgTitulo);
+        imgTitulo.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideImage() {
-
+        imgTitulo.setVisibility(View.GONE);
     }
 
     @Override
