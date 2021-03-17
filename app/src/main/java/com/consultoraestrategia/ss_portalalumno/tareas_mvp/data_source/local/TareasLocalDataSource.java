@@ -367,7 +367,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
             Date date = null;
             try {
                 Date date1 = new Date(vstr_FechaEntrega);
-                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+                DateFormat outputFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
                 String output = outputFormatter.format(date1); // Output : 01/20/2012
 
                 DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
@@ -377,10 +377,11 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
             }
 
             if (date!=null) {
-                boolean isbefore = date.before(new Date(vlong_FechaEntregaAlumno));//Validar si la tarea se entrego antes
+                Date alumno = new Date(vlong_FechaEntregaAlumno);
+                boolean isbefore = date.before(alumno);//Validar si la tarea se entrego antes
                 //return isbefore ? "Entregado con retraso" : "Tarea entregada";
                 //                            true              false
-                return !isbefore;
+                return isbefore;
             } else {
                 //return "Tarea entregada";// si la fecha es erronea
                 return true;
@@ -389,7 +390,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
             Date m_alumno = null;
             try {
                 Date date = new Date(vlong_FechaEntregaAlumno);
-                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+                DateFormat outputFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
                 String output = outputFormatter.format(date); // Output : 01/20/2012
 
                 DateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
@@ -404,7 +405,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                 boolean isbefore = m.before(m_alumno);//Validar si la tarea se entrego antes
                 //return isbefore ? "Entregado con retraso" : "Tarea entregada" ;
                 //                          true                    false
-                return !isbefore;
+                return isbefore;
             }else {
                 //return "Tarea entregada";// si la fecha es erronea
                 return true;

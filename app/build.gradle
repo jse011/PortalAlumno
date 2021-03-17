@@ -10,8 +10,8 @@ android {
         applicationId "com.consultoraestrategia.ss_portalalumno"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 9
-        versionName "1.2.2"
+        versionCode 11
+        versionName "1.2.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -87,5 +87,6 @@ dependencies {
     implementation ("androidx.concurrent:concurrent-futures:1.0.0"){
         //exclude group: 'com.google.guava', module: 'listenablefuture'
     }
-    //implementation 'jp.wasabeef:recyclerview-animators:4.0.1'
+    implementation 'com.github.robohorse:gpversionchecker:1.7.1'
+    implementation 'org.jsoup:jsoup:1.9.2'
 }

@@ -3,7 +3,7 @@ package com.consultoraestrategia.ss_portalalumno.login2.entities;
 public class HabilitarAccesoUi {
     int usuarioId;
     boolean habilitar;
-    boolean modifiado;
+    private boolean modificado;
 
     public int getUsuarioId() {
         return usuarioId;
@@ -21,11 +21,11 @@ public class HabilitarAccesoUi {
         this.habilitar = habilitar;
     }
 
-    public boolean isModifiado() {
-        return modifiado;
+    public void setModificado(boolean modificado) {
+        this.modificado = modificado;
     }
 
-    public void setModifiado(boolean modifiado) {
-        this.modifiado = modifiado;
+    public boolean isModifiado() {
+        return modificado;
     }
 }

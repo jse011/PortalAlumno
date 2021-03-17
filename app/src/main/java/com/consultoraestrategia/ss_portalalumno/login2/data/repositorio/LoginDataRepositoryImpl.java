@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.consultoraestrategia.ss_portalalumno.entities.ActividadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.AdminService;
@@ -98,6 +99,7 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelI
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -536,7 +538,7 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                                 SQLite.delete()
                                         .from(SessionUser.class)
                                         .execute(databaseWrapper);
-                                usuario.setHabilitarAcceso(usuario.isHabilitarAcceso());
+
                                 usuario.save();
 
                                 TransaccionUtils.fastStoreListSave(Entidad.class, usuario.getEntidades(), databaseWrapper, true);
@@ -657,6 +659,101 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int usuarioId = sessionUser!=null?sessionUser.getUserId():0;
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
+
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15,TimeUnit.SECONDS);
+        RetrofitCancel<Boolean> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.f_isHabilitadoUsuario(usuarioId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<Boolean>() {
+            @Override
+            public void onResponse(Boolean response) {
+
+                if(response!=null){
+                    Log.d(TAG,"isSuccessful usuarioId: " + usuarioId);
+                    //habilitado = UtilsFirebase.convert(dataSnapshot.child("habilitado").getValue(), false);
+                    boolean habilitado = response;
+                    HabilitarAccesoUi habilitarAccesoUi = new HabilitarAccesoUi();
+
+                    habilitarAccesoUi.setUsuarioId(usuarioId);
+                    BloqueoUsuario bloqueoUsuario = SQLite.select()
+                            .from(BloqueoUsuario.class)
+                            .where(Usuario_Table.usuarioId.eq(usuarioId))
+                            .querySingle();
+                    if(bloqueoUsuario==null){
+                        bloqueoUsuario = new BloqueoUsuario();
+                        bloqueoUsuario.setUsuarioId(usuarioId);
+                    }
+                    bloqueoUsuario.setHabilitarAcceso(habilitado);
+                    bloqueoUsuario.save();
+
+                    habilitarAccesoUi.setHabilitar(habilitado);
+                    callback.onResponse(true, habilitarAccesoUi);
+                }else {
+                    callback.onResponse(true, getBloqueo(usuarioId));
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+                callback.onResponse(true, getBloqueo(usuarioId));
+            }
+        });
+
+
+        return new FirebaseCancelImpl(mDatabase.child("/AV_Movil/Bloqueo/user_" + usuarioId),
+                new ChildEventListener() {
+
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        String key = dataSnapshot.getKey();
+                        if(key.equals("habilitado")){
+                            boolean habilitado = UtilsFirebase.convert(dataSnapshot.getValue(), false);
+                            HabilitarAccesoUi habilitarAccesoUi = new HabilitarAccesoUi();
+
+                            habilitarAccesoUi.setUsuarioId(usuarioId);
+                            BloqueoUsuario bloqueoUsuario = SQLite.select()
+                                    .from(BloqueoUsuario.class)
+                                    .where(Usuario_Table.usuarioId.eq(usuarioId))
+                                    .querySingle();
+                            if(bloqueoUsuario==null){
+                                bloqueoUsuario = new BloqueoUsuario();
+                                bloqueoUsuario.setUsuarioId(usuarioId);
+                            }
+                            bloqueoUsuario.setHabilitarAcceso(habilitado);
+                            bloqueoUsuario.save();
+                            habilitarAccesoUi.setModificado(true);
+                            habilitarAccesoUi.setHabilitar(habilitado);
+                            callback.onResponse(true, habilitarAccesoUi);
+                        }
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+
+    public HabilitarAccesoUi getBloqueo(int usuarioId){
         BloqueoUsuario bloqueoUsuario = SQLite.select()
                 .from(BloqueoUsuario.class)
                 .where(Usuario_Table.usuarioId.eq(usuarioId))
@@ -665,57 +762,7 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
         HabilitarAccesoUi habilitarAccesoUi = new HabilitarAccesoUi();
         habilitarAccesoUi.setHabilitar(bloqueoUsuario == null || bloqueoUsuario.isHabilitarAcceso());
         habilitarAccesoUi.setUsuarioId(usuarioId);
-        return new FirebaseCancelImpl(mDatabase.child("/AV_Movil/Bloqueo/user_" + usuarioId),
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
-                        apiRetrofit.changeSetTime(10,15,15,TimeUnit.SECONDS);
-                        RetrofitCancel<Boolean> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.f_isHabilitadoUsuario(usuarioId));
-                        retrofitCancel.enqueue(new RetrofitCancel.Callback<Boolean>() {
-                            @Override
-                            public void onResponse(Boolean response) {
-
-                                if(response!=null){
-                                    Log.d(TAG,"isSuccessful usuarioId: " + usuarioId);
-                                    //habilitado = UtilsFirebase.convert(dataSnapshot.child("habilitado").getValue(), false);
-                                    boolean habilitado = response;
-                                    habilitarAccesoUi.setModifiado(habilitarAccesoUi.isHabilitar()!=habilitado);
-
-                                    BloqueoUsuario bloqueoUsuario = SQLite.select()
-                                            .from(BloqueoUsuario.class)
-                                            .where(Usuario_Table.usuarioId.eq(usuarioId))
-                                            .querySingle();
-                                    if(bloqueoUsuario==null){
-                                        bloqueoUsuario = new BloqueoUsuario();
-                                        bloqueoUsuario.setUsuarioId(usuarioId);
-                                    }
-                                    bloqueoUsuario.setHabilitarAcceso(habilitado);
-                                    bloqueoUsuario.save();
-
-                                    habilitarAccesoUi.setHabilitar(habilitado);
-                                    callback.onResponse(true, habilitarAccesoUi);
-                                }else {
-                                    callback.onResponse(false, habilitarAccesoUi);
-                                }
-
-
-                            }
-
-                            @Override
-                            public void onFailure(Throwable t) {
-                                t.printStackTrace();
-                                callback.onResponse(false, habilitarAccesoUi);
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        callback.onResponse(false, habilitarAccesoUi);
-                    }
-                });
+        return habilitarAccesoUi;
     }
 
 

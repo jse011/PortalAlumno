@@ -135,11 +135,13 @@ public class InstrumentoEvaluacionPresenterImpl extends BasePresenterImpl<Instru
         String progress = variableUi.getPostion()+cantpregResueltas + "/" + (cantidad+cantpregResueltas);
         if(tipoEvaluacionView!=null)tipoEvaluacionView.setProgress(progress);
         if(tipoEvaluacionView!=null)tipoEvaluacionView.setTitulo(variableUi.getNombre());
+
         if(!TextUtils.isEmpty(variableUi.getPath())){
             if(tipoEvaluacionView!=null)tipoEvaluacionView.showImage(variableUi.getPath());
         }else {
             if(tipoEvaluacionView!=null)tipoEvaluacionView.hideImage();
         }
+
         switch (variableUi.getTipoInputRespuestaId()){
             case 7://Entero
                 if(tipoEvaluacionView!=null)tipoEvaluacionView.setInputEntero();

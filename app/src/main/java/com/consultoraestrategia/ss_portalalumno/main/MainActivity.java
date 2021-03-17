@@ -58,6 +58,7 @@ import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.main.listeners.MenuListener;
+import com.consultoraestrategia.ss_portalalumno.main.nuevaVersion.NuevaVersionDisponible;
 import com.consultoraestrategia.ss_portalalumno.permisos.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.sincronizar.instrumentos.SyncInstrumento;
@@ -75,6 +76,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.karumi.dexter.Dexter;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.robohorse.gpversionchecker.GPVersionChecker;
+import com.robohorse.gpversionchecker.domain.Version;
+import com.robohorse.gpversionchecker.domain.VersionInfoListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,6 +165,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     protected void setContentView() {
         setContentView(R.layout.activity_main_final);
         ButterKnife.bind(this);
+        setupVersion();
         limpiarVariableGlobales();
         desbloqOrientation();
         setupTabMenu();
@@ -169,6 +174,32 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         setupAdapter();
         setupValidatePermisos(this);
         SyncInstrumento.start(this);
+    }
+
+    private void setupVersion() {
+        new GPVersionChecker.Builder(this)
+                .setVersionInfoListener(new VersionInfoListener() {
+
+                    @Override
+                    public void onErrorHandled(@Nullable Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onResulted(Version version) {
+                        if(version.isNeedToUpdate()){
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    NuevaVersionDisponible.newInstance(version.getNewVersionCode(), version.getChanges())
+                                            .show(getSupportFragmentManager(),"NuevaVersionDisponible");
+                                }
+                            });
+                        }
+
+                    }
+                })
+                .create();
     }
 
     private void limpiarVariableGlobales() {
