@@ -12,6 +12,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.AnioAcademicoAlumno;
 import com.consultoraestrategia.ss_portalalumno.entities.Archivo;
 import com.consultoraestrategia.ss_portalalumno.entities.Aula;
 import com.consultoraestrategia.ss_portalalumno.entities.BEListaPadre;
+import com.consultoraestrategia.ss_portalalumno.entities.BloqueoUsuario;
 import com.consultoraestrategia.ss_portalalumno.entities.Calendario;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioListaUsuario;
@@ -535,7 +536,7 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                                 SQLite.delete()
                                         .from(SessionUser.class)
                                         .execute(databaseWrapper);
-
+                                usuario.setHabilitarAcceso(usuario.isHabilitarAcceso());
                                 usuario.save();
 
                                 TransaccionUtils.fastStoreListSave(Entidad.class, usuario.getEntidades(), databaseWrapper, true);
@@ -656,13 +657,13 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int usuarioId = sessionUser!=null?sessionUser.getUserId():0;
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
-        Usuario usuario = SQLite.select()
-                .from(Usuario.class)
+        BloqueoUsuario bloqueoUsuario = SQLite.select()
+                .from(BloqueoUsuario.class)
                 .where(Usuario_Table.usuarioId.eq(usuarioId))
                 .querySingle();
 
         HabilitarAccesoUi habilitarAccesoUi = new HabilitarAccesoUi();
-        habilitarAccesoUi.setHabilitar(usuario != null && usuario.isHabilitarAcceso());
+        habilitarAccesoUi.setHabilitar(bloqueoUsuario == null || bloqueoUsuario.isHabilitarAcceso());
         habilitarAccesoUi.setUsuarioId(usuarioId);
         return new FirebaseCancelImpl(mDatabase.child("/AV_Movil/Bloqueo/user_" + usuarioId),
                 new ValueEventListener() {
@@ -681,10 +682,17 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                                     boolean habilitado = response;
                                     habilitarAccesoUi.setModifiado(habilitarAccesoUi.isHabilitar()!=habilitado);
 
-                                    SQLite.update(Usuario.class)
-                                            .set(Usuario_Table.habilitarAcceso.eq(habilitado))
+                                    BloqueoUsuario bloqueoUsuario = SQLite.select()
+                                            .from(BloqueoUsuario.class)
                                             .where(Usuario_Table.usuarioId.eq(usuarioId))
-                                            .execute();
+                                            .querySingle();
+                                    if(bloqueoUsuario==null){
+                                        bloqueoUsuario = new BloqueoUsuario();
+                                        bloqueoUsuario.setUsuarioId(usuarioId);
+                                    }
+                                    bloqueoUsuario.setHabilitarAcceso(habilitado);
+                                    bloqueoUsuario.save();
+
                                     habilitarAccesoUi.setHabilitar(habilitado);
                                     callback.onResponse(true, habilitarAccesoUi);
                                 }else {

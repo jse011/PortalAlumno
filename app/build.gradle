@@ -87,4 +87,5 @@ dependencies {
     implementation ("androidx.concurrent:concurrent-futures:1.0.0"){
         //exclude group: 'com.google.guava', module: 'listenablefuture'
     }
+    //implementation 'jp.wasabeef:recyclerview-animators:4.0.1'
 }

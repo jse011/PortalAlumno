@@ -274,6 +274,9 @@ public class ApiRetrofit {
         Log.d(TAG,"url: " + url);
         Log.d(TAG, "json: " + parametroChangeUser.toString());
         ApiRequestBody< ParametroChangeUser> apiRequestBody = new ApiRequestBody<>("fobj_ObtenerUsuario_By_Id",parametroChangeUser);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
         return service.fobj_ObtenerUsuario(apiRequestBody);
     }
 

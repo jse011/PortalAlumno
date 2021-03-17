@@ -146,6 +146,7 @@ public class MainRepositorioImpl implements MainRepositorio {
                 .from(Usuario.class)
                 .where(Usuario_Table.usuarioId.eq(alumnoUi.getUsuarioId()))
                 .querySingle();
+
         alumnoUi.setHabilitarAcceso(usuario != null && usuario.isHabilitarAcceso());
         return alumnoUi;
     }
