@@ -44,6 +44,9 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     private TabCursoTareaView tabCursoTareaView;
     private TabCursoUnidadView tabCursoUnidadView;
     private boolean finishUpdateUnidadFb;
+    private boolean iniciandoApp = true;
+    private int silaboEventoId;
+
 
     public TabCursoPresenteImpl(UseCaseHandler handler, Resources res, GetCalendarioPeriodo getCalendarioPeriodo, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje, UpdateFireBasePersona updateFireBasePersona,
                                 Online online) {
@@ -67,6 +70,7 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     @Override
     public void onCreate() {
         super.onCreate();
+        iniciandoApp = true;
         setupVaribleGlobal();
         setupCalendarioPerio();
         if(view!=null)view.showTitle(nombreCurso);
@@ -201,6 +205,7 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         this.anioAcademicoId = iCRMEdu.variblesGlobales.getAnioAcademicoId();
         this.programaEducativoId = iCRMEdu.variblesGlobales.getProgramEducativoId();
         this.cargaCursoId = gbCursoUi.getCargaCursoId();
+        this.silaboEventoId = gbCursoUi.getSilaboEventoId();
         this.parametroColor1 = gbCursoUi.getParametroDisenioColor1();
         this.parametroColor2 = gbCursoUi.getParametroDisenioColor2();
         this.parametroColor3 = gbCursoUi.getParametroDisenioColor3();
@@ -278,6 +283,7 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
 
     @Override
     public void onDestroy() {
+        if(view!=null)view.desconetarAsistenica(silaboEventoId);
         super.onDestroy();
         finishUpdateUnidadFb = false;
     }
@@ -285,15 +291,19 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     @Override
     public void onResume() {
         super.onResume();
-        online.online(success -> {
-            if(success){
-                if(!finishUpdateUnidadFb){
-                    updateFireBaseUnidadAprendizaje();
+        if(iniciandoApp){
+            online.online(success -> {
+                if(success){
+                    if(!finishUpdateUnidadFb){
+                        updateFireBaseUnidadAprendizaje();
+                    }
+                    if(view!=null)view.modoOnline();
+                }else {
+                    if(view!=null)view.modoOffline();
                 }
-                if(view!=null)view.modoOnline();
-            }else {
-                if(view!=null)view.modoOffline();
-            }
-        });
+            });
+        }
+        iniciandoApp = false;
+
     }
 }

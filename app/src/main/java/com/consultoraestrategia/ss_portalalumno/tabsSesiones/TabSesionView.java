@@ -17,4 +17,6 @@ public interface TabSesionView extends BaseView<TabSesionPresenter> {
     void modoOnline();
 
     void modoOffline();
+
+    void servicePasarAsistencia(int silaboEventoId);
 }

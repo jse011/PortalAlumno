@@ -99,6 +99,16 @@ public class UserBloqueoActivity extends AppCompatActivity implements ICRMEduLis
     }
 
     @Override
+    public void onConetadoAsistencia() {
+
+    }
+
+    @Override
+    public void onDesconetadoAsistencia() {
+
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         setupBtnAtras();

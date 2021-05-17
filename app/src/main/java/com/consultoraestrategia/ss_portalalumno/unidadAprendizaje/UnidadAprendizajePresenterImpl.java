@@ -33,6 +33,7 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     private String color2;
     private String color3;
     private List<UnidadAprendizajeUi> unidadAprendizajeUiList = new ArrayList<>();
+    private int silaboEventoId;
 
     public UnidadAprendizajePresenterImpl(UseCaseHandler handler, Resources res, Online online, GetUnidadAprendizajeList getUnidadAprendizajeList, UpdateFireBaseUnidadAprendizaje updateFireBaseUnidadAprendizaje,
                                           SaveToogle saveToogle) {
@@ -84,6 +85,7 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     private void setupData() {
         GbCursoUi gbCursoUi = iCRMEdu.variblesGlobales.getGbCursoUi();
         this.cargaCursoId = gbCursoUi.getCargaCursoId();
+        this.silaboEventoId = gbCursoUi.getSilaboEventoId();
         this.anioAcademicoId = iCRMEdu.variblesGlobales.getAnioAcademicoId();
         this.color1 = gbCursoUi.getParametroDisenioColor1();
         this.color2 = gbCursoUi.getParametroDisenioColor2();
@@ -127,6 +129,7 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
         gbSesionAprendizajeUi.setNumero(sesionAprendizajeUi.getNroSesion());
         iCRMEdu.variblesGlobales.setGbSesionAprendizajeUi(gbSesionAprendizajeUi);
         if(view!=null)view.showTabSesionAprendizaje(sesionAprendizajeUi);
+        if(view!=null)view.servicePasarAsistencia(silaboEventoId);
     }
 
     @Override

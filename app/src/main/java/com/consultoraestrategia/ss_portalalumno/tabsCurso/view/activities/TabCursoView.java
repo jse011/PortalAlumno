@@ -24,4 +24,6 @@ public interface TabCursoView extends BaseView<TabCursoPresenter> {
     void modoOffline();
 
     void modoOnline();
+
+    void desconetarAsistenica(int silaboEventoId);
 }

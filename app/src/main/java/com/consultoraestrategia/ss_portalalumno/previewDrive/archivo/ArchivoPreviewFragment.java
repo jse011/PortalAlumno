@@ -127,7 +127,7 @@ public class ArchivoPreviewFragment extends Fragment implements ArchivoPreviewVi
     @Override
     public void uploadArchivo(String idDrive) {
         try {
-            webview.loadUrl("https://drive.google.com/file/d/" + idDrive + "/preview");
+            webview.loadUrl("https://drive.google.com/file/d/" + idDrive + "/view");
         } catch (Exception e) {
             e.printStackTrace();
         }

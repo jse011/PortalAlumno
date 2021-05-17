@@ -56,6 +56,8 @@ public class CursoCustom {
     public String descripcionAula;
     @Column
     public int planCursoId;
+    @Column
+    public int silaboEventoId;
 
     public int getCursoId() {
         return cursoId;
@@ -249,24 +251,11 @@ public class CursoCustom {
         this.planCursoId = planCursoId;
     }
 
-    @Override
-    public String toString() {
-        return "CursoCustom{" +
-                "cursoId=" + cursoId +
-                ", nombre='" + nombre + '\'' +
-                ", estadoId=" + estadoId +
-                ", descripcion='" + descripcion + '\'' +
-                ", alias='" + alias + '\'' +
-                ", cargaCursoId=" + cargaCursoId +
-                ", cargaAcademicaId=" + cargaAcademicaId +
-                ", seccionId=" + seccionId +
-                ", periodoId=" + periodoId +
-                ", aulaId=" + aulaId +
-                ", idPlanEstudio=" + idPlanEstudio +
-                ", idPlanEstudioVersion=" + idPlanEstudioVersion +
-                ", idAnioAcademico=" + idAnioAcademico +
-                ", seccion='" + seccion + '\'' +
-                ", periodo='" + periodo + '\'' +
-                '}';
+    public int getSilaboEventoId() {
+        return silaboEventoId;
+    }
+
+    public void setSilaboEventoId(int silaboEventoId) {
+        this.silaboEventoId = silaboEventoId;
     }
 }

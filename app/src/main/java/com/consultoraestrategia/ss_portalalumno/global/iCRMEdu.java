@@ -12,11 +12,18 @@ import android.os.Bundle;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.consultoraestrategia.ss_portalalumno.global.applife.ActivityLifecycleHandler;
+import com.consultoraestrategia.ss_portalalumno.global.asistencia.Asistencia;
+import com.consultoraestrategia.ss_portalalumno.global.asistencia.FirebaseAsistenciaImpl;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbPreview;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
+import com.consultoraestrategia.ss_portalalumno.main.MainActivity;
+import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity2;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.gson.Gson;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -31,15 +38,20 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
     private static final String TAG = "iCRMEduTAG";
     private ProgressReceiver progressReceiver;
     private List<ICRMEduListener> icrmEduListenerList = new ArrayList<>();
-
-
+    Asistencia asistencia;
     @Override
     public void onCreate() {
         super.onCreate();
         FlowManager.init(new FlowConfig.Builder(this).build());
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler(this));
         variblesGlobales = new VariblesGlobales().getData(getApplicationContext());
-        registerProgressReceiver();
+       getAsistencia();
+       registerProgressReceiver();
+    }
+
+    private Asistencia getAsistencia() {
+        if(asistencia==null) asistencia = new FirebaseAsistenciaImpl();
+        return asistencia;
     }
 
     @Override
@@ -67,6 +79,62 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
         if(variblesGlobales==null)variblesGlobales = new VariblesGlobales().getData(getApplicationContext());
     }
 
+
+    public void pasarAsistencia(int silaboEventoId){
+        Asistencia asistencia = getAsistencia();
+
+        asistencia.f_getAccionAcistenciaDocente(silaboEventoId, new Asistencia.Callback() {
+            @Override
+            public void onSuccess() {
+                //Tomar asistencia solo al los alumnos que esten adentro de uhn cuso y no en la lista de cursos
+                boolean esVisible = UtilsPortalAlumno.isActivityOnTop(getApplicationContext(), MainActivity.class);
+                if(!esVisible){
+                    asistencia.f_SaveAsistenciaAlumno(silaboEventoId,true, false, new Asistencia.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            for (ICRMEduListener listener : icrmEduListenerList)listener.onConetadoAsistencia();
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+        asistencia.f_SaveAsistenciaAlumno(silaboEventoId,true, true, new Asistencia.Callback() {
+            @Override
+            public void onSuccess() {
+                asistencia.sinInternet(new Asistencia.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        for (ICRMEduListener listener : icrmEduListenerList)listener.onConetadoAsistencia();
+                    }
+
+                    @Override
+                    public void onError() {
+                        for (ICRMEduListener listener : icrmEduListenerList)listener.onDesconetadoAsistencia();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+
+    }
+
+
     @Override
     public void onTerminate() {
         super.onTerminate();
@@ -83,6 +151,22 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
 
         return progressReceiver;
     }
+
+    public void desconectarAsistencia(int silaboEventoId) {
+        asistencia.desconectarAsistencia();
+        asistencia.f_SaveAsistenciaAlumno(silaboEventoId,false, false, new Asistencia.Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+    }
+
     //variables globales
     public static class VariblesGlobales{
         GbCursoUi gbCursoUi;

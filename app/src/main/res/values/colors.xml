@@ -4,6 +4,9 @@
     <color name="colorPrimaryDark">#2d43bc</color>
     <color name="colorAccent">#D81B60</color>
 
+    <color name="backgarund">#F2F3F8</color>
+    <color name="status_bar_lolipop">#6351535C</color>
+
     <color name="md_red_50">#ffebee</color>
     <color name="md_red_100">#FFCDD2</color>
     <color name="md_red_200">#EF9A9A</color>

@@ -1,12 +1,11 @@
 package com.consultoraestrategia.ss_portalalumno.main;
 
-import android.content.Intent;
 import android.content.res.Resources;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
-import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
@@ -20,10 +19,10 @@ import com.consultoraestrategia.ss_portalalumno.main.entities.AlumnoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AnioAcademicoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
+import com.consultoraestrategia.ss_portalalumno.main.entities.NuevaVersionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
-import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
@@ -42,6 +41,8 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     private RetrofitCancel cancel;
     private Online online;
     private AlumnoUi alumnoUi;
+    private NuevaVersionUi nuevaVersionUi = null;
+    private boolean mainPause;
 
     public MainPresenterImpl(UseCaseHandler handler, Resources res, GetCursos getCursos, UpdateCalendarioPeriodo calendarioPeriodo, UpdateFirebaseTipoNota updateFirebaseTipoNota,
                              Online online) {
@@ -188,13 +189,6 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        String usuarioFirebase = firebaseNode + "_" + usuario+"@gmail.com";
-        if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
-    }
-
-    @Override
     public void onClickConfiguracion(ConfiguracionUi configuracionUi) {
         switch (configuracionUi){
             case INFORMACION:
@@ -256,6 +250,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         GbCursoUi gbCursoUi = new GbCursoUi();
         gbCursoUi.setCursoId(cursosUi.getCursoId());
         gbCursoUi.setCargaCursoId(cursosUi.getCargaCursoId());
+        gbCursoUi.setSilaboEventoId(cursosUi.getSilaboEventoId());
         gbCursoUi.setParametroDisenioColor1(cursosUi.getBackgroundSolidColor());
         gbCursoUi.setParametroDisenioColor2(cursosUi.getBackgroundSolidColor2());
         gbCursoUi.setParametroDisenioColor3(cursosUi.getBackgroundSolidColor3());
@@ -276,6 +271,38 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         if(view!=null)view.cerrarSesion();
     }
 
+    @Override
+    public void nuevaVersionDisponible(String newVersionCode, String changes) {
+        nuevaVersionUi = new NuevaVersionUi();
+        nuevaVersionUi.setNewVersionCode(newVersionCode);
+        nuevaVersionUi.setChange(changes);
+        if(!mainPause){
+            if(view!=null)view.showNuevaversion(nuevaVersionUi);
+            nuevaVersionUi = null;
+        }
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mainPause = false;
+        if(nuevaVersionUi!=null){
+            if(view!=null)view.showNuevaversion(nuevaVersionUi);
+            nuevaVersionUi = null;
+        }
+        usuario = "quispe del catillo";
+        String usuarioFirebase = firebaseNode + "_" + (!TextUtils.isEmpty(usuario)?usuario.replaceAll(" ","_"):usuario) +"@gmail.com";
+        if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
+    }
+
+
+
+    @Override
+    public void onPause() {
+        mainPause = true;
+        super.onPause();
+    }
 
     @Override
     public void onDestroy() {

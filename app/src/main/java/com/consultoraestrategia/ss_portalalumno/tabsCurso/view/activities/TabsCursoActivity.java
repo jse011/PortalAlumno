@@ -1,6 +1,5 @@
 package com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
@@ -22,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,8 +53,6 @@ import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoUnidadVie
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.adapters.PeriodoAdapter;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.ui.FragmentTareas;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.UnidadAprendizajeFragment;
-import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
-import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoDialog;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -67,7 +65,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresenter> implements TabCursoView, PeriodoListener, BaseFragmentListener, LifecycleImpl.LifecycleListener {
+public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresenter> implements TabCursoView, PeriodoListener, BaseFragmentListener, LifecycleImpl.LifecycleListener, ICRMEduListener {
 
     private static final String TAG = TabsCursoActivity.class.getSimpleName();
     @BindView(R.id.imgBackgroundAppbar)
@@ -98,8 +96,8 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
     ProgressBar progress;
     @BindView(R.id.root)
     CoordinatorLayout root;
-    @BindView(R.id.txt_offline)
-    TextView txtOffline;
+    @BindView(R.id.txt_sin_senial)
+    ImageView txtOffline;
     @BindView(R.id.txt_error)
     TextView txtError;
     @BindView(R.id.msg_error)
@@ -154,6 +152,7 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
         setupAdapterPeriodo();
         setTitle("");
         showFragments();
+        iCRMEdu.getiCRMEdu(this).addiCRMEduListener(this);
     }
 
 
@@ -328,7 +327,6 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
 
     @Override
     public void modoOffline() {
-        txtOffline.setText(" Sin señal");
         msgError.setVisibility(View.VISIBLE);
         txtError.setPaintFlags(txtError.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         txtError.setText("Volver a cargar.");
@@ -336,8 +334,12 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
 
     @Override
     public void modoOnline() {
-        txtOffline.setText("");
         msgError.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void desconetarAsistenica(int silaboEventoId) {
+        iCRMEdu.getiCRMEdu(this).desconectarAsistencia(silaboEventoId);
     }
 
     @Override
@@ -392,7 +394,24 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        iCRMEdu.getiCRMEdu(this).removeCore2Listener(this);
     }
+
+    @Override
+    public void onChangeBloqueo() {
+
+    }
+
+    @Override
+    public void onConetadoAsistencia() {
+        txtOffline.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_circle_asistencia_conec));
+    }
+
+    @Override
+    public void onDesconetadoAsistencia() {
+        txtOffline.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_circle_asistencia_desconec));
+    }
+
 
     public static class ToolsTitleToolbar {
         private final ViewPager viewPager;

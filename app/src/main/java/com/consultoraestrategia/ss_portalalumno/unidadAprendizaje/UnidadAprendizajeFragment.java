@@ -21,6 +21,7 @@ import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragment;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoUnidadView;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity2;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.SesionColumnCountProvider;
@@ -150,6 +151,11 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     @Override
     public void hideMensajeListaVacia() {
         mensaje.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void servicePasarAsistencia(int silaboEventoId) {
+        iCRMEdu.getiCRMEdu(getActivity()).pasarAsistencia(silaboEventoId);
     }
 
     @Override

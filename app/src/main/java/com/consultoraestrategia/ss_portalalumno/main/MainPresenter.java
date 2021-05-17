@@ -20,4 +20,7 @@ public interface MainPresenter extends BasePresenter<MainView> {
     void onClickCurso(CursosUi cursosUi);
 
     void onClickDialogoCerrarSesion();
+
+    void nuevaVersionDisponible(String newVersionCode, String changes);
+
 }

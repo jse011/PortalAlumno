@@ -14,6 +14,7 @@ public class CursosUi {
     private int planCursoId;
     private String profesor;
     private String fotoProfesor;
+    private int silaboEventoId;
 
     public int getCursoId() {
         return cursoId;
@@ -117,5 +118,13 @@ public class CursosUi {
 
     public String getFotoProfesor() {
         return fotoProfesor;
+    }
+
+    public int getSilaboEventoId() {
+        return silaboEventoId;
+    }
+
+    public void setSilaboEventoId(int silaboEventoId) {
+        this.silaboEventoId = silaboEventoId;
     }
 }

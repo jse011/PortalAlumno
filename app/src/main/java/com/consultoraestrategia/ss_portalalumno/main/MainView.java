@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.main;
 
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseView;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
+import com.consultoraestrategia.ss_portalalumno.main.entities.NuevaVersionUi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,4 +33,6 @@ public interface MainView extends BaseView<MainPresenter> {
     void showActivtyBloqueo();
 
     void initBloqueo();
+
+    void showNuevaversion(NuevaVersionUi nuevaVersionUi);
 }

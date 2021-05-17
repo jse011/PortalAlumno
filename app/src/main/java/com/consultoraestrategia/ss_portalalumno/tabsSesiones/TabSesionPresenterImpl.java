@@ -41,6 +41,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
     private FirebaseCancel reunionVirtualCancel;
     private boolean updateInstrumento;
     private TabSesionEvidenciaView tabSesionEvidenciaView;
+    private int silaboEventoId;
 
     public TabSesionPresenterImpl(UseCaseHandler handler, Resources res, UpdateFirebaseInstrumento updateFirebaseInstrumento, UpdateFirebasePreguntas updateFirebasePreguntas, Online online,
                                   UpdateFirebaseColaborativa updateFirebaseColaborativa, UpdateFirebaseReunionVirtual updateFirebaseReunionVirtual) {
@@ -74,6 +75,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
         GbCursoUi gbCursoUi = iCRMEdu.variblesGlobales.getGbCursoUi();
         if(gbCursoUi!=null){
             this.idCargaCurso = gbCursoUi.getCargaCursoId();
+            this.silaboEventoId = gbCursoUi.getSilaboEventoId();
             this.color1 = gbCursoUi.getParametroDisenioColor1();
             this.color2 = gbCursoUi.getParametroDisenioColor2();
             this.color3 = gbCursoUi.getParametroDisenioColor3();
@@ -182,6 +184,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
     public void onVolverCargar() {
         online.restarOnline(success -> {
             if(success){
+                if(view!=null)view.servicePasarAsistencia(silaboEventoId);
                 if(view!=null)view.modoOnline();
             }else {
                 if(view!=null)view.modoOffline();
@@ -281,6 +284,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
         online.restarOnline(success -> {
             if(success){
                 if(view!=null)view.modoOnline();
+                if(view!=null)view.servicePasarAsistencia(silaboEventoId);
                 if(reunionVirtualCancel==null||colaborativaCancel==null){
                     updateFirebaseColaborativa();
                 }

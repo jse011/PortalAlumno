@@ -251,6 +251,11 @@ public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPr
 
     }
 
+    @Override
+    public void servicePasarAsistencia(int silaboEventoId) {
+
+    }
+
 
     @Override
     public void onChildsFragmentViewCreated() {

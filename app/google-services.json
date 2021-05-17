@@ -31,14 +31,6 @@
           }
         },
         {
-          "client_id": "292103131694-oh8t21crol1h5cfo62pclqps0tlvfko8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.consultoraestrategia.messengeracademico",
-            "certificate_hash": "913a0468f8e4ceebd928b3d9a41b877f9c3f9fb5"
-          }
-        },
-        {
           "client_id": "292103131694-jrj2tt0ebbr25b1qhksdqajqahsv2dsq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -47,59 +39,14 @@
           }
         },
         {
-          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "113993595250655306241",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:292103131694:android:128824145be91213",
-        "android_client_info": {
-          "package_name": "com.consultoraestrategia.messengeracademico_beta"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "292103131694-62gcni599l1glh525nb6f4lutic0prdq.apps.googleusercontent.com",
+          "client_id": "292103131694-oh8t21crol1h5cfo62pclqps0tlvfko8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.consultoraestrategia.messengeracademico_beta",
+            "package_name": "com.consultoraestrategia.messengeracademico",
             "certificate_hash": "913a0468f8e4ceebd928b3d9a41b877f9c3f9fb5"
           }
         },
         {
-          "client_id": "292103131694-gedhbko2vh1356ejkits534q6gqve38e.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.consultoraestrategia.messengeracademico_beta",
-            "certificate_hash": "cecab72df4c3dfab037407c645eada545a7ec6b8"
-          }
-        },
-        {
-          "client_id": "292103131694-4mppb3r2u88b2sh0furhr2mtubendgc1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.consultoraestrategia.messengeracademico_beta",
-            "certificate_hash": "7d0832f8bb7f3bd76146581c20dc494435cc46a3"
-          }
-        },
-        {
           "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -107,13 +54,16 @@
       "api_key": [
         {
           "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "113993595250655306241",
+              "client_id": "106604595259599939631",
               "client_type": 3
             }
           ]
@@ -129,19 +79,27 @@
       },
       "oauth_client": [
         {
-          "client_id": "292103131694-tcpff96kup54slq8ju85l7srn28b1sv1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.consultoraestrategia.padre_mentor",
-            "certificate_hash": "946c0b239b75f86504969045f7ce98b031ca5bdb"
-          }
-        },
-        {
           "client_id": "292103131694-aihodroc8q0b703r9bhsoh2ppk8vb02j.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consultoraestrategia.padre_mentor",
             "certificate_hash": "aa52474a8022d5dc5cf401228ad0ab3df73dc864"
+          }
+        },
+        {
+          "client_id": "292103131694-d00k31hbfe1r44e2ddrhtpfm9mu2iqg0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consultoraestrategia.padre_mentor",
+            "certificate_hash": "74885992708db50e1d365fd5d3fc44f40fb7f5cf"
+          }
+        },
+        {
+          "client_id": "292103131694-jp91lv61ftq5pei338s209v41ducj4hf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consultoraestrategia.padre_mentor",
+            "certificate_hash": "030328dfa1c4034f594b8df2c36baf9d31fd225b"
           }
         },
         {
@@ -161,19 +119,11 @@
           }
         },
         {
-          "client_id": "292103131694-jp91lv61ftq5pei338s209v41ducj4hf.apps.googleusercontent.com",
+          "client_id": "292103131694-tcpff96kup54slq8ju85l7srn28b1sv1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consultoraestrategia.padre_mentor",
-            "certificate_hash": "030328dfa1c4034f594b8df2c36baf9d31fd225b"
-          }
-        },
-        {
-          "client_id": "292103131694-d00k31hbfe1r44e2ddrhtpfm9mu2iqg0.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.consultoraestrategia.padre_mentor",
-            "certificate_hash": "74885992708db50e1d365fd5d3fc44f40fb7f5cf"
+            "certificate_hash": "946c0b239b75f86504969045f7ce98b031ca5bdb"
           }
         },
         {
@@ -184,13 +134,56 @@
       "api_key": [
         {
           "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "113993595250655306241",
+              "client_id": "106604595259599939631",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292103131694:android:f6c48f9cfa99756d8545bf",
+        "android_client_info": {
+          "package_name": "com.consultoraestrategia.padre_mentor.educar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292103131694-346udj8ofqtab0htmrnp73lo6du9qt4n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consultoraestrategia.padre_mentor.educar",
+            "certificate_hash": "a7e554eca96f7b095bd16bbeb24cba100a37017b"
+          }
+        },
+        {
+          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "106604595259599939631",
               "client_type": 3
             }
           ]
@@ -206,19 +199,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "292103131694-hoc2h3h7na7rho6ugn4opbokbng16jqj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.consultoraestrategia.ss_crmeducativo",
-            "certificate_hash": "946c0b239b75f86504969045f7ce98b031ca5bdb"
-          }
-        },
-        {
           "client_id": "292103131694-ei92ie2enfr6caukbq1aqtoohdgrkklh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consultoraestrategia.ss_crmeducativo",
             "certificate_hash": "030328dfa1c4034f594b8df2c36baf9d31fd225b"
+          }
+        },
+        {
+          "client_id": "292103131694-hoc2h3h7na7rho6ugn4opbokbng16jqj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consultoraestrategia.ss_crmeducativo",
+            "certificate_hash": "946c0b239b75f86504969045f7ce98b031ca5bdb"
           }
         },
         {
@@ -237,13 +230,56 @@
       "api_key": [
         {
           "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "113993595250655306241",
+              "client_id": "106604595259599939631",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292103131694:android:f4c4d61dc0a7405b8545bf",
+        "android_client_info": {
+          "package_name": "com.consultoraestrategia.ss_crmeducativo.educar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292103131694-1abbh54lrv65vtbsaavasnbbprtrvhd0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consultoraestrategia.ss_crmeducativo.educar",
+            "certificate_hash": "6ce72ddb1e045923a64c9d3dc485ed4f88e4a469"
+          }
+        },
+        {
+          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "106604595259599939631",
               "client_type": 3
             }
           ]
@@ -259,11 +295,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "292103131694-4io3j5o6khkd23v17rfu1an8tv646275.apps.googleusercontent.com",
+          "client_id": "292103131694-4s752bmq8pgur8kptggi0mb0mg5g75fp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consultoraestrategia.ss_portalalumno",
-            "certificate_hash": "a40e55dc345307b1d357de84f76c154d04928439"
+            "certificate_hash": "75f7848a67b0fd1cc3538cf9a2aee42b481cb6f3"
           }
         },
         {
@@ -274,13 +310,48 @@
       "api_key": [
         {
           "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "113993595250655306241",
+              "client_id": "106604595259599939631",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292103131694:android:b59daa944108949a8545bf",
+        "android_client_info": {
+          "package_name": "com.consultoraestrategia.ss_portalalumno.eva"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "106604595259599939631",
               "client_type": 3
             }
           ]
@@ -303,71 +374,16 @@
       "api_key": [
         {
           "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
+        },
+        {
+          "current_key": "AIzaSyCNOJECIF-SWld4e2G6A4dpCol77CXIWc0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "113993595250655306241",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:292103131694:android:364e923b3297b69e",
-        "android_client_info": {
-          "package_name": "com.consultoraestrategiabeta.ss_crmeducativo"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "113993595250655306241",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:292103131694:android:f47f264b4266ff6a8545bf",
-        "android_client_info": {
-          "package_name": "com.whatsapp.clone"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "292103131694-bq37cighnmhf0p8et4i80hmcp9dq33ea.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "113993595250655306241",
+              "client_id": "106604595259599939631",
               "client_type": 3
             }
           ]

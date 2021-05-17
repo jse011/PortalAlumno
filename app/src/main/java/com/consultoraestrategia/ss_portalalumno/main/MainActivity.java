@@ -55,6 +55,7 @@ import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalend
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
+import com.consultoraestrategia.ss_portalalumno.main.entities.NuevaVersionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
 import com.consultoraestrategia.ss_portalalumno.main.listeners.MenuListener;
@@ -191,8 +192,9 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    NuevaVersionDisponible.newInstance(version.getNewVersionCode(), version.getChanges())
-                                            .show(getSupportFragmentManager(),"NuevaVersionDisponible");
+
+                                  presenter.nuevaVersionDisponible(version.getNewVersionCode(), version.getChanges());
+
                                 }
                             });
                         }
@@ -473,6 +475,12 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     @Override
     public void initBloqueo() {
         BloqueoRealTime.Companion.getInstance(this);
+    }
+
+    @Override
+    public void showNuevaversion(NuevaVersionUi nuevaVersionUi) {
+        NuevaVersionDisponible.newInstance(nuevaVersionUi.getNewVersionCode(), nuevaVersionUi.getChange())
+                .show(getSupportFragmentManager(),"NuevaVersionDisponible");
     }
 
     private void initializingFirebase(String email, String password, OnCompleteListener<AuthResult> callback){

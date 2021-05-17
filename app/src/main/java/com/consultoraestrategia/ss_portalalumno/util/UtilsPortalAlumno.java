@@ -214,4 +214,29 @@ public class UtilsPortalAlumno {
 
         return onTop;
     }
+
+    public static boolean isActivityOnTop(Context context, Class<?>... className) {
+        boolean onTop = false;
+        String activityName;
+
+        if (context != null) {
+            for (Class<?> c: className){
+                activityName = c.getName();
+
+                ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+
+                for (ActivityManager.RunningTaskInfo object : taskInfo) {
+                    if (object.topActivity.getClassName().equals(activityName)) {
+                        onTop = true;
+                        break;
+                    }
+                }
+                if(onTop)break;
+            }
+
+        }
+
+        return onTop;
+    }
 }

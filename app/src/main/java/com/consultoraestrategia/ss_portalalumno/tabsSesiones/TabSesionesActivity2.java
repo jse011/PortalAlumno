@@ -26,6 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -72,7 +73,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionPresenter> implements TabSesionView, BaseFragmentListener, TabSesionCallback, LifecycleImpl.LifecycleListener, ExoPlayerCallback {
+public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionPresenter> implements TabSesionView, BaseFragmentListener, TabSesionCallback, LifecycleImpl.LifecycleListener, ExoPlayerCallback, ICRMEduListener {
     @BindView(R.id.tabs)
     TabLayout tabs;
     @BindView(R.id.toolbar)
@@ -97,7 +98,7 @@ public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionP
     ImageView imageView3;
 
     @BindView(R.id.txt_sin_senial)
-    TextView txtSinSenial;
+    ImageView txtSinSenial;
 
     @BindView(R.id.msg_error)
     CardView msgError;
@@ -151,6 +152,7 @@ public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionP
         setupAdapter();
         desbloqOrientation();
         setupSilingPanel();
+        iCRMEdu.getiCRMEdu(this).addiCRMEduListener(this);
         /*
         webview.requestFocus();
 
@@ -237,6 +239,7 @@ public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionP
     @Override
     protected void onDestroy() {
         slidingUp.onDestroy();
+        iCRMEdu.getiCRMEdu(this).removeCore2Listener(this);
         super.onDestroy();
     }
 
@@ -369,17 +372,20 @@ public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionP
 
     @Override
     public void modoOnline() {
-        txtSinSenial.setVisibility(View.GONE);
         msgError.setVisibility(View.GONE);
     }
 
     @Override
     public void modoOffline() {
-        txtSinSenial.setVisibility(View.VISIBLE);
         msgError.setVisibility(View.VISIBLE);
         msgError.setVisibility(View.VISIBLE);
         txtError.setPaintFlags(txtError.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         txtError.setText("Volver a cargar.");
+    }
+
+    @Override
+    public void servicePasarAsistencia(int silaboEventoId) {
+        iCRMEdu.getiCRMEdu(this).pasarAsistencia(silaboEventoId);
     }
 
     @Override
@@ -416,6 +422,21 @@ public class TabSesionesActivity2 extends BaseActivity<TabSesionView, TabSesionP
     @Override
     public void onPused() {
         slidingUp.onPused();
+    }
+
+    @Override
+    public void onChangeBloqueo() {
+
+    }
+
+    @Override
+    public void onConetadoAsistencia() {
+        txtSinSenial.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_circle_asistencia_conec));
+    }
+
+    @Override
+    public void onDesconetadoAsistencia() {
+        txtSinSenial.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_circle_asistencia_desconec));
     }
 
     public static class ToolsTitleToolbar {

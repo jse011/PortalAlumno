@@ -119,8 +119,11 @@ public class MainRepositorioImpl implements MainRepositorio {
         String fileName = persona!=null?persona.getFoto():"";
         int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
         fileName = fileName.substring(p + 1);
-
-        alumnoUi.setFoto(urlFoto+personaId+"/"+fileName);
+        if(!TextUtils.isEmpty(fileName) &&"default.png".equals(fileName)){
+            alumnoUi.setFoto(persona.getFoto());
+        }else {
+            alumnoUi.setFoto(urlFoto+personaId+"/"+fileName);
+        }
         alumnoUi.setNombre(persona==null?"":UtilsPortalAlumno.capitalize(UtilsPortalAlumno.getFirstWord(persona.getFirstName()))+" "+UtilsPortalAlumno.capitalize(persona.getApellidoPaterno())+" "+UtilsPortalAlumno.capitalize(persona.getApellidoMaterno()));
 
         AnioAcademicoAlumno anioAcademicoAlumno = SQLite.select()
@@ -181,6 +184,7 @@ public class MainRepositorioImpl implements MainRepositorio {
                 CargaCursos_Table.cargaCursoId.withTable(),
                 CargaCursos_Table.empleadoId.withTable(),
                 CargaCursos_Table.complejo.withTable(),
+                SilaboEvento_Table.silaboEventoId.withTable(),
                 CargaAcademica_Table.cargaAcademicaId.withTable(),
                 CargaAcademica_Table.seccionId.withTable(),
                 CargaAcademica_Table.periodoId.withTable(),
@@ -233,6 +237,9 @@ public class MainRepositorioImpl implements MainRepositorio {
                 .innerJoin(NivelAcademico.class)
                 .on(ProgramasEducativo_Table.nivelAcadId.withTable()
                         .eq(NivelAcademico_Table.nivelAcadId.withTable()))
+                .leftOuterJoin(SilaboEvento.class)
+                .on(CargaCursos_Table.cargaCursoId.withTable()
+                        .eq(SilaboEvento_Table.cargaCursoId.withTable()))
                 //#endregion Detalle
                 .where(PlanEstudios_Table.planEstudiosId.withTable()
                         .eq(CargaAcademica_Table.idPlanEstudio.withTable()))
@@ -258,6 +265,7 @@ public class MainRepositorioImpl implements MainRepositorio {
             cursosUi.setSalon(cursoCustom.getDescripcionAula() + ": "+cursoCustom.getNumeroAula());
             cursosUi.setSeccionyperiodo(cursoCustom.getPeriodo()+" "+cursoCustom.getSeccion()+" - "+cursoCustom.getNivelAcademico());
             cursosUi.setCargaCursoId(cursoCustom.getCargaCursoId());
+            cursosUi.setSilaboEventoId(cursoCustom.getSilaboEventoId());
             cursosUi.setPlanCursoId(cursoCustom.getPlanCursoId());
             ParametrosDisenio parametrosDisenio = SQLite.select()
                     .from(ParametrosDisenio.class)

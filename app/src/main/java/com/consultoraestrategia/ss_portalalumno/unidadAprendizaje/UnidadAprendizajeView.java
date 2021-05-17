@@ -19,4 +19,6 @@ public interface UnidadAprendizajeView extends BaseView<UnidadAprendizajePresent
     void showMensajeListaVacia();
 
     void hideMensajeListaVacia();
+
+    void servicePasarAsistencia(int silaboEventoId);
 }

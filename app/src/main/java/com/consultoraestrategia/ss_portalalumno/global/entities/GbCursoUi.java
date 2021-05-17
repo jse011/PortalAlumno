@@ -11,6 +11,7 @@ public class GbCursoUi {
     private String parametroDisenioColor2;
     private String parametroDisenioColor3;
     private int planCursoId;
+    private int silaboEventoId;
 
     public int getCursoId() {
         return cursoId;
@@ -90,5 +91,13 @@ public class GbCursoUi {
 
     public int getPlanCursoId() {
         return planCursoId;
+    }
+
+    public void setSilaboEventoId(int silaboEventoId) {
+        this.silaboEventoId = silaboEventoId;
+    }
+
+    public int getSilaboEventoId() {
+        return silaboEventoId;
     }
 }
