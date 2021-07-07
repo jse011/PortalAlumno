@@ -179,7 +179,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
         private int instrumentoId;
         private boolean habilitarAcceso;
         private boolean bloqueoAcceso;
-
+        private boolean updateInstrumento;
         public GbCursoUi getGbCursoUi() {
             return gbCursoUi;
         }
@@ -280,6 +280,14 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
 
         public boolean getBloqueoAcceso() {
             return bloqueoAcceso;
+        }
+
+        public boolean isUpdateInstrumento() {
+            return updateInstrumento;
+        }
+
+        public void setUpdateInstrumento(boolean updateInstrumento) {
+            this.updateInstrumento = updateInstrumento;
         }
     }
 

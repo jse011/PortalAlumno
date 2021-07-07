@@ -62,6 +62,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
     public void onCreate() {
         super.onCreate();
         setupData();
+        iCRMEdu.variblesGlobales.setUpdateInstrumento(false);
         online.online(success -> {
             if(success){
                 if(view!=null)view.modoOnline();
@@ -217,6 +218,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
                     @Override
                     public void onSucces() {
                         if(tabSesionInstrumentoView!=null)tabSesionInstrumentoView.changeList();
+                        if(tabSesionInstrumentoView!=null)tabSesionInstrumentoView.hideProgress2();
                         //if(tabSesionInstrumentoView!=null)tabSesionActividadView.changeList();
                     }
 
@@ -298,6 +300,12 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
                 if(view!=null)view.modoOffline();
             }
         });
+
+        if(iCRMEdu.variblesGlobales.isUpdateInstrumento()){
+            iCRMEdu.variblesGlobales.setUpdateInstrumento(false);
+            if(tabSesionInstrumentoView!=null)tabSesionInstrumentoView.showProgress2();
+            updateFirebaseInstrumento();
+        }
     }
 
 

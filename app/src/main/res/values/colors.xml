@@ -306,4 +306,6 @@
 
     <color name="color_sesion">#42af78</color>
     <color name="transprent_black">#8000</color>
+    <color name="internal_black_semitransparent_light">#8000</color>
+
 </resources>

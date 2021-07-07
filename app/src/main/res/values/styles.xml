@@ -14,6 +14,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="FullScrenMode"  parent="AppTheme.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="TooblarClassroom" parent="Theme.AppCompat.NoActionBar">
         <!-- android:textColorPrimary is the  color of the title text
       in the Toolbar, in the Theme.AppCompat theme:  -->

@@ -291,7 +291,6 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
             if(view!=null)view.showNuevaversion(nuevaVersionUi);
             nuevaVersionUi = null;
         }
-        usuario = "quispe del catillo";
         String usuarioFirebase = firebaseNode + "_" + (!TextUtils.isEmpty(usuario)?usuario.replaceAll(" ","_"):usuario) +"@gmail.com";
         if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
     }

@@ -93,4 +93,5 @@ dependencies {
     implementation 'com.github.robohorse:gpversionchecker:1.7.1'
     implementation 'org.jsoup:jsoup:1.9.2'
     implementation 'com.github.florent37:shapeofview:1.4.7'
+    implementation 'com.jpardogo.googleprogressbar:library:1.2.0'
 }

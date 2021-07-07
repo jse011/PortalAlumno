@@ -86,6 +86,7 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
             instrumentoUiList.add(instrumentoUi);
         }
         if(view!=null)view.showListInstrumento(instrumentoUiList);
+        hideProgress();
     }
 
     private void setData() {

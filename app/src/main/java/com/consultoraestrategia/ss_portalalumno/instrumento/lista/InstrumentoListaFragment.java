@@ -22,6 +22,7 @@ import com.consultoraestrategia.ss_portalalumno.instrumento.data.source.Instrume
 import com.consultoraestrategia.ss_portalalumno.instrumento.data.source.InstrumentoRepositoryImpl;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion.InstrumentoEvaluacionActivity;
+import com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion_online.EvaluacionOnlineActivity;
 import com.consultoraestrategia.ss_portalalumno.instrumento.lista.adapter.InstrumentoListAdapter;
 import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoList;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionInstrumentoView;
@@ -37,6 +38,8 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     @BindView(R.id.progressBar14)
     ProgressBar progressBar14;
     private InstrumentoListAdapter adapter;
+    @BindView(R.id.progressBar15)
+    ProgressBar progressBar15;
 
     @Override
     protected String getLogTag() {
@@ -117,11 +120,31 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
 
     @Override
     public void showActivityInstrumento() {
-        startActivity(new Intent(getContext(), InstrumentoEvaluacionActivity.class));
+        startActivity(new Intent(getContext(), EvaluacionOnlineActivity.class));
     }
 
     @Override
     public void changeList() {
         if (presenter != null) presenter.notifyChangeFragment();
+    }
+
+    @Override
+    public void showProgress2() {
+        progressBar15.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress2() {
+        progressBar15.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showProgress() {
+        super.showProgress();
+    }
+
+    @Override
+    public void hideProgress() {
+        super.hideProgress();
     }
 }
