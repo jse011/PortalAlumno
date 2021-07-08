@@ -51,6 +51,10 @@ public class InstrumentoEvaluacion extends BaseModel {
     private int InstrumentoEvalParentId;
     @Column
     private int CantidadPreguntas;
+    @Column
+    private String rubroEvaluacionId;
+    @Column
+    private String tipoNotaId;
 
     public int getInstrumentoEvalId() {
         return InstrumentoEvalId;
@@ -226,5 +230,21 @@ public class InstrumentoEvaluacion extends BaseModel {
 
     public void setCantidadPreguntas(int cantidadPreguntas) {
         CantidadPreguntas = cantidadPreguntas;
+    }
+
+    public void setRubroEvaluacionId(String rubroEvaluacionId) {
+        this.rubroEvaluacionId = rubroEvaluacionId;
+    }
+
+    public String getRubroEvaluacionId() {
+        return rubroEvaluacionId;
+    }
+
+    public void setTipoNotaId(String tipoNotaId) {
+        this.tipoNotaId = tipoNotaId;
+    }
+
+    public String getTipoNotaId() {
+        return tipoNotaId;
     }
 }

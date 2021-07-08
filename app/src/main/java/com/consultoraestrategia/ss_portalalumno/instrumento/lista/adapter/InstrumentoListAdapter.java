@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,8 +71,10 @@ public class InstrumentoListAdapter extends RecyclerView.Adapter<InstrumentoList
         CustomProgress progressBar5;
         @BindView(R.id.anim_alert)
         LottieAnimationView animAlert;
-        @BindView(R.id.img_porcentaje)
-        ImageView imgPorcentaje;
+        @BindView(R.id.img_pregunta)
+        ImageView imgPregunta;
+        @BindView(R.id.img_descripcion)
+        TextView imgDescripcion;
         @BindView(R.id.cardView)
         CardView cardView;
         @BindView(R.id.icono)
@@ -124,29 +127,23 @@ public class InstrumentoListAdapter extends RecyclerView.Adapter<InstrumentoList
             animAlert.playAnimation();
             animAlert.setVisibility(instrumentoUi.getCatidadPreguntasSinEnviar()>0?View.VISIBLE:View.GONE);
             if(instrumentoUi.getPorcentaje()==-1){
-                imgPorcentaje.setVisibility(View.GONE);
+                imgPregunta.setVisibility(View.GONE);
+                imgDescripcion.setVisibility(View.GONE);
             }else {
-                imgPorcentaje.setVisibility(View.VISIBLE);
-                if(instrumentoUi.getPorcentaje()<=25){
-                    Glide.with(imgPorcentaje)
-                            .load(R.drawable.ic_triste)
-                            .apply(UtilsGlide.getGlideRequestOptionsSimple())
-                            .into(imgPorcentaje);
-                }else if(instrumentoUi.getPorcentaje()<=50){
-                    Glide.with(imgPorcentaje)
-                            .load(R.drawable.ic_neutral)
-                            .apply(UtilsGlide.getGlideRequestOptionsSimple())
-                            .into(imgPorcentaje);
-                }else if(instrumentoUi.getPorcentaje()<=75){
-                    Glide.with(imgPorcentaje)
-                            .load(R.drawable.ic_contento)
-                            .apply(UtilsGlide.getGlideRequestOptionsSimple())
-                            .into(imgPorcentaje);
-                }else{
-                    Glide.with(imgPorcentaje)
-                            .load(R.drawable.ic_muy_contento)
-                            .apply(UtilsGlide.getGlideRequestOptionsSimple())
-                            .into(imgPorcentaje);
+
+                if (instrumentoUi.getTipoIdTipoNota() == 412) {
+                    String vstr_Titulo = instrumentoUi.getTituloValorTipoNota();
+                    imgPregunta.setVisibility(View.GONE);
+                    imgDescripcion.setVisibility(View.VISIBLE);
+                    imgDescripcion.setText(vstr_Titulo);
+                }else {
+                    String vstr_PathIcon = instrumentoUi.getIconoValorTipoNota();
+                    Glide.with(imgPregunta)
+                            .load(vstr_PathIcon)
+                            .apply(UtilsGlide.getGlideRequestOptions())
+                            .into(imgPregunta);
+                    imgPregunta.setVisibility(View.VISIBLE);
+                    imgDescripcion.setVisibility(View.GONE);
                 }
             }
         }

@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -238,5 +239,24 @@ public class UtilsPortalAlumno {
         }
 
         return onTop;
+    }
+
+    /**
+     * a = valor minimo del origen
+     * b = valor maximo del origen
+     * x = valor a transformar
+     * c = valor minimo transformado
+     * d = valor maximo transformado
+     */
+    public static double transformacionInvariante(double a, double b, double x, double c, double d) {
+        try {
+            double t = (1 - ((b - x) / (b - a))) * (d - c);
+            Log.d(UtilsPortalAlumno.class.getSimpleName(), "notaTransformada: " + "1 - ((" + b + "-" + x + ")/(" + b + "-" + a + "))) * (" + d + " - " + c + ") = " + t);
+            return t;
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+
     }
 }

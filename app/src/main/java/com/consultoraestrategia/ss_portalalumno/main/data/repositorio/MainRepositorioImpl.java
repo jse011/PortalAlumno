@@ -410,6 +410,9 @@ public class MainRepositorioImpl implements MainRepositorio {
                             tipoNotaC.setTipoNotaId(tipoNotaC.getKey());
                             tipoNotaC.setNombre(UtilsFirebase.convert(tipoSnapshot.child("Nombre").getValue(), ""));
                             tipoNotaC.setTipoId(UtilsFirebase.convert(tipoSnapshot.child("TipoId").getValue(), 0));
+                            tipoNotaC.setValorMaximo(UtilsFirebase.convert(tipoSnapshot.child("ValorMaximo").getValue(), 0));
+                            tipoNotaC.setValorMinino(UtilsFirebase.convert(tipoSnapshot.child("ValorMinimo").getValue(), 0));
+                            tipoNotaC.setIntervalo(UtilsFirebase.convert(tipoSnapshot.child("Intervalo:").getValue(), false));
                             tipoNotaCList.add(tipoNotaC);
                             RelProgramaEducativoTipoNota relProgramaEducativoTipoNota = new RelProgramaEducativoTipoNota();
                             relProgramaEducativoTipoNota.setTipoNotaId(tipoNotaC.getTipoNotaId());
@@ -426,6 +429,11 @@ public class MainRepositorioImpl implements MainRepositorio {
                                     valorTipoNotaC.setTipoNotaId(UtilsFirebase.convert(valoresDataSnapshot.child("TipoNotaId").getValue(), ""));
                                     valorTipoNotaC.setTitulo(UtilsFirebase.convert(valoresDataSnapshot.child("Titulo").getValue(), ""));
                                     valorTipoNotaC.setValorNumerico(UtilsFirebase.convert(valoresDataSnapshot.child("ValorNumerico").getValue(), 0.0D));
+
+                                    valorTipoNotaC.setIncluidoLInferior(UtilsFirebase.convert(valoresDataSnapshot.child("IncluidoLInferior").getValue(), false));
+                                    valorTipoNotaC.setIncluidoLSuperior(UtilsFirebase.convert(valoresDataSnapshot.child("IncluidoLSuperior").getValue(), false));
+                                    valorTipoNotaC.setLimiteInferior(UtilsFirebase.convert(valoresDataSnapshot.child("LimiteInferior").getValue(), 0.0D));
+                                    valorTipoNotaC.setLimiteSuperior(UtilsFirebase.convert(valoresDataSnapshot.child("LimiteSuperior").getValue(), 0.0D));
                                     valorTipoNotaCList.add(valorTipoNotaC);
                                 }
 

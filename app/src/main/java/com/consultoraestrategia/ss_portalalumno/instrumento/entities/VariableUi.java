@@ -18,6 +18,10 @@ public class VariableUi {
     private String respuestaActual;
     private String instrumentoObservadoId;
     private boolean enviado;
+    private int desempenioIcd;
+    private String tituloRubroDetalle;
+    private int tipoCompetenciaId;
+    private int tipoDecempenioId;
 
     public int getVariableId() {
         return variableId;
@@ -137,5 +141,37 @@ public class VariableUi {
 
     public boolean getEnviado() {
         return enviado;
+    }
+
+    public void setDesempenioIcd(int desempenioIcd) {
+        this.desempenioIcd = desempenioIcd;
+    }
+
+    public int getDesempenioIcd() {
+        return desempenioIcd;
+    }
+
+    public void setTituloRubroDetalle(String tituloRubroDetalle) {
+        this.tituloRubroDetalle = tituloRubroDetalle;
+    }
+
+    public String getTituloRubroDetalle() {
+        return tituloRubroDetalle;
+    }
+
+    public void setTipoCompetenciaId(int tipoCompetenciaId) {
+        this.tipoCompetenciaId = tipoCompetenciaId;
+    }
+
+    public int getTipoCompetenciaId() {
+        return tipoCompetenciaId;
+    }
+
+    public void setTipoDecempenioId(int tipoDecempenioId) {
+        this.tipoDecempenioId = tipoDecempenioId;
+    }
+
+    public int getTipoDecempenioId() {
+        return tipoDecempenioId;
     }
 }

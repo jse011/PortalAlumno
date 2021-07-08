@@ -103,11 +103,13 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                             instrumentoEvaluacion.setImagen(fbInstrumento.getImagen());
                             instrumentoEvaluacion.setNombre(fbInstrumento.getNombre());
                             instrumentoEvaluacion.setSesionId(fbInstrumento.getSesionAprendizajeId());
-                            instrumentoEvaluacion.setSilaboId(fbInstrumento.getSilaboEventoId());
+                            instrumentoEvaluacion.setRubroEvaluacionId(UtilsFirebase.convert(instrumentoSnapshot.child("RubroEvaluacionId").getValue(), ""));
+                            instrumentoEvaluacion.setTipoNotaId(UtilsFirebase.convert(instrumentoSnapshot.child("TipoNotaId").getValue(), ""));
                             instrumentoEvaluacionList.add(instrumentoEvaluacion);
-                            if(fbInstrumento.getVariables()!=null)
-                                for (Map.Entry<String, FBInstrumento.FBVariables> mapFbVariable: fbInstrumento.getVariables().entrySet()) {
-                                    FBInstrumento.FBVariables fbVariables = mapFbVariable.getValue();
+                            if(instrumentoSnapshot.child("Variables").exists()){
+                                for (DataSnapshot variablesSnapshot : instrumentoSnapshot.child("Variables").getChildren()){
+                                    FBInstrumento.FBVariables fbVariables = variablesSnapshot.getValue(FBInstrumento.FBVariables.class);
+
                                     Variable variable = new Variable();
                                     variable.setVariableId(fbVariables.getVariableId());
                                     variable.setBancoPreguntaId(fbVariables.getBancoPreguntaId());
@@ -131,6 +133,13 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                                     variable.setTipoRespuestaId(fbVariables.getTipoRespuestaId());
                                     variable.setTipoVariableId(fbVariables.getTipoVariableId());
                                     variable.setValorMaximo(fbVariables.getValorMaximo());
+                                    variable.setTipoCompetenciaId(UtilsFirebase.convert(variablesSnapshot.child("TipoCompetenciaId").getValue(), 0));
+                                    variable.setTipoDecempenioId(UtilsFirebase.convert(variablesSnapshot.child("TipoDecempenioId").getValue(), 0));
+                                    variable.setTituloRubroDetalle(UtilsFirebase.convert(variablesSnapshot.child("TituloRubroDetalle").getValue(), ""));
+                                    variable.setDesempenioIcd(UtilsFirebase.convert(variablesSnapshot.child("DesempenioIcd").getValue(), 0));
+                                    variable.setCapacidadId(UtilsFirebase.convert(variablesSnapshot.child("CapacidadId").getValue(), 0));
+                                    variable.setCampoTematicoId(UtilsFirebase.convert(variablesSnapshot.child("CampoTematicoId").getValue(), 0));
+
                                     variable.setValorMinimo(fbVariables.getValorMinimo());
                                     variableList.add(variable);
                                     if(fbVariables.getValores()!=null)
@@ -148,8 +157,10 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                                             valor.setVariableId(fbValores.getVariableId());
                                             valorList.add(valor);
                                         }
-
                                 }
+                            }
+
+
                         }
 
                         SessionUser sessionUser = SessionUser.getCurrentUser();

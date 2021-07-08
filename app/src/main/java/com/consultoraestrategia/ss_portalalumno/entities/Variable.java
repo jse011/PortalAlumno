@@ -57,6 +57,18 @@ public class Variable extends BaseModel {
     private String Tiempo;
     @Column
     private boolean Pertencia;
+    @Column
+    private int tipoCompetenciaId;
+    @Column
+    private int tipoDecempenioId;
+    @Column
+    private String tituloRubroDetalle;
+    @Column
+    private int desempenioIcd;
+    @Column
+    private int capacidadId;
+    @Column
+    private int campoTematicoId;
 
     public int getVariableId() {
         return VariableId;
@@ -248,5 +260,53 @@ public class Variable extends BaseModel {
 
     public void setPertencia(boolean pertencia) {
         Pertencia = pertencia;
+    }
+
+    public void setTipoCompetenciaId(int tipoCompetenciaId) {
+        this.tipoCompetenciaId = tipoCompetenciaId;
+    }
+
+    public int getTipoCompetenciaId() {
+        return tipoCompetenciaId;
+    }
+
+    public void setTipoDecempenioId(int tipoDecempenioId) {
+        this.tipoDecempenioId = tipoDecempenioId;
+    }
+
+    public int getTipoDecempenioId() {
+        return tipoDecempenioId;
+    }
+
+    public void setTituloRubroDetalle(String tituloRubroDetalle) {
+        this.tituloRubroDetalle = tituloRubroDetalle;
+    }
+
+    public String getTituloRubroDetalle() {
+        return tituloRubroDetalle;
+    }
+
+    public void setDesempenioIcd(int desempenioIcd) {
+        this.desempenioIcd = desempenioIcd;
+    }
+
+    public int getDesempenioIcd() {
+        return desempenioIcd;
+    }
+
+    public void setCapacidadId(int capacidadId) {
+        this.capacidadId = capacidadId;
+    }
+
+    public int getCapacidadId() {
+        return capacidadId;
+    }
+
+    public void setCampoTematicoId(int campoTematicoId) {
+        this.campoTematicoId = campoTematicoId;
+    }
+
+    public int getCampoTematicoId() {
+        return campoTematicoId;
     }
 }

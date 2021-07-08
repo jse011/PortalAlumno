@@ -3,44 +3,73 @@ package com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion_online;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.view.WindowInsetsAnimation;
 import android.view.WindowInsetsController;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 import com.consultoraestrategia.ss_portalalumno.R;
+import com.consultoraestrategia.ss_portalalumno.base.viewpager.LifecycleImpl;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.lib.cardviewGesture.MovableCardView;
+import com.consultoraestrategia.ss_portalalumno.util.KeyboardUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
+import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
+import com.consultoraestrategia.ss_portalalumno.youtube.YoutubeConfig;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.database.annotations.NotNull;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 
-public class EvaluacionOnlineActivity extends AppCompatActivity {
+public class EvaluacionOnlineActivity extends AppCompatActivity implements LifecycleImpl.LifecycleListener {
     private String TAG = "EvaluacionOnlineActivity";
 
     @BindView(R.id.webView)
@@ -51,8 +80,13 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
     FrameLayout background;
     @BindView(R.id.root_layout)
     FrameLayout root_layout;
-    @BindView(R.id.card_view)
-    FrameLayout card_view;
+    @BindView(R.id.contentPlayer)
+    FrameLayout contentPlayer;
+    @BindView(R.id.youtube_layout)
+    FrameLayout youtubeLayout;
+
+    private KeyBoardView keyBoardView;
+    private YoutubeConfig youtubeConfig;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,16 +94,8 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_evaluacion_online);
         ButterKnife.bind(this);
         setupWebView();
-        card_view.setVisibility(View.GONE);
-        KeyboardVisibilityEvent.setEventListener(
-               this,
-                new KeyboardVisibilityEventListener() {
-                    @Override
-                    public void onVisibilityChanged(boolean isOpen) {
-                        Log.d(TAG, "open: " + isOpen);
-                        card_view.setVisibility(isOpen?View.VISIBLE:View.GONE);
-                    }
-                });
+
+        getSupportFragmentManager().registerFragmentLifecycleCallbacks(new LifecycleImpl(0,this),true);
     }
 
     JavaScriptInterface jsInterface;
@@ -78,6 +104,7 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
         String serverUrl = GlobalSettings.getServerUrl();
         return !TextUtils.isEmpty(serverUrl)?serverUrl+"/?insmovil":"";
     }
+
     private void setupWebView() {
         try {
             iCRMEdu.variblesGlobales.setUpdateInstrumento(true);
@@ -191,20 +218,104 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(jsInterface!=null) webView.removeJavascriptInterface("JSInterface");
-        jsInterface = new JavaScriptInterface(this);
+        jsInterface = new JavaScriptInterface(this, keyBoardView);
         webView.addJavascriptInterface(jsInterface, "JSInterface");
     }
 
-    public static class JavaScriptInterface {
-        private Activity activity;
+    @Override
+    public void onChildsFragmentViewCreated() {
 
-        public JavaScriptInterface(Activity activity) {
+    }
+
+    @Override
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ConstraintLayout.LayoutParams layoutLayoutParams = (ConstraintLayout.LayoutParams) youtubeLayout.getLayoutParams();
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+            layoutLayoutParams.dimensionRatio = null;
+            layoutLayoutParams.bottomMargin = (int)UtilsPortalAlumno.convertDpToPixel(0, this);
+            layoutLayoutParams.leftMargin = (int)UtilsPortalAlumno.convertDpToPixel(55, this);
+            layoutLayoutParams.rightMargin = (int)UtilsPortalAlumno.convertDpToPixel(55, this);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            layoutLayoutParams.dimensionRatio = "12:9";
+            layoutLayoutParams.bottomMargin = (int)UtilsPortalAlumno.convertDpToPixel(45, this);
+            layoutLayoutParams.leftMargin = (int)UtilsPortalAlumno.convertDpToPixel(0, this);
+            layoutLayoutParams.rightMargin = (int)UtilsPortalAlumno.convertDpToPixel(0, this);
+        }
+    }
+
+    @Override
+    public void onFragmentViewCreated(Fragment f, View view, Bundle savedInstanceState) {
+        if(f instanceof KeyBoardView){
+            keyBoardView = (KeyBoardView)f;
+            keyBoardView.setInputText(getTextoInput());
+            keyBoardView.setPresenter(this);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if( contentPlayer.getVisibility()!=View.GONE){
+            salirYoutube();
+        }else {
+            webView.loadUrl("javascript:(function(){var input = document.querySelector('.btn-eq-pause'); input.dispatchEvent(new Event('click'));})()");
+        }
+    }
+
+    @Override
+    public void onFragmentResumed(Fragment f) {
+
+    }
+
+    @Override
+    public void onFragmentViewDestroyed(Fragment f) {
+        keyBoardView = null;
+    }
+
+    @Override
+    public void onFragmentActivityCreated(Fragment f, Bundle savedInstanceState) {
+        if(f instanceof KeyBoardView){
+            keyBoardView = (KeyBoardView)f;
+            keyBoardView.setInputText(getTextoInput());
+            keyBoardView.setPresenter(this);
+        }
+    }
+
+    public static class JavaScriptInterface {
+        private final EvaluacionOnlineActivity activity;
+        private KeyBoardView keyBoardView;
+        public JavaScriptInterface(EvaluacionOnlineActivity activity, KeyBoardView keyBoardView) {
             this.activity = activity;
         }
 
         @JavascriptInterface
         public void finishActivity(){
             activity.finish();
+        }
+
+        @JavascriptInterface
+        public void openkeyboard(String texto){
+            activity.setTextoInput(texto);
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    if(keyBoardView==null)new Dialogkeyboard().show(activity.getSupportFragmentManager(),"Dialogkeyboard");
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void showYoutubeAndroid(String url){
+
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                   activity.showYoutube(url);
+                }
+            });
+
         }
 
     }
@@ -272,6 +383,219 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
 
+    }
+
+    public static class Dialogkeyboard extends BottomSheetDialogFragment implements KeyBoardView {
+
+        private Unbinder unbinder;
+        @BindView(R.id.txt_titulo)
+        TextView txtTitulo;
+        @BindView(R.id.editText)
+        EditText editText;
+        @BindView(R.id.btn_guardar)
+        Button btnGuardar;
+        @BindView(R.id.btn_cancelar)
+        Button btnCancelar;
+
+
+
+        private EvaluacionOnlineActivity activity;
+
+        @Override
+        public void setupDialog(@NonNull Dialog dialog, int style) {
+
+
+            BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
+            bottomSheetDialog.setContentView(R.layout.dialog_keyboard_evalaucion_online);
+            unbinder = ButterKnife.bind(this, dialog.getWindow().getDecorView());
+            txtTitulo.setText("Escribe tu respuesta");
+            editText.requestFocus(); //Asegurar que editText tiene focus
+            InputMethodManager imm = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+
+            try {
+                Field behaviorField = bottomSheetDialog.getClass().getDeclaredField("behavior");
+                behaviorField.setAccessible(true);
+                final BottomSheetBehavior behavior = (BottomSheetBehavior) behaviorField.get(bottomSheetDialog);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+
+                    @Override
+                    public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                        if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    }
+
+                    @Override
+                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    }
+                });
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    if(activity!=null)activity.setTextoInput(editText.getText().toString());
+                }
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    // TODO Auto-generated method stub
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    // TODO Auto-generated method stub
+                }
+            });
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogKeyBoardStyle);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog)
+        {
+            editText.clearFocus();
+            Log.d(getClass().getSimpleName(), "hideKeyboard");
+            KeyboardUtils.hideKeyboard(editText.getContext(), editText);
+            super.onDismiss(dialog);
+        }
+
+        @Override
+        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+                    FrameLayout bottomSheet = (FrameLayout)
+                            dialog.findViewById(R.id.design_bottom_sheet);
+                    BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    behavior.setPeekHeight(0);
+                }
+            });
+        }
+        @Override
+        public void onDestroyView() {
+            if(activity!=null)KeyboardUtils.hideKeyboard(activity, activity.webView);
+            super.onDestroyView();
+            activity=null;
+            unbinder.unbind();
+        }
+
+        @OnClick({R.id.btn_guardar, R.id.btn_cancelar})
+        public void onViewClicked(View view) {
+            switch (view.getId()) {
+                case R.id.btn_cancelar:
+                    dismiss();
+                    break;
+                case R.id.btn_guardar:
+                    if(activity!=null)activity.setTextoInput(editText.getText().toString());
+                    dismiss();
+                    break;
+            }
+        }
+
+
+        @Override
+        public void setInputText(String texto) {
+            editText.setText(texto);
+            editText.setSelection(editText.getText().length());
+        }
+
+        @Override
+        public void salir() {
+            dismiss();
+        }
+
+        @Override
+        public void setPresenter(EvaluacionOnlineActivity activity) {
+            this.activity = activity;
+        }
+    }
+
+    interface KeyBoardView{
+
+        void setInputText(String texto);
+
+        void salir();
+
+        void setPresenter(EvaluacionOnlineActivity activity);
+    }
+
+    private String textoInput;
+
+    public String getTextoInput() {
+        return textoInput;
+    }
+
+    public void setTextoInput(String textoInput) {
+        this.textoInput = (TextUtils.isEmpty(textoInput)?"":textoInput);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                webView.loadUrl("javascript:(function(){var input = document.querySelector('.textarea_eq_respuesta');  input.value = '"+textoInput+"';  input.dispatchEvent(new Event('keypress')); input.dispatchEvent(new Event('keydown')); })()");
+            }
+        });
+    }
+
+
+    public void showYoutube(String url) {
+        contentPlayer.setVisibility(View.VISIBLE);
+        setupYoutubePlayer(url);
+    }
+
+    private void setupYoutubePlayer(String url) {
+        if (youtubeConfig == null) youtubeConfig = new YoutubeConfig(this);
+        Log.d(TAG, url);
+        if (youtubeConfig != null) {
+            youtubeConfig.setDisabledRotation(true);
+            youtubeConfig.initialize(YouTubeUrlParser.getVideoId(url), getSupportFragmentManager(), R.id.youtube_layout, new YoutubeConfig.PlaybackEventListener() {
+                @Override
+                public void onPlaying() {
+                    //imgActionYoutube.setImageDrawable(ContextCompat.getDrawable(imgActionYoutube.getContext(), R.drawable.ic_pause_youtube));
+                }
+
+                @Override
+                public void onPaused() {
+                    //imgActionYoutube.setImageDrawable(ContextCompat.getDrawable(imgActionYoutube.getContext(), R.drawable.ic_play_youtube));
+                }
+
+                @Override
+                public void onLandscape() {
+
+                }
+
+                @Override
+                public void onPortrait() {
+
+                }
+            });
+        }
+    }
+
+    @OnClick(R.id.btn_close_youtube)
+    public void onbtnCloseYoutubeClicked() {
+       salirYoutube();
+    }
+
+    @OnClick(R.id.contentPlayer)
+    public void onbtnContentPlayerClicked() {
+        salirYoutube();
+    }
+
+    void  salirYoutube(){
+        contentPlayer.setVisibility(View.GONE);
+        if (youtubeConfig != null) youtubeConfig.closeVideo(getSupportFragmentManager(), this);
     }
 
 

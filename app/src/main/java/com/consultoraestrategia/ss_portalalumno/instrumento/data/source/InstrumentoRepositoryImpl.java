@@ -11,10 +11,17 @@ import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacionObservado;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacionObservado_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.ProgramasEducativo;
+import com.consultoraestrategia.ss_portalalumno.entities.RelProgramaEducativoTipoNota;
+import com.consultoraestrategia.ss_portalalumno.entities.RelProgramaEducativoTipoNota_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.TipoNotaC;
+import com.consultoraestrategia.ss_portalalumno.entities.TipoNotaC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Valor;
+import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC;
+import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Valor_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Variable;
 import com.consultoraestrategia.ss_portalalumno.entities.VariableObservado;
@@ -24,11 +31,13 @@ import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBInstrumento;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
+import com.consultoraestrategia.ss_portalalumno.instrumento.entities.RubroDetalleUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.ValorUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.VariableUi;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,10 +51,14 @@ import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import butterknife.internal.Utils;
 
 public class InstrumentoRepositoryImpl implements InstrumentoRepository {
 
@@ -187,6 +200,14 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
 
     @Override
     public List<InstrumentoUi> getInstrumentos(int sesionAprendizajeId) {
+
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_PathImgPreguntasInstrumento"))
+                .querySingle();
+
+        String pathValores = webconfig!=null?webconfig.getContent():"";
+
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int alumnoId =  sessionUser!=null?sessionUser.getPersonaId():0;
 
@@ -249,7 +270,66 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
             instrumentoUi.setCantidadPregunta(countVA);
             instrumentoUi.setCantidadPreguntaResueltas(countVAO);
             instrumentoUi.setCatidadPreguntasSinEnviar((int)countOVASinEviar);
+
+            instrumentoUi.setTipoNotaId(instrumentoEvaluacion.getTipoNotaId());
+            instrumentoUi.setRubroEvaluacionId(instrumentoEvaluacion.getRubroEvaluacionId());
             instrumentoUiList.add(instrumentoUi);
+
+            List<VariableUi> variableUiList = new ArrayList<>();
+
+            for (Variable variable: variableList){
+                VariableObservado variableObservado = SQLite.select()
+                        .from(VariableObservado.class)
+                        .where(VariableObservado_Table.VariableId.eq(variable.getVariableId()))
+                        .and(VariableObservado_Table.InstrumentoObservadoId.eq(instrumentoEvaluacionObservado!=null?instrumentoEvaluacionObservado.getKey():""))
+                        .querySingle();
+
+                VariableUi variableUi = new VariableUi();
+                variableUi.setVariableId(variable.getVariableId());
+                variableUi.setInputRespuesta(variable.getInputRespuesta());
+                variableUi.setNombre(variable.getNombre());
+                variableUi.setTipoInputRespuestaId(variable.getTipoInputRespuestaId());
+                //variableUi.setTipoRespuestaId(variable.getTipoRespuestaId()==11?12:variable.getTipoRespuestaId());
+                variableUi.setTipoRespuestaId(variable.getTipoRespuestaId());
+                variableUi.setPuntaje(variable.getPuntaje());
+                variableUi.setPath(!TextUtils.isEmpty(variable.getPath())?pathValores+variable.getPath():"");
+                if(variableObservado!=null){
+                    variableUi.setPuntajeObtenido(variableObservado.getPuntajeObtenido());
+                    variableUi.setVariableObservadaId(variableObservado.getVariableObservadaId());
+                }
+                variableUi.setInstrumentoEvalId(instrumentoEvaluacion.getInstrumentoEvalId());
+                variableUi.setInstrumentoObservadoId(instrumentoEvaluacionObservado!=null?instrumentoEvaluacionObservado.getKey():"");
+                variableUi.setDesempenioIcd(variable.getDesempenioIcd());
+                variableUi.setTituloRubroDetalle(variable.getTituloRubroDetalle());
+                variableUi.setTipoCompetenciaId(variable.getTipoCompetenciaId());
+                variableUi.setTipoDecempenioId(variable.getTipoDecempenioId());
+
+                List<Valor> valorList = SQLite.select()
+                        .from(Valor.class)
+                        .where(Valor_Table.VariableId.eq(variable.getVariableId()))
+                        .queryList();
+                List<ValorUi> valorUiList = new ArrayList<>();
+                for (Valor valor: valorList){
+                    ValorUi valorUi =  new ValorUi();
+                    valorUi.setValorId(valor.getValorId());
+                    valorUi.setValor(valor.getValor());
+                    valorUi.setDescripcion(valor.getDescripcion());
+                    valorUi.setEtiqueta(valor.getEtiqueta());
+                    valorUi.setIconoValor(valor.getIconoValor());
+                    valorUi.setEtiqueta(valor.getEtiqueta());
+                    valorUi.setInputRespuesta(valor.getInputRespuesta());
+                    valorUi.setPath(!TextUtils.isEmpty(valor.getPath())?pathValores+valor.getPath():"");
+                    valorUi.setPuntaje(valor.getPuntaje());
+                    valorUi.setTipoInputRespuestaId(valor.getTipoInputRespuestaId());
+                    valorUi.setVariableId(valor.getVariableId());
+                    valorUiList.add(valorUi);
+                }
+
+                variableUi.setValores(valorUiList);
+                variableUiList.add(variableUi);
+            }
+            instrumentoUi.setVariables(variableUiList);
+            transformarNotasANotasRubrica(instrumentoUi);
         }
 
         return instrumentoUiList;
@@ -276,8 +356,20 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
                 .where(InstrumentoEvaluacionObservado_Table.InstrumentoEvalId.eq(instrumentoId))
                 .and(InstrumentoEvaluacionObservado_Table.PersonaId.eq(sessionUser!=null?sessionUser.getPersonaId():0))
                 .querySingle();
+
+        InstrumentoEvaluacion instrumentoEvaluacion = SQLite.select()
+                .from(InstrumentoEvaluacion.class)
+                .where(InstrumentoEvaluacion_Table.InstrumentoEvalId.eq(instrumentoId))
+                .querySingle();
+
+
         InstrumentoUi instrumentoUi = new InstrumentoUi();
         instrumentoUi.setInstrumentoEvalId(instrumentoId);
+        if(instrumentoEvaluacion!=null){
+            instrumentoUi.setTipoNotaId(instrumentoEvaluacion.getTipoNotaId());
+            instrumentoUi.setRubroEvaluacionId(instrumentoEvaluacion.getRubroEvaluacionId());
+        }
+
         List<VariableUi> variableUiList = new ArrayList<>();
 
         for (Variable variable: variableList){
@@ -302,6 +394,11 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
             }
             variableUi.setInstrumentoEvalId(instrumentoId);
             variableUi.setInstrumentoObservadoId(instrumentoEvaluacionObservado!=null?instrumentoEvaluacionObservado.getKey():"");
+            variableUi.setDesempenioIcd(variable.getDesempenioIcd());
+            variableUi.setTituloRubroDetalle(variable.getTituloRubroDetalle());
+            variableUi.setTipoCompetenciaId(variable.getTipoCompetenciaId());
+            variableUi.setTipoDecempenioId(variable.getTipoDecempenioId());
+
             List<Valor> valorList = SQLite.select()
                     .from(Valor.class)
                     .where(Valor_Table.VariableId.eq(variable.getVariableId()))
@@ -327,7 +424,223 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
             variableUiList.add(variableUi);
         }
         instrumentoUi.setVariables(variableUiList);
-
+        transformarNotasANotasRubrica(instrumentoUi);
         return instrumentoUi;
+    }
+
+    void transformarNotasANotasRubrica(InstrumentoUi instrumentoUi){
+
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_UrlExpresiones"))
+                .querySingle();
+
+        String pathValores = webconfig!=null?webconfig.getContent():"";
+
+        List<RubroDetalleUi> rubroDetalleUiList = new ArrayList<>();
+
+        for (VariableUi variableUi : instrumentoUi.getVariables()){
+            RubroDetalleUi rubroDetalleUi = new RubroDetalleUi();
+            rubroDetalleUi.setDesempenioIcd(variableUi.getDesempenioIcd());
+            int position = rubroDetalleUiList.indexOf(rubroDetalleUi);
+            if(position==-1){
+                rubroDetalleUi.setTipoCompetenciaId(variableUi.getTipoCompetenciaId());
+                rubroDetalleUi.setTipoDecempenioId(variableUi.getTipoDecempenioId());
+                rubroDetalleUi.setTituloRubroDetalle(variableUi.getTituloRubroDetalle());
+                rubroDetalleUi.setVariableUiList(new ArrayList<>());
+                rubroDetalleUiList.add(rubroDetalleUi);
+            }else {
+                rubroDetalleUi = rubroDetalleUiList.get(position);
+            }
+            rubroDetalleUi.getVariableUiList().add(variableUi);
+        }
+
+        TipoNotaC tipoNotaC = SQLite.select()
+                .from(TipoNotaC.class)
+                .where(TipoNotaC_Table.tipoNotaId.eq(instrumentoUi.getTipoNotaId()))
+                .querySingle();
+
+        List<ValorTipoNotaC> valorTipoNotaCList = SQLite.select()
+                .from(ValorTipoNotaC.class)
+                .where(ValorTipoNotaC_Table.tipoNotaId.eq(instrumentoUi.getTipoNotaId()))
+                .queryList();
+
+        for (RubroDetalleUi rubroDetalleUi : rubroDetalleUiList){
+            if (tipoNotaC!=null) {
+                int mint_resultado = 0;
+                for (VariableUi variableUi : rubroDetalleUi.getVariableUiList()){
+                    int mint_puntaje = variableUi.getPuntaje();
+                    int mint_puntajeObtenido = variableUi.getPuntajeObtenido();
+
+                    mint_resultado += mint_puntaje > 0 ? UtilsPortalAlumno.transformacionInvariante(0, mint_puntaje, mint_puntajeObtenido,tipoNotaC.getValorMinino(), tipoNotaC.getValorMaximo()) : 0;
+
+                }
+
+                if (!rubroDetalleUi.getVariableUiList().isEmpty()) {
+
+                    mint_resultado /= rubroDetalleUi.getVariableUiList().size();
+
+                    rubroDetalleUi.setNota(mint_resultado);
+                    rubroDetalleUi.setTipoNotaTipoId(tipoNotaC.getTipoId());
+                    ValorTipoNotaC valorTipoNotaC = getValorTipoNotaCalculado(tipoNotaC, valorTipoNotaCList, mint_resultado);
+                    if(valorTipoNotaC!=null){
+                        rubroDetalleUi.setAliasValorTipoNota(valorTipoNotaC.getAlias());
+                        rubroDetalleUi.setIconoValorTipoNota(pathValores + "" +valorTipoNotaC.getIcono());
+                        rubroDetalleUi.setTituloValorTipoNota(valorTipoNotaC.getTitulo());
+                    }
+
+                }
+
+            }
+
+
+        }
+
+        int vint_resultadoAlumno = 0;
+        int vint_count_decempenioIcd = 0;
+        for (RubroDetalleUi rubroDetalleUi : rubroDetalleUiList){
+            vint_resultadoAlumno += rubroDetalleUi.getNota();
+            vint_count_decempenioIcd++;
+        }
+
+        if (vint_count_decempenioIcd > 0) vint_resultadoAlumno /= vint_count_decempenioIcd;
+        instrumentoUi.setRubroDetalleUiList(rubroDetalleUiList);
+        instrumentoUi.setNota(vint_resultadoAlumno);
+        instrumentoUi.setTipoIdTipoNota(tipoNotaC.getTipoId());
+        if (tipoNotaC!=null) {
+            ValorTipoNotaC valorTipoNotaC = getValorTipoNotaCalculado(tipoNotaC, valorTipoNotaCList, vint_resultadoAlumno);
+            if(valorTipoNotaC!=null){
+                instrumentoUi.setAliasValorTipoNota(valorTipoNotaC.getAlias());
+                instrumentoUi.setIconoValorTipoNota(pathValores + "" +valorTipoNotaC.getIcono());
+                instrumentoUi.setTituloValorTipoNota(valorTipoNotaC.getTitulo());
+            }
+
+            double vint_puntoBase = (tipoNotaC.getValorMaximo() - tipoNotaC.getValorMinino()) * vint_count_decempenioIcd;
+
+            double vint_puntosActuales = UtilsPortalAlumno.transformacionInvariante((tipoNotaC.getValorMinino()), tipoNotaC.getValorMaximo(), vint_resultadoAlumno,0, vint_puntoBase);
+
+            instrumentoUi.PuntoBase = vint_puntoBase;
+            instrumentoUi.PuntoActuales = vint_puntosActuales;
+            instrumentoUi.Porcentaje = 0;
+            try {
+                instrumentoUi.Porcentaje = ((vint_puntosActuales / vint_puntoBase) * 100);
+
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
+
+            Integer[] vlst_peso = getPercentParts(100, instrumentoUi.getRubroDetalleUiList().size());
+
+            for (int i = 0; i < instrumentoUi.getRubroDetalleUiList().size(); i++) {
+                try {
+                    instrumentoUi.getRubroDetalleUiList().get(i).setPeso(vlst_peso[i]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+    }
+
+
+    Integer[] getPercentParts(int vint_totalPeso, int vint_cantidad) {
+        if (vint_cantidad == 0) return null;
+        Integer[] vlst_percentParts = new Integer[vint_cantidad];
+
+        int vint_subtotalPeso = vint_totalPeso / vint_cantidad;
+        int vint_diferencia = vint_totalPeso - (vint_subtotalPeso * vint_cantidad);
+
+        for (int i = 0; i < vint_cantidad; i++) {
+            vlst_percentParts[i] = vint_subtotalPeso;
+        }
+
+        for (int i = 0; i < vint_diferencia; i++) {
+            vlst_percentParts[i] += 1;
+        }
+
+        return vlst_percentParts;
+    }
+    ValorTipoNotaC getValorTipoNotaCalculado(TipoNotaC vobj_NivelLogro, List<ValorTipoNotaC> valorTipoNotaCList, double vint_nota){
+        ValorTipoNotaC mobj_result = null;
+        if (vobj_NivelLogro.isIntervalo()) {
+            for(ValorTipoNotaC valorTipoNota : valorTipoNotaCList){
+                boolean mbol_valorInferior = false;
+                boolean mbol_valorSuperior = false;
+
+                if (valorTipoNota.isIncluidoLInferior()) {
+                    if (valorTipoNota.getLimiteSuperior() >= vint_nota) {
+                        mbol_valorSuperior = true;
+                    }
+                }
+                else {
+                    if (valorTipoNota.getLimiteSuperior() > vint_nota) {
+                        mbol_valorSuperior = true;
+                    }
+                }
+
+                if (valorTipoNota.isIncluidoLInferior()) {
+                    if (valorTipoNota.getLimiteInferior() <= vint_nota) {
+                        mbol_valorInferior = true;
+                    }
+                }
+                else {
+                    if (valorTipoNota.getLimiteInferior() < vint_nota) {
+                        mbol_valorInferior = true;
+                    }
+                }
+
+                if (mbol_valorInferior && mbol_valorSuperior) {
+                    mobj_result = valorTipoNota;
+                    break;
+                }
+
+            }
+
+        } else {
+            long mint_notaEntera = Math.round(vint_nota);
+            if (valorTipoNotaCList.size() == 2) {
+                int mint_valorintermedio = (vobj_NivelLogro.getValorMaximo() + vobj_NivelLogro.getValorMinino()) / 2;
+
+                List<ValorTipoNotaC> mlst_valoresOrdenados = new ArrayList<>(valorTipoNotaCList);
+                Collections.sort(mlst_valoresOrdenados, new Comparator<ValorTipoNotaC>() {
+                    @Override
+                    public int compare(ValorTipoNotaC o1, ValorTipoNotaC o2) {
+                        return Double.compare(o1.getValorNumerico(), o2.getValorNumerico());
+                    }
+                });
+
+                if (mint_valorintermedio >= mint_notaEntera) {
+                    mobj_result = mlst_valoresOrdenados.get(0);
+                }
+                else {
+                    mobj_result = mlst_valoresOrdenados.get(0);
+                }
+            }
+            else {
+
+                List<ValorTipoNotaC> mlst_valoresOrdenados = new ArrayList<>(valorTipoNotaCList);
+                Collections.sort(mlst_valoresOrdenados, new Comparator<ValorTipoNotaC>() {
+                    @Override
+                    public int compare(ValorTipoNotaC o1, ValorTipoNotaC o2) {
+                        return Double.compare(o1.getValorNumerico(), o2.getValorNumerico());
+                    }
+                });
+
+              for(ValorTipoNotaC valorTipoNota : valorTipoNotaCList){
+                    if (valorTipoNota.getValorNumerico() == mint_notaEntera) {
+                        mobj_result = valorTipoNota;
+                        break;
+                    }
+                }
+
+                if (mobj_result == null) {
+                    mobj_result = mlst_valoresOrdenados.get(0);
+                }
+
+            }
+
+        }
+        return mobj_result;
     }
 }

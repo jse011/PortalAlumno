@@ -100,10 +100,24 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
+                        <TextView
+                            android:id="@+id/img_descripcion"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:fontFamily="serif"
+                            android:visibility="gone"
+                            android:textColor="#4C4C4C"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            tools:text="A">
+
+                        </TextView>
+
                         <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/img_porcentaje"
+                            android:id="@+id/img_pregunta"
                             android:layout_width="58dp"
-                            android:layout_height="58dp"
+                            android:layout_height="65dp"
                             android:layout_gravity="center"
                             android:visibility="visible"
                             app:srcCompat="@drawable/ic_contento" />
