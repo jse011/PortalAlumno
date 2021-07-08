@@ -224,27 +224,32 @@ public class SlidingUpPanelViewHolder {
             @Override
             public void run() {
                 if(youtubeConfig!=null){
-                    youtubeConfig.initialize(YouTubeUrlParser.getVideoId(url), ((AppCompatActivity)slidingLayout.getContext()).getSupportFragmentManager(), R.id.youtube_layout, new YoutubeConfig.PlaybackEventListener() {
-                        @Override
-                        public void onPlaying() {
-                            imgActionYoutube.setImageDrawable(ContextCompat.getDrawable(imgActionYoutube.getContext(), R.drawable.ic_pause_youtube));
-                        }
+                    try {
+                        youtubeConfig.initialize(YouTubeUrlParser.getVideoId(url), ((AppCompatActivity)slidingLayout.getContext()).getSupportFragmentManager(), R.id.youtube_layout, new YoutubeConfig.PlaybackEventListener() {
+                            @Override
+                            public void onPlaying() {
+                                imgActionYoutube.setImageDrawable(ContextCompat.getDrawable(imgActionYoutube.getContext(), R.drawable.ic_pause_youtube));
+                            }
 
-                        @Override
-                        public void onPaused() {
-                            imgActionYoutube.setImageDrawable(ContextCompat.getDrawable(imgActionYoutube.getContext(), R.drawable.ic_play_youtube));
-                        }
+                            @Override
+                            public void onPaused() {
+                                imgActionYoutube.setImageDrawable(ContextCompat.getDrawable(imgActionYoutube.getContext(), R.drawable.ic_play_youtube));
+                            }
 
-                        @Override
-                        public void onLandscape() {
+                            @Override
+                            public void onLandscape() {
 
-                        }
+                            }
 
-                        @Override
-                        public void onPortrait() {
+                            @Override
+                            public void onPortrait() {
 
-                        }
-                    });
+                            }
+                        });
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 }
                 activityYoutubePreview = new ActividadYoutubePreview();
                 FragmentTransaction transaction = ((AppCompatActivity)slidingLayout.getContext()).getSupportFragmentManager().beginTransaction();
