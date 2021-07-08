@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowInsets;
+import android.view.WindowInsetsAnimation;
 import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -18,6 +19,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,8 +30,12 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +49,10 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
     ProgressBar progressBar11;
     @BindView(R.id.background)
     FrameLayout background;
+    @BindView(R.id.root_layout)
+    FrameLayout root_layout;
+    @BindView(R.id.card_view)
+    FrameLayout card_view;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +60,18 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_evaluacion_online);
         ButterKnife.bind(this);
         setupWebView();
+        card_view.setVisibility(View.GONE);
+        KeyboardVisibilityEvent.setEventListener(
+               this,
+                new KeyboardVisibilityEventListener() {
+                    @Override
+                    public void onVisibilityChanged(boolean isOpen) {
+                        Log.d(TAG, "open: " + isOpen);
+                        card_view.setVisibility(isOpen?View.VISIBLE:View.GONE);
+                    }
+                });
     }
+
     JavaScriptInterface jsInterface;
 
     private String getUrlServidor(){
@@ -87,9 +108,9 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
 
         //webView.clearCache(true);
         //webView.setInitialScale(1);
-        webView.getSettings().setUseWideViewPort(false);
+        //webView.getSettings().setUseWideViewPort(false);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setGeolocationEnabled(true);
+        //webView.getSettings().setGeolocationEnabled(true);
         //webView.getSettings().setAppCacheEnabled(true);
         //webView.getSettings().setDatabaseEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
@@ -162,7 +183,7 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-
+        webView.destroy();
         super.onDestroy();
     }
 
@@ -252,5 +273,7 @@ public class EvaluacionOnlineActivity extends AppCompatActivity {
         }
 
     }
+
+
 
 }

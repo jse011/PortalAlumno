@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.consultoraestrategia.ss_portalalumno">
 
-  
+
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -88,6 +88,7 @@
 
         <activity  android:label=" "
             android:theme="@style/FullScrenMode"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="sensor"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:name=".instrumento.evaluacion_online.EvaluacionOnlineActivity" />
