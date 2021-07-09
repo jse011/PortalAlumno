@@ -412,7 +412,7 @@ public class MainRepositorioImpl implements MainRepositorio {
                             tipoNotaC.setTipoId(UtilsFirebase.convert(tipoSnapshot.child("TipoId").getValue(), 0));
                             tipoNotaC.setValorMaximo(UtilsFirebase.convert(tipoSnapshot.child("ValorMaximo").getValue(), 0));
                             tipoNotaC.setValorMinino(UtilsFirebase.convert(tipoSnapshot.child("ValorMinimo").getValue(), 0));
-                            tipoNotaC.setIntervalo(UtilsFirebase.convert(tipoSnapshot.child("Intervalo:").getValue(), false));
+                            tipoNotaC.setIntervalo(UtilsFirebase.convert(tipoSnapshot.child("Intervalo").getValue(), false));
                             tipoNotaCList.add(tipoNotaC);
                             RelProgramaEducativoTipoNota relProgramaEducativoTipoNota = new RelProgramaEducativoTipoNota();
                             relProgramaEducativoTipoNota.setTipoNotaId(tipoNotaC.getTipoNotaId());
