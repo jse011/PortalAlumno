@@ -1,6 +1,8 @@
 package com.consultoraestrategia.ss_portalalumno.main;
 
 import android.content.res.Resources;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -100,8 +102,8 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         this.anioAcademicoUi = response.getAnioAcademicoUi();
         setupProgramaEducativo(response.getProgramaEduactivoUIList());
         this.cursosUiList.addAll(response.getCursosUiList());
+
         setupCurso();
-        updateFirebaseTipoNota();
         cancel = calendarioPeriodo.execute(anioAcademicoUi.getAnioAcademicoId(), new UpdateCalendarioPeriodo.Callback() {
             @Override
             public void onSucess() {
@@ -282,7 +284,12 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         }
     }
 
+    @Override
+    public void onInitCuentaFirebase() {
+        //updateFirebaseTipoNota();
+    }
 
+    boolean actualizarUnavezTipoNota;
     @Override
     public void onStart() {
         super.onStart();
@@ -293,6 +300,15 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         }
         String usuarioFirebase = firebaseNode + "_" + (!TextUtils.isEmpty(usuario)?usuario.replaceAll(" ","_"):usuario) +"@gmail.com";
         if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
+        if(!actualizarUnavezTipoNota){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    updateFirebaseTipoNota();
+                }
+            },2000);
+        }
+        actualizarUnavezTipoNota = true;
     }
 
 
@@ -309,9 +325,12 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         if(cancel!=null)cancel.cancel();
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
+
+
         online.restarOnline(success -> {
 
         });

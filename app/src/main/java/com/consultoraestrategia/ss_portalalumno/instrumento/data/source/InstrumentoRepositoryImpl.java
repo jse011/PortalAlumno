@@ -506,8 +506,9 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
         if (vint_count_decempenioIcd > 0) vint_resultadoAlumno /= vint_count_decempenioIcd;
         instrumentoUi.setRubroDetalleUiList(rubroDetalleUiList);
         instrumentoUi.setNota(vint_resultadoAlumno);
-        instrumentoUi.setTipoIdTipoNota(tipoNotaC.getTipoId());
+
         if (tipoNotaC!=null) {
+            instrumentoUi.setTipoIdTipoNota(tipoNotaC.getTipoId());
             ValorTipoNotaC valorTipoNotaC = getValorTipoNotaCalculado(tipoNotaC, valorTipoNotaCList, vint_resultadoAlumno);
             if(valorTipoNotaC!=null){
                 instrumentoUi.setAliasValorTipoNota(valorTipoNotaC.getAlias());

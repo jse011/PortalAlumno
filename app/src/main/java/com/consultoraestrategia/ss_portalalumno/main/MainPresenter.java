@@ -23,4 +23,5 @@ public interface MainPresenter extends BasePresenter<MainView> {
 
     void nuevaVersionDisponible(String newVersionCode, String changes);
 
+    void onInitCuentaFirebase();
 }

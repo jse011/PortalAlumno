@@ -40,9 +40,6 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.global.ICRMEduListener;
-import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
-import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.Login2Activity;
 import com.consultoraestrategia.ss_portalalumno.login2.service.BloqueoRealTime;
@@ -488,6 +485,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        presenter.onInitCuentaFirebase();
                         if(callback!=null)callback.onComplete(task);
                     }
                 });

@@ -257,7 +257,9 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
 
     @Override
     public void onBackPressed() {
-        if( contentPlayer.getVisibility()!=View.GONE){
+        if(background.getVisibility() == View.VISIBLE){
+            super.onBackPressed();
+        }else if( contentPlayer.getVisibility()!=View.GONE){
             salirYoutube();
         }else {
             webView.loadUrl("javascript:(function(){var input = document.querySelector('.btn-eq-pause'); input.dispatchEvent(new Event('click'));})()");
@@ -285,14 +287,21 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
 
     public static class JavaScriptInterface {
         private final EvaluacionOnlineActivity activity;
-        private KeyBoardView keyBoardView;
+        private final KeyBoardView keyBoardView;
         public JavaScriptInterface(EvaluacionOnlineActivity activity, KeyBoardView keyBoardView) {
             this.activity = activity;
+            this.keyBoardView = keyBoardView;
         }
 
         @JavascriptInterface
         public void finishActivity(){
-            activity.finish();
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    activity.finish();
+                }
+            });
+
         }
 
         @JavascriptInterface
