@@ -169,7 +169,7 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
                                         super.onAnimationEnd(animation);
-                                        progressBar11.setVisibility(View.GONE);
+                                        background.setVisibility(View.GONE);
 
                                     }
                                 });
