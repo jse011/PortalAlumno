@@ -19,10 +19,7 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbPreview;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
-import com.consultoraestrategia.ss_portalalumno.main.MainActivity;
-import com.consultoraestrategia.ss_portalalumno.tabsCurso.view.activities.TabsCursoActivity;
-import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity2;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
+import com.consultoraestrategia.ss_portalalumno.main.MainActivity2;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.gson.Gson;
 import com.raizlabs.android.dbflow.config.FlowConfig;
@@ -87,7 +84,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
             @Override
             public void onSuccess() {
                 //Tomar asistencia solo al los alumnos que esten adentro de uhn cuso y no en la lista de cursos
-                boolean esVisible = UtilsPortalAlumno.isActivityOnTop(getApplicationContext(), MainActivity.class);
+                boolean esVisible = UtilsPortalAlumno.isActivityOnTop(getApplicationContext(), MainActivity2.class);
                 if(!esVisible){
                     asistencia.f_SaveAsistenciaAlumno(silaboEventoId,true, false, new Asistencia.Callback() {
                         @Override

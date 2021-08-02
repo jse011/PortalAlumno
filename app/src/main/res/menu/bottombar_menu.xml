@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/tab1"
+        android:checked="true"
+        android:icon="@drawable/tab_5_selector"
+        android:title="@null" />
+    <item
+        android:id="@+id/tab2"
+        android:icon="@drawable/tab_2_selector"
+        android:title="@null" />
+
+    <item
+        android:id="@+id/tab3"
+        android:icon="@null"
+        android:title="@null"
+        android:enabled="false"/>
+
+    <item
+        android:id="@+id/tab4"
+        android:icon="@drawable/tab_4_selector"
+        android:title="@null" />
+
+    <item
+        android:id="@+id/tab5"
+        android:icon="@null"
+        android:title="@null"
+        android:enabled="false"/>
+
+
+</menu>

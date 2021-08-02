@@ -2,6 +2,7 @@
 package com.consultoraestrategia.ss_portalalumno.retrofit;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 
 import com.consultoraestrategia.ss_portalalumno.entities.AdminService;
@@ -11,6 +12,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.Persona;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEEventoAgenda;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroAgendaEvento;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeUser;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
@@ -23,11 +26,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -171,6 +178,19 @@ public class ApiRetrofit {
         final String representacionJSON = gsons.toJson(apiRequestBody);
         Log.d(TAG, "apiRequestBody : " + representacionJSON);
         return service.f_SynckEviSesDrive(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<BEEventoAgenda>> getEventoAgendaAlumno(int usuarioId, int alumnoId, int tipoEventoId) {
+        ParametroAgendaEvento parametroAgendaEvento = new ParametroAgendaEvento();
+        parametroAgendaEvento.setUsuarioId(usuarioId);//
+        parametroAgendaEvento.setAlumnoId(alumnoId);//
+        parametroAgendaEvento.setTipoEventoId(tipoEventoId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroAgendaEvento> apiRequestBody = new ApiRequestBody<>("getEventoAgendaAlumno",parametroAgendaEvento);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getEventoAgendaFlutter(apiRequestBody);
     }
 
     public class ApiRequestBody<T extends Parameters>{

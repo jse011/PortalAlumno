@@ -7,7 +7,7 @@ import com.raizlabs.android.dbflow.annotation.Table;
 @Table(database = AppDatabase.class)
 public class Archivo extends BaseEntity {
 
-    public static final int TIPO_VIDEO = 379, TIPO_VINCULO = 380, TIPO_DOCUMENTO = 397, TIPO_IMAGEN = 398, TIPO_AUDIO = 399, TIPO_HOJA_CALCULO = 400, TIPO_DIAPOSITIVA = 401, TIPO_PDF = 402;
+    public static final int TIPO_VIDEO = 379, TIPO_VINCULO = 380, TIPO_DOCUMENTO = 397, TIPO_IMAGEN = 398, TIPO_AUDIO = 399, TIPO_HOJA_CALCULO = 400, TIPO_DIAPOSITIVA = 401, TIPO_PDF = 402, TIPO_YOUTUBE = 581, TIPO_ENCUESTA = 630;
 
     @Column
     public String archivoId;

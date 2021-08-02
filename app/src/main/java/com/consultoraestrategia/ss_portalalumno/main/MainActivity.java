@@ -52,6 +52,7 @@ import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalend
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
+import com.consultoraestrategia.ss_portalalumno.main.entities.EventoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.NuevaVersionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.UsuarioAccesoUI;
@@ -138,10 +139,11 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     @Override
     protected MainPresenter getPresenter() {
         MainRepositorio mainRepositorio = new MainRepositorioImpl(ApiRetrofit.getInstance());
-        return new MainPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCursos(mainRepositorio),
+        /*return new MainPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(), new GetCursos(mainRepositorio),
                 new UpdateCalendarioPeriodo(mainRepositorio),
                 new UpdateFirebaseTipoNota(mainRepositorio),
-                new AndroidOnlineImpl(this));
+                new AndroidOnlineImpl(this));*/
+        return null;
     }
 
     @Override
@@ -341,11 +343,11 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         startActivity(intent);
         finish();
     }
-
+/*
     @Override
     public void showListCurso(List<CursosUi> cursosUiList) {
         adapter.setList(cursosUiList);
-    }
+    }*/
 
     @Override
     public void showTabCursoActivity() {
@@ -478,6 +480,56 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     public void showNuevaversion(NuevaVersionUi nuevaVersionUi) {
         NuevaVersionDisponible.newInstance(nuevaVersionUi.getNewVersionCode(), nuevaVersionUi.getChange())
                 .show(getSupportFragmentManager(),"NuevaVersionDisponible");
+    }
+
+    @Override
+    public void showVinculo(String titulo) {
+
+    }
+
+    @Override
+    public void startCompartirEvento(EventoUi eventoUi) {
+
+    }
+
+    @Override
+    public boolean isInternetAvailable() {
+        return false;
+    }
+
+    @Override
+    public void showDialogListaBannerEvento() {
+
+    }
+
+    @Override
+    public void showDialogAdjuntoEvento() {
+
+    }
+
+    @Override
+    public void showDialogEventoDownload() {
+
+    }
+
+    @Override
+    public void showPreviewArchivo() {
+
+    }
+
+    @Override
+    public void showMultimediaPlayer() {
+
+    }
+
+    @Override
+    public void setChangeIconoPortal(String url) {
+
+    }
+
+    @Override
+    public void servicePasarAsistencia(int silaboEventoId) {
+
     }
 
     private void initializingFirebase(String email, String password, OnCompleteListener<AuthResult> callback){

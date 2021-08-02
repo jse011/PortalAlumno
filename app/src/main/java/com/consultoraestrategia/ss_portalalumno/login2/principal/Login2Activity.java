@@ -48,7 +48,7 @@ import com.consultoraestrategia.ss_portalalumno.login2.principal.password.Passwo
 import com.consultoraestrategia.ss_portalalumno.login2.principal.progress.ProgressFragment;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.usuario.UsuarioFragment;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.usuario.UsuarioView;
-import com.consultoraestrategia.ss_portalalumno.main.MainActivity;
+import com.consultoraestrategia.ss_portalalumno.main.MainActivity2;
 import com.consultoraestrategia.ss_portalalumno.util.LifeCycleFragment;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -314,7 +314,7 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
     public void goToActivity(int idUsuario) {
 
         Log.d(getTag(), "idUsuario : " + idUsuario);
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainActivity2.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

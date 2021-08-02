@@ -24,4 +24,6 @@ public interface MultimediaPreviewView {
     void uploadMkv(String idDrive);
 
     void showBtnReload();
+
+    void dimensionRatio(int a, int b);
 }

@@ -7,6 +7,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
@@ -469,6 +472,7 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
             setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogKeyBoardStyle);
         }
 
+
         @Override
         public void onDismiss(DialogInterface dialog)
         {
@@ -495,7 +499,11 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
         }
         @Override
         public void onDestroyView() {
-            if(activity!=null)KeyboardUtils.hideKeyboard(activity, activity.webView);
+            if(activity!=null){
+                activity.clearFocusWebView();
+
+                KeyboardUtils.hideKeyboard(activity, activity.webView);
+            }
             super.onDestroyView();
             activity=null;
             unbinder.unbind();
@@ -532,6 +540,8 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
         }
     }
 
+
+
     interface KeyBoardView{
 
         void setInputText(String texto);
@@ -553,6 +563,15 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
             @Override
             public void run() {
                 webView.loadUrl("javascript:(function(){var input = document.querySelector('.textarea_eq_respuesta');  input.value = '"+textoInput+"';  input.dispatchEvent(new Event('keypress')); input.dispatchEvent(new Event('keydown')); })()");
+            }
+        });
+    }
+
+    private void clearFocusWebView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                webView.loadUrl("javascript:(function(){var input = document.querySelector('.textarea_eq_respuesta');  input.dispatchEvent(new Event('clearKeyBoad')); })()");
             }
         });
     }

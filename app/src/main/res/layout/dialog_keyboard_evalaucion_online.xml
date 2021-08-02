@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet"
+    android:background="#461741"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -14,7 +15,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         tools:text="Escribe tu nombre"
-        android:textColor="@color/md_black_1000"
+        android:textColor="@color/md_white_1000"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,36 +29,44 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="24dp"
         android:ems="6"
+        app:backgroundTint="#90858F"
         android:inputType="textMultiLine"
+        android:textCursorDrawable="@drawable/white_cursor"
+        android:textColor="@color/md_white_1000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt_titulo" />
 
-    <Button
-        android:id="@+id/btn_guardar"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        android:text="Cambiar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
-        android:textColor="#2d7eea"/>
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btn_cancelar"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:visibility="gone"
-        android:text="Atras"
-        android:textColor="#2d7eea"
-        app:layout_constraintEnd_toStartOf="@+id/btn_guardar"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        <Button
+            android:id="@+id/btn_guardar"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Terminar"
+            android:textColor="#2d7eea"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_cancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Salir del Teclado"
+            app:backgroundTint="#884EBD"
+            android:textColor="@color/md_white_1000"
+            android:visibility="visible"
+            app:layout_constraintEnd_toStartOf="@+id/btn_guardar"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </LinearLayout>

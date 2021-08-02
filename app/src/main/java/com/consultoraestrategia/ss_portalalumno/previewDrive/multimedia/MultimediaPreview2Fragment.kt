@@ -291,6 +291,16 @@ class MultimediaPreview2Fragment : Fragment(), Player.EventListener, MultimediaP
         return true;
     }
 
+    override fun dimensionRatio(a: Int, b: Int) {
+        if(a == 0 && b == 0){
+            (frameLayout.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio =  null;
+        }else{
+            (frameLayout.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "$a:$b";
+        }
+
+        frameLayout.requestLayout();
+    }
+
     override fun uploadMkv(idDrive: String?) {
         val mUri = Uri.parse("https://drive.google.com/uc?export=download&id=$idDrive")
         val dataSourceFactory = DefaultDataSourceFactory(

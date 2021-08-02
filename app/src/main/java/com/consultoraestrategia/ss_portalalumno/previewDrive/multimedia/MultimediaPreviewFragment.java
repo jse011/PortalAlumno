@@ -279,6 +279,11 @@ public class MultimediaPreviewFragment extends Fragment implements MultimediaPre
 
     }
 
+    @Override
+    public void dimensionRatio(int a, int b) {
+
+    }
+
     private class PlaybackStateListener implements Player.EventListener {
 
         @Override

@@ -2,11 +2,17 @@ package com.consultoraestrategia.ss_portalalumno.util;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
 import java.text.Normalizer;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -258,5 +264,139 @@ public class UtilsPortalAlumno {
             return 0;
         }
 
+    }
+
+    public static Date convertDateTimePtBR(String fecha, String hora)
+    {
+        Date convertido;
+        try {
+            //En este caso buscará en el String dia/mes/año
+            if(!TextUtils.isEmpty(hora)){
+                DateFormat fechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.US);
+                convertido = fechaHora.parse(fecha+" "+hora);
+            }else {
+                DateFormat fechaFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                convertido = fechaFormat.parse(fecha);
+            }
+
+            //Se necesita definir un formato para poder cambiar el String a Date
+            //En este caso buscará en el String año-mes-dia hora:minutos:segundos
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            convertido = new Date(0);
+        }
+
+        return convertido;
+    }
+
+    public static String tiempoFechaCreacion(long fecha){
+
+        Calendar calendarActual = Calendar.getInstance();
+        int anhoActual = calendarActual.get(Calendar.YEAR);
+        int mesActual = calendarActual.get(Calendar.MONTH);
+        int diaActual = calendarActual.get(Calendar.DAY_OF_MONTH);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(fecha);
+        int anhio = calendar.get(Calendar.YEAR);
+        int mes= calendar.get(Calendar.MONTH);
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int hora = calendar.get(Calendar.HOUR_OF_DAY);
+        int minuto = calendar.get(Calendar.MINUTE);
+
+        calendarActual.set(Calendar.DAY_OF_YEAR,+1);
+
+        int anioManiana = calendarActual.get(Calendar.YEAR);
+        int mesManiana= calendarActual.get(Calendar.MONTH);
+        int diaManiana = calendarActual.get(Calendar.DAY_OF_MONTH);
+
+        if (anhio==anhoActual&&mesActual==mes&&dia==diaActual){
+            if(hora==0&&minuto==0){
+                return "para hoy";
+            }else {
+                return "para hoy a las " + changeTime12Hour(hora,minuto);
+            }
+
+        }else if (anhio==anioManiana&&mesManiana==mes&&dia==diaManiana) {
+            if(hora==0&&minuto==0){
+                return "para mañana";
+            }else {
+                return "para mañana a las " + changeTime12Hour(hora,minuto);
+            }
+
+        }else if(anhio==anhoActual){
+            if(hora==0&&minuto==0){
+                return "para el "+f_fecha_letras(fecha);
+            }else {
+                return "para el "+f_fecha_letras(fecha) + " " + changeTime12Hour(hora,minuto);
+            }
+        }else {
+            if(hora==0&&minuto==0){
+                return  "para el "+getFechaDiaMesAnho(fecha);
+            }else {
+                return  "para el "+getFechaDiaMesAnho(fecha) + " " + changeTime12Hour(hora,minuto);
+            }
+        }
+    }
+
+    public static Uri getImageUri(Context context, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    public static Integer calcularEdad(String fecha){
+        Date fechaNac=null;
+        try {
+            /**Se puede cambiar la mascara por el formato de la fecha
+             que se quiera recibir, por ejemplo año mes día "yyyy-MM-dd"
+             en este caso es día mes año*/
+            fechaNac = new SimpleDateFormat("dd/MM/yyyy", Locale.US).parse(fecha);
+        } catch (Exception ex) {
+            return -1;
+        }
+        Calendar fechaNacimiento = Calendar.getInstance();
+        //Se crea un objeto con la fecha actual
+        Calendar fechaActual = Calendar.getInstance();
+        //Se asigna la fecha recibida a la fecha de nacimiento.
+        fechaNacimiento.setTime(fechaNac);
+        //Se restan la fecha actual y la fecha de nacimiento
+        int año = fechaActual.get(Calendar.YEAR)- fechaNacimiento.get(Calendar.YEAR);
+        int mes =fechaActual.get(Calendar.MONTH)- fechaNacimiento.get(Calendar.MONTH);
+        int dia = fechaActual.get(Calendar.DATE)- fechaNacimiento.get(Calendar.DATE);
+        //Se ajusta el año dependiendo el mes y el día
+        if(mes<0 || (mes==0 && dia<0)){
+            año--;
+        }
+        //Regresa la edad en base a la fecha de nacimiento
+        return año;
+    }
+
+    public static String f_fecha_letrasSinHora(String vstr_Start) {
+        String mstr_fecha = "";
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+
+            String[] vobj_days = {"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"};
+            String[] vobj_Meses = {"Ene.", "Feb.", "Mar.", "Abr.", "May.", "Jun.", "Jul.", "Ago.", "Sept.", "Oct.", "Nov.", "Dic."};
+
+            Date date = format.parse(vstr_Start);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH); // Jan = 0, dec = 11
+            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+            mstr_fecha = vobj_days[dayOfWeek - 1] + " " + dayOfMonth + " de " + vobj_Meses[month];
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return mstr_fecha;
     }
 }

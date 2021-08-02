@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/previewBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"/>
+
+
+    <ImageView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"/>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimer_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#DFDFDF">
+
+            <ImageView
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_placeholder"
+                tools:ignore="VectorDrawableCompat" />
+
+        </FrameLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btn_video"
+        android:layout_width="80dp"
+        android:layout_height="60dp"
+        app:cardBackgroundColor="#CE000000"
+        app:cardElevation="0dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="16dp">
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            app:tint="@color/md_white_1000"
+            app:srcCompat="@drawable/ic_play_recurso"
+            tools:ignore="VectorDrawableCompat" />
+
+    </androidx.cardview.widget.CardView>
+
+    <FrameLayout
+        android:visibility="gone"
+        android:id="@+id/more_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000">
+
+        <TextView
+            android:id="@+id/more_preview_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="+1"
+            android:shadowColor="#000000"
+            android:shadowRadius="10"
+            android:shadowDx="2"
+            android:shadowDy="5"
+            android:textColor="@color/md_white_1000"
+            android:textSize="48sp"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+</FrameLayout>

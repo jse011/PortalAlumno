@@ -6,7 +6,9 @@ import com.consultoraestrategia.ss_portalalumno.entities.Persona;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
+import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEEventoAgenda;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroAgendaEvento;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeUser;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
@@ -48,4 +50,6 @@ public interface Service {
     Call<RestApiResponse<BEDrive>> f_SynckEviSesDrive(@Body ApiRetrofit.ApiRequestBody<ParametroIdDrive> apiRequestBody);
     @POST(" ")
     Call<RestApiResponse<Boolean>> f_isHabilitadoUsuario(@Body ApiRetrofit.ApiRequestBody<ParametroChangeUser> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<BEEventoAgenda>> getEventoAgendaFlutter(@Body ApiRetrofit.ApiRequestBody<ParametroAgendaEvento> apiRequestBody);
 }

@@ -14,14 +14,14 @@
     <application
         android:name=".global.iCRMEdu"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_educar"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="n">
 
         <activity
-            android:name=".main.MainActivity"
+            android:name=".main.MainActivity2"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -92,6 +92,7 @@
             android:screenOrientation="sensor"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:name=".instrumento.evaluacion_online.EvaluacionOnlineActivity" />
+
 
         <provider
             android:name=".provider.GenericFileProvider"

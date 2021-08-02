@@ -101,4 +101,15 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
+
+    <style name="bnve_white_bg" >
+        <item name="android:background">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="BlurDialogFragment.Default.Animation" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/default_dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/default_dialog_out</item>
+    </style>
 </resources>

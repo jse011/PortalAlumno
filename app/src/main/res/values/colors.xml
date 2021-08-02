@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#0088cc</color>
     <color name="colorPrimaryDark">#2d43bc</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#5983f0</color>
 
     <color name="backgarund">#F2F3F8</color>
     <color name="status_bar_lolipop">#6351535C</color>
@@ -307,5 +307,10 @@
     <color name="color_sesion">#42af78</color>
     <color name="transprent_black">#8000</color>
     <color name="internal_black_semitransparent_light">#8000</color>
+    <color name="background">#F2F3F8</color>
+    <color name="bottom_bar">#FAFAFA</color>
 
+    <color name="tab_select_txt">#5983f0</color>
+    <color name="tab_unselect_txt">#c3c9da</color>
+    <color name="color_shimmer">#DFDFDF</color>
 </resources>

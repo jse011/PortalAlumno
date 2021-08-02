@@ -1,5 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.main.entities;
 
+import java.util.List;
+
 public class AlumnoUi {
     private int personaId;
     private int usuarioId;
@@ -7,6 +9,10 @@ public class AlumnoUi {
     private String foto;
     private String fotoApoderado;
     private boolean habilitarAcceso;
+    private String fechaNacimiento;
+    private String celular;
+    private String correo;
+    private List<FamiliaUi> familiaUiList;
 
     public int getPersonaId() {
         return personaId;
@@ -54,5 +60,37 @@ public class AlumnoUi {
 
     public boolean getHabilitarAcceso() {
         return habilitarAcceso;
+    }
+
+    public String getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(String fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public String getCelular() {
+        return celular;
+    }
+
+    public void setCelular(String celular) {
+        this.celular = celular;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public List<FamiliaUi> getFamiliaUiList() {
+        return familiaUiList;
+    }
+
+    public void setFamiliaUiList(List<FamiliaUi> familiaUiList) {
+        this.familiaUiList = familiaUiList;
     }
 }
