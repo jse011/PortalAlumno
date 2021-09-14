@@ -11,7 +11,7 @@ public class ColaborativaUi {
         return id;
     }
 
-    public enum Tipo{GOOGLEDRIVE, GOOGLEDOCS, JAMBOARD, KAHOOT,MEET,ZOOM}
+    public enum Tipo{GOOGLEDRIVE, GOOGLEDOCS, JAMBOARD, KAHOOT,MEET,ZOOM, GRABACION}
     private String nombre;
     private String descripcion;
     private Tipo tipo = Tipo.ZOOM;

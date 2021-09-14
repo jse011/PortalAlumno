@@ -47,6 +47,9 @@ import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFireb
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebaseInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebasePreguntas;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebaseReunionVirtual;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateGrabacionesSalaVirtual;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateInstrumentoEncuestaSesion;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateReunionVirtualAlumno;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -95,7 +98,10 @@ public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPr
                 new UpdateFirebasePreguntas(tabSesionesRepositorio),
                 new AndroidOnlineImpl(this),
                 new UpdateFirebaseColaborativa(tabSesionesRepositorio),
-                new UpdateFirebaseReunionVirtual(tabSesionesRepositorio));
+                new UpdateFirebaseReunionVirtual(tabSesionesRepositorio),
+                new UpdateInstrumentoEncuestaSesion(tabSesionesRepositorio),
+                new UpdateReunionVirtualAlumno(tabSesionesRepositorio),
+                new UpdateGrabacionesSalaVirtual(tabSesionesRepositorio));
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.tabsSesiones;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
@@ -19,12 +20,18 @@ import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFireb
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebaseInstrumento;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebasePreguntas;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateFirebaseReunionVirtual;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateGrabacionesSalaVirtual;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateInstrumentoEncuestaSesion;
+import com.consultoraestrategia.ss_portalalumno.tabsSesiones.usecase.UpdateReunionVirtualAlumno;
 
 public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> implements TabSesionPresenter {
     private UpdateFirebaseInstrumento updateFirebaseInstrumento;
     private UpdateFirebasePreguntas updateFirebasePreguntas;
     private UpdateFirebaseColaborativa updateFirebaseColaborativa;
     private UpdateFirebaseReunionVirtual updateFirebaseReunionVirtual;
+    private UpdateInstrumentoEncuestaSesion updateInstrumentoEncuestaSesion;
+    private UpdateReunionVirtualAlumno updateReunionVirtualAlumno;
+    private UpdateGrabacionesSalaVirtual updateGrabacionesSalaVirtual;
     private int sesionAprendizajeId;
     private int idCargaCurso;
     private FirebaseCancel preguntasCancel;
@@ -42,15 +49,22 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
     private boolean updateInstrumento;
     private TabSesionEvidenciaView tabSesionEvidenciaView;
     private int silaboEventoId;
+    private int personaId;
+    private int entidadId;
+    private int georeferenciaId;
 
     public TabSesionPresenterImpl(UseCaseHandler handler, Resources res, UpdateFirebaseInstrumento updateFirebaseInstrumento, UpdateFirebasePreguntas updateFirebasePreguntas, Online online,
-                                  UpdateFirebaseColaborativa updateFirebaseColaborativa, UpdateFirebaseReunionVirtual updateFirebaseReunionVirtual) {
+                                  UpdateFirebaseColaborativa updateFirebaseColaborativa, UpdateFirebaseReunionVirtual updateFirebaseReunionVirtual, UpdateInstrumentoEncuestaSesion updateInstrumentoEncuestaSesion,
+                                  UpdateReunionVirtualAlumno updateReunionVirtualAlumno, UpdateGrabacionesSalaVirtual updateGrabacionesSalaVirtual) {
         super(handler, res);
         this.updateFirebaseInstrumento = updateFirebaseInstrumento;
         this.updateFirebasePreguntas = updateFirebasePreguntas;
         this.online = online;
         this.updateFirebaseColaborativa = updateFirebaseColaborativa;
         this.updateFirebaseReunionVirtual = updateFirebaseReunionVirtual;
+        this.updateInstrumentoEncuestaSesion = updateInstrumentoEncuestaSesion;
+        this.updateReunionVirtualAlumno = updateReunionVirtualAlumno;
+        this.updateGrabacionesSalaVirtual = updateGrabacionesSalaVirtual;
     }
 
     @Override
@@ -73,6 +87,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
     }
 
     private void setupData() {
+
         GbCursoUi gbCursoUi = iCRMEdu.variblesGlobales.getGbCursoUi();
         if(gbCursoUi!=null){
             this.idCargaCurso = gbCursoUi.getCargaCursoId();
@@ -92,6 +107,9 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
         if(view!=null)view.setTabColor(color3, color1, color2);
         this.sesionAprendizajeId = gbSesionAprendizajeUi.getSesionAprendizajeId();
         if(view!=null)view.setDescripcionSesion(color1, gbSesionAprendizajeUi.getNombreApredizaje(), nombre, fondo);
+        this.personaId = iCRMEdu.variblesGlobales.getPersonaId();
+        this.entidadId = iCRMEdu.variblesGlobales.getEntidadId();
+        this.georeferenciaId = iCRMEdu.variblesGlobales.getGeoreferenciaId();
     }
 
     @Override
@@ -145,6 +163,7 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
     public void attachView(TabSesionColaborativaView tabSesionColaborativaView) {
         this.tabSesionColaborativaView = tabSesionColaborativaView;
         updateFirebaseColaborativa();
+        Log.d(getTag(), "tabSesionColaborativaView");
     }
 
     private void updateFirebaseColaborativa() {
@@ -171,6 +190,21 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
                             }
                         }
                     });
+
+                    updateReunionVirtualAlumno.execute(sesionAprendizajeId, entidadId, georeferenciaId, new UpdateReunionVirtualAlumno.Callback() {
+                        @Override
+                        public void onLoad(boolean success) {
+                            if(tabSesionColaborativaView!=null)tabSesionColaborativaView.changeReunionVirtualBaseDatosList();
+                        }
+                    });
+
+                    updateGrabacionesSalaVirtual.execute(sesionAprendizajeId, new UpdateGrabacionesSalaVirtual.Callback() {
+                        @Override
+                        public void onLoad(boolean success) {
+                            if(tabSesionColaborativaView!=null)tabSesionColaborativaView.changeGrabacionesSalaVirtualList();
+                        }
+                    });
+
                 }
             }
         });
@@ -225,6 +259,13 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
                     @Override
                     public void onError(String error) {
 
+                    }
+                });
+
+                updateInstrumentoEncuestaSesion.execute(sesionAprendizajeId, personaId, new UpdateInstrumentoEncuestaSesion.Callback() {
+                    @Override
+                    public void onLoad(boolean success) {
+                        if(tabSesionInstrumentoView!=null)tabSesionInstrumentoView.changeInstrumentoEncuestaList();
                     }
                 });
             }

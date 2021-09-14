@@ -10,13 +10,16 @@ import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPeri
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.instrumento.entities.EncuestaUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
+import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoEncuesta;
 import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoList;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<InstrumentoListaView> implements InstrumentoListaPresenter {
+    private GetInstrumentoEncuesta getInstrumentoEncuesta;
     private GetInstrumentoList getInstrumentoList;
     private List<InstrumentoUi> instrumentoUiList = new ArrayList<>();
     private int anioAcademicoId;
@@ -31,10 +34,12 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
     private String color3;
     private boolean initFragment;
     private Online online;
+    private int personaId;
 
-    public InstrumentoListaPresenterImpl(UseCaseHandler handler, Resources res, GetInstrumentoList getInstrumentoList, Online online) {
+    public InstrumentoListaPresenterImpl(UseCaseHandler handler, Resources res, GetInstrumentoList getInstrumentoList, GetInstrumentoEncuesta getInstrumentoEncuesta, Online online) {
         super(handler, res);
         this.getInstrumentoList = getInstrumentoList;
+        this.getInstrumentoEncuesta = getInstrumentoEncuesta;
         this.online = online;
     }
 
@@ -105,6 +110,7 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
 
         GbSesionAprendizajeUi gbSesionAprendizajeUi = iCRMEdu.variblesGlobales.getGbSesionAprendizajeUi();
         this.sesionAprendizajeId = gbSesionAprendizajeUi.getSesionAprendizajeId();
+        this.personaId = iCRMEdu.variblesGlobales.getPersonaId();
 
     }
 
@@ -124,5 +130,11 @@ public class InstrumentoListaPresenterImpl extends BaseFragmentPresenterImpl<Ins
     public void notifyChangeFragment() {
         setData();
         getInstrumentoList();
+    }
+
+    @Override
+    public void changeInstrumentoEncuestaList() {
+        List<EncuestaUi> encuestaUiList = getInstrumentoEncuesta.execute(sesionAprendizajeId, personaId);
+        if(view!=null)view.showListaInstrumentoEncuesta(encuestaUiList);
     }
 }

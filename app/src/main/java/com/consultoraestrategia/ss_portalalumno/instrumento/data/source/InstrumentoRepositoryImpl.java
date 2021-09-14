@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.consultoraestrategia.ss_portalalumno.entities.BaseEntity;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacionObservado;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacionObservado_Table;
@@ -30,6 +32,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.Variable_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBInstrumento;
+import com.consultoraestrategia.ss_portalalumno.instrumento.entities.EncuestaUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.RubroDetalleUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.ValorUi;
@@ -426,6 +429,30 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
         instrumentoUi.setVariables(variableUiList);
         transformarNotasANotasRubrica(instrumentoUi);
         return instrumentoUi;
+    }
+
+    @Override
+    public List<EncuestaUi> getInstrumentoEncuesta(int sesionAprendizajeId, int personaId) {
+        List<InstrumentoEncuestaEval> instrumentoEncuestaEvalList = SQLite.select()
+                .from(InstrumentoEncuestaEval.class)
+                //.where(InstrumentoEncuestaEval_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                //.and(InstrumentoEncuestaEval_Table.personaId.eq(personaId))
+                .queryList();
+        List<EncuestaUi> encuestaUiList = new ArrayList<>();
+        for (InstrumentoEncuestaEval instrumentoEncuestaEval : instrumentoEncuestaEvalList){
+            EncuestaUi encuestaUi = new EncuestaUi();
+            encuestaUi.setNombre(instrumentoEncuestaEval.getNombre());
+            encuestaUi.setCantidadPregunta(instrumentoEncuestaEval.getCantPregunta());
+            encuestaUi.setPuntos(instrumentoEncuestaEval.getPuntaje());
+
+            if(instrumentoEncuestaEval.getTipoInstrumentoId() == 1 && instrumentoEncuestaEval.getEstadoId() == 410){
+                encuestaUi.setVerResultados(true);
+            }else {
+                encuestaUi.setVerResultados(false);
+            }
+            encuestaUiList.add(encuestaUi);
+        }
+        return encuestaUiList;
     }
 
     void transformarNotasANotasRubrica(InstrumentoUi instrumentoUi){

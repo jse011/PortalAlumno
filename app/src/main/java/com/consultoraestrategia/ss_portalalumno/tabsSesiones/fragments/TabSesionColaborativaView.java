@@ -5,4 +5,7 @@ public interface TabSesionColaborativaView {
 
     void changeReunionVirtualList();
 
+    void changeGrabacionesSalaVirtualList();
+
+    void changeReunionVirtualBaseDatosList();
 }

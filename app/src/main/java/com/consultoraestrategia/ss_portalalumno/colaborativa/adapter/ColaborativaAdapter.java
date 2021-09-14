@@ -89,6 +89,9 @@ public class ColaborativaAdapter extends RecyclerView.Adapter<ColaborativaAdapte
                 case ZOOM:
                     imgTipo.setImageDrawable(ContextCompat.getDrawable(imgTipo.getContext(), R.drawable.ic_ico_videocall));
                     break;
+                case GRABACION:
+                    imgTipo.setImageDrawable(ContextCompat.getDrawable(imgTipo.getContext(), R.drawable.ic_rec));
+                    break;
                 default:
                     imgTipo.setImageDrawable(ContextCompat.getDrawable(imgTipo.getContext(), R.drawable.ic_ico_videocall));
                     break;

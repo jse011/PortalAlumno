@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!--<string name="app_name">EVA Estudent</string>-->
+    <!--<string name="app_name">EVA Student</string>-->
     <string name="app_name">Educar Student</string>
    <string name="activity_login_title">Iniciar Sesión</string>
    <string name="vision_crme" tools:ignore="ExtraTranslation">Instituciones Educativas apoyados por el Social iCRM Educativo Móvil</string>

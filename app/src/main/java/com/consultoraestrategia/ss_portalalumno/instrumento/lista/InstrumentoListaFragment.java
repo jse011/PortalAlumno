@@ -1,11 +1,13 @@
 package com.consultoraestrategia.ss_portalalumno.instrumento.lista;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,10 +22,13 @@ import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListen
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.instrumento.data.source.InstrumentoRepository;
 import com.consultoraestrategia.ss_portalalumno.instrumento.data.source.InstrumentoRepositoryImpl;
+import com.consultoraestrategia.ss_portalalumno.instrumento.entities.EncuestaUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.entities.InstrumentoUi;
 import com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion.InstrumentoEvaluacionActivity;
 import com.consultoraestrategia.ss_portalalumno.instrumento.evaluacion_online.EvaluacionOnlineActivity;
+import com.consultoraestrategia.ss_portalalumno.instrumento.lista.adapter.InstrumentoEncuestaAdapter;
 import com.consultoraestrategia.ss_portalalumno.instrumento.lista.adapter.InstrumentoListAdapter;
+import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoEncuesta;
 import com.consultoraestrategia.ss_portalalumno.instrumento.useCase.GetInstrumentoList;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionInstrumentoView;
 
@@ -31,7 +36,7 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView, InstrumentoListaPresenter, BaseFragmentListener> implements InstrumentoListaView, InstrumentoListAdapter.Callback, TabSesionInstrumentoView {
+public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView, InstrumentoListaPresenter, BaseFragmentListener> implements InstrumentoListaView, InstrumentoListAdapter.Callback, TabSesionInstrumentoView, InstrumentoEncuestaAdapter.Callback {
 
     @BindView(R.id.rc_lista_instrumento)
     RecyclerView rcListaInstrumento;
@@ -40,6 +45,9 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     private InstrumentoListAdapter adapter;
     @BindView(R.id.progressBar15)
     ProgressBar progressBar15;
+    @BindView(R.id.rc_lista_encuesta)
+    RecyclerView rcListaEncuesta;
+    InstrumentoEncuestaAdapter adapterEncuesta;
 
     @Override
     protected String getLogTag() {
@@ -51,6 +59,7 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
         InstrumentoRepository repository = new InstrumentoRepositoryImpl();
         return new InstrumentoListaPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(),
                 new GetInstrumentoList(repository),
+                new GetInstrumentoEncuesta(repository),
                 new AndroidOnlineImpl(getContext()));
     }
 
@@ -81,6 +90,12 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
         rcListaInstrumento.setAdapter(adapter);
         rcListaInstrumento.setLayoutManager(new LinearLayoutManager(getContext()));
         ((SimpleItemAnimator) rcListaInstrumento.getItemAnimator()).setSupportsChangeAnimations(false);
+
+        adapterEncuesta = new InstrumentoEncuestaAdapter(this);
+        rcListaEncuesta.setAdapter(adapterEncuesta);
+        rcListaEncuesta.setLayoutManager(new LinearLayoutManager(getContext()));
+        ((SimpleItemAnimator) rcListaEncuesta.getItemAnimator()).setSupportsChangeAnimations(false);
+
     }
 
     @Override
@@ -124,6 +139,11 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     }
 
     @Override
+    public void showListaInstrumentoEncuesta(List<EncuestaUi> encuestaUiList) {
+        adapterEncuesta.setList(encuestaUiList);
+    }
+
+    @Override
     public void changeList() {
         if (presenter != null) presenter.notifyChangeFragment();
     }
@@ -139,6 +159,11 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     }
 
     @Override
+    public void changeInstrumentoEncuestaList() {
+        presenter.changeInstrumentoEncuestaList();
+    }
+
+    @Override
     public void showProgress() {
         super.showProgress();
     }
@@ -146,5 +171,15 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     @Override
     public void hideProgress() {
         super.hideProgress();
+    }
+
+    @Override
+    public void onClickEncuesta(EncuestaUi instrumentoUi) {
+
+    }
+
+    @Override
+    public void onClickEncuestaVerResultados(EncuestaUi instrumentoUi) {
+
     }
 }

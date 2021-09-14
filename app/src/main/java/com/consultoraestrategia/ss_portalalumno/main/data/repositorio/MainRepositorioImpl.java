@@ -37,6 +37,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.EventoAdjunto;
 import com.consultoraestrategia.ss_portalalumno.entities.EventoAdjunto_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.EventoTipos;
 import com.consultoraestrategia.ss_portalalumno.entities.EventoTipos_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Georeferencia;
+import com.consultoraestrategia.ss_portalalumno.entities.Georeferencia_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.NivelAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.NivelAcademico_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.ParametrosDisenio;
@@ -236,10 +238,19 @@ public class MainRepositorioImpl implements MainRepositorio {
                 .where(AnioAcademicoAlumno_Table.personaId.eq(personaId))
                 .and(AnioAcademicoAlumno_Table.toogle.eq(true))
                 .querySingle();
+
         AnioAcademicoUi anioAcademicoUi = new AnioAcademicoUi();
         if(anioAcademicoAlumno!=null){
             anioAcademicoUi.setAnioAcademicoId(anioAcademicoAlumno.getIdAnioAcademico());
             anioAcademicoUi.setNombre(anioAcademicoAlumno.getNombre());
+            anioAcademicoUi.setGeoreferenciaId(anioAcademicoAlumno.getGeoreferenciaId());
+        }
+        Georeferencia georeferencia = SQLite.select()
+                .from(Georeferencia.class)
+                .where(Georeferencia_Table.georeferenciaId.eq(anioAcademicoUi.getGeoreferenciaId()))
+                .querySingle();
+        if(georeferencia!=null){
+            anioAcademicoUi.setEntidadId(georeferencia.getEntidadId());
         }
         return anioAcademicoUi;
     }

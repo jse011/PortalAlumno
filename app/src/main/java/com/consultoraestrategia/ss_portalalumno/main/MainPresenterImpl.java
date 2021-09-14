@@ -298,6 +298,9 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         iCRMEdu.variblesGlobales.setGbCursoUi(gbCursoUi);
         iCRMEdu.variblesGlobales.setAnioAcademicoId(anioAcademicoUi.getAnioAcademicoId());
         iCRMEdu.variblesGlobales.setProgramEducativoId(programaEducativo.getIdPrograma());
+        iCRMEdu.variblesGlobales.setPersonaId(alumnoUi.getPersonaId());
+        iCRMEdu.variblesGlobales.setEntidadId(anioAcademicoUi.getEntidadId());
+        iCRMEdu.variblesGlobales.setGeoreferenciaId(anioAcademicoUi.getGeoreferenciaId());
         //iCRMEdu.variblesGlobales.setProgramEducativoId(idPrograma);
         if(programaEducativo!=null)if(view!=null)view.showTabCursoActivity();
         if(view!=null)view.servicePasarAsistencia(cursosUi.getSilaboEventoId());

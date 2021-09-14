@@ -24,4 +24,7 @@ public interface TabSesionesRepositorio {
     void updateFirebasePregunta(int sesionAprendizajeId, int cargaCursoId, PreguntaCallback callbackSimple);
     FirebaseCancel updateFirebaseColaborativa(int sesionAprendizajeId, int cargaCursoId, CallbackSimple callbackSimple);
     FirebaseCancel updateFirebaseReunionVirtual(int sesionAprendizajeId, int cargaCursoId, CallbackSimple callbackSimple);
+    RetrofitCancel getGrabacionesSalaVirtual(int sesionAprendizajeId, CallbackSimple callback);
+    RetrofitCancel getReunionVirtualAlumno(int sesionAprendizajeId, int entidadId, int georeferenciaId, CallbackSimple callback);
+    RetrofitCancel getInstrumentoEncuestaEval(int sesionAprendizajeId, int personaId, CallbackSimple callback);
 }

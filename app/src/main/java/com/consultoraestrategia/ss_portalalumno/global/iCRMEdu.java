@@ -173,6 +173,9 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
         GbPreview gbPreview;
         private int anioAcademicoId;
         private int programEducativoId;
+        private int georeferenciaId;
+        private int entidadId;
+        private int personaId;
         private int instrumentoId;
         private boolean habilitarAcceso;
         private boolean bloqueoAcceso;
@@ -285,6 +288,30 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
 
         public void setUpdateInstrumento(boolean updateInstrumento) {
             this.updateInstrumento = updateInstrumento;
+        }
+
+        public int getGeoreferenciaId() {
+            return georeferenciaId;
+        }
+
+        public void setGeoreferenciaId(int georeferenciaId) {
+            this.georeferenciaId = georeferenciaId;
+        }
+
+        public int getEntidadId() {
+            return entidadId;
+        }
+
+        public void setEntidadId(int entidadId) {
+            this.entidadId = entidadId;
+        }
+
+        public int getPersonaId() {
+            return personaId;
+        }
+
+        public void setPersonaId(int personaId) {
+            this.personaId = personaId;
         }
     }
 

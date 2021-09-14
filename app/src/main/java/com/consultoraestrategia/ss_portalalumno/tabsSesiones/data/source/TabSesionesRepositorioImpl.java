@@ -11,10 +11,15 @@ import com.consultoraestrategia.ss_portalalumno.entities.Archivo_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.BaseEntity;
 import com.consultoraestrategia.ss_portalalumno.entities.ColborativaPA;
 import com.consultoraestrategia.ss_portalalumno.entities.ColborativaPA_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.GrabacionSalaVirtual;
+import com.consultoraestrategia.ss_portalalumno.entities.GrabacionSalaVirtual_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacionObservado;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacionObservado_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.Persona;
 import com.consultoraestrategia.ss_portalalumno.entities.PreguntaEvaluacionPA;
 import com.consultoraestrategia.ss_portalalumno.entities.PreguntaPA;
 import com.consultoraestrategia.ss_portalalumno.entities.PreguntaPA_Table;
@@ -23,6 +28,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.RecursoDidacticoEventoC
 import com.consultoraestrategia.ss_portalalumno.entities.RecursoReferenciaC;
 import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualPA;
 import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualPA_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualServidor;
+import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualServidor_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
@@ -41,6 +48,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBRecursos;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
+import com.consultoraestrategia.ss_portalalumno.login2.entities.PersonaUi;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
@@ -63,6 +72,7 @@ import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
     public static final String TAG = TabSesionesRepositorioImpl.class.getSimpleName();
@@ -94,15 +104,15 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                         List<Variable> variableList = new ArrayList<>();
                         List<Valor> valorList = new ArrayList<>();
                         for (DataSnapshot instrumentoSnapshot : dataSnapshot.getChildren()){
-                            FBInstrumento fbInstrumento = instrumentoSnapshot.getValue(FBInstrumento.class);
-                            if(fbInstrumento==null) continue;
+                            //FBInstrumento fbInstrumento = instrumentoSnapshot.getValue(FBInstrumento.class);
+                            //if(fbInstrumento==null) continue;
                             InstrumentoEvaluacion instrumentoEvaluacion = new InstrumentoEvaluacion();
-                            instrumentoEvaluacion.setInstrumentoEvalId(fbInstrumento.getInstrumentoEvalId());
-                            instrumentoEvaluacion.setCantidadPreguntas(fbInstrumento.getCantidadPreguntas());
-                            instrumentoEvaluacion.setIcono(fbInstrumento.getIcono());
-                            instrumentoEvaluacion.setImagen(fbInstrumento.getImagen());
-                            instrumentoEvaluacion.setNombre(fbInstrumento.getNombre());
-                            instrumentoEvaluacion.setSesionId(fbInstrumento.getSesionAprendizajeId());
+                            instrumentoEvaluacion.setInstrumentoEvalId(UtilsFirebase.convert(instrumentoSnapshot.child("InstrumentoEvalId").getValue(), 0));
+                            instrumentoEvaluacion.setCantidadPreguntas(UtilsFirebase.convert(instrumentoSnapshot.child("CantidadPreguntas").getValue(), 0));
+                            instrumentoEvaluacion.setIcono(UtilsFirebase.convert(instrumentoSnapshot.child("Icono").getValue(), ""));
+                            instrumentoEvaluacion.setImagen(UtilsFirebase.convert(instrumentoSnapshot.child("Imagen").getValue(), ""));
+                            instrumentoEvaluacion.setNombre(UtilsFirebase.convert(instrumentoSnapshot.child("Nombre").getValue(), ""));
+                            instrumentoEvaluacion.setSesionId(UtilsFirebase.convert(instrumentoSnapshot.child("SesionAprendizajeId").getValue(), 0));
                             instrumentoEvaluacion.setRubroEvaluacionId(UtilsFirebase.convert(instrumentoSnapshot.child("RubroEvaluacionId").getValue(), ""));
                             instrumentoEvaluacion.setTipoNotaId(UtilsFirebase.convert(instrumentoSnapshot.child("TipoNotaId").getValue(), ""));
                             instrumentoEvaluacionList.add(instrumentoEvaluacion);
@@ -538,6 +548,150 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                         callbackSimple.onLoad(false);
                     }
                 });
+    }
+
+    @Override
+    public RetrofitCancel getGrabacionesSalaVirtual(int sesionAprendizajeId, CallbackSimple callback) {
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<List<GrabacionSalaVirtual>> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getGrabacionesSalaVirtual(sesionAprendizajeId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<List<GrabacionSalaVirtual>>() {
+            @Override
+            public void onResponse(List<GrabacionSalaVirtual> list) {
+
+                DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                    @Override
+                    public void execute(DatabaseWrapper databaseWrapper) {
+
+                        SQLite.delete()
+                                .from(GrabacionSalaVirtual.class)
+                                .where(GrabacionSalaVirtual_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                                .execute(databaseWrapper);
+
+                        TransaccionUtils.fastStoreListSave(GrabacionSalaVirtual.class, list, databaseWrapper, false);
+                    }
+                }).success(new Transaction.Success() {
+                    @Override
+                    public void onSuccess(@NonNull Transaction transaction) {
+                        callback.onLoad(true);
+                    }
+                }).error(new Transaction.Error() {
+                    @Override
+                    public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                        error.printStackTrace();
+                        callback.onLoad(false);
+                    }
+                }).build();
+
+                transaction.execute();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callback.onLoad(false);
+                Log.d(TAG,"onFailure");
+            }
+        });
+        return retrofitCancel;
+    }
+
+    @Override
+    public RetrofitCancel getReunionVirtualAlumno(int sesionAprendizajeId, int entidadId, int georeferenciaId, CallbackSimple callback) {
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<List<ReunionVirtualServidor>> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getReunionVirtualAlumno(sesionAprendizajeId, entidadId, georeferenciaId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<List<ReunionVirtualServidor>>() {
+            @Override
+            public void onResponse(List<ReunionVirtualServidor> list) {
+
+                DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                    @Override
+                    public void execute(DatabaseWrapper databaseWrapper) {
+                        Log.d(TAG, "getReunionVirtualAlumno: "+list.size());
+                        SQLite.delete()
+                                .from(ReunionVirtualServidor.class)
+                                .where(ReunionVirtualServidor_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                                .and(ReunionVirtualServidor_Table.entidadId.eq(entidadId))
+                                .and(ReunionVirtualServidor_Table.georeferenciaId.eq(georeferenciaId))
+                                .execute(databaseWrapper);
+
+
+                        TransaccionUtils.fastStoreListSave(ReunionVirtualServidor.class, list, databaseWrapper, false);
+                    }
+                }).success(new Transaction.Success() {
+                    @Override
+                    public void onSuccess(@NonNull Transaction transaction) {
+                        callback.onLoad(true);
+                    }
+                }).error(new Transaction.Error() {
+                    @Override
+                    public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                        error.printStackTrace();
+                        Log.d(TAG,"getReunionVirtualAlumno onError");
+                        callback.onLoad(false);
+                    }
+                }).build();
+
+                transaction.execute();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callback.onLoad(false);
+                Log.d(TAG,"onFailure");
+            }
+        });
+        return retrofitCancel;
+    }
+
+    @Override
+    public RetrofitCancel getInstrumentoEncuestaEval(int sesionAprendizajeId, int personaId, CallbackSimple callback) {
+        SessionUser sessionUser = SessionUser.getCurrentUser();
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<List<InstrumentoEncuestaEval>> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getInstrumentoEncuestaEval(sesionAprendizajeId, personaId, sessionUser.getUserId()));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<List<InstrumentoEncuestaEval>>() {
+            @Override
+            public void onResponse(List<InstrumentoEncuestaEval> list) {
+
+                DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                    @Override
+                    public void execute(DatabaseWrapper databaseWrapper) {
+                        SQLite.delete()
+                                .from(InstrumentoEncuestaEval.class)
+                                .where(InstrumentoEncuestaEval_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                                .and(InstrumentoEncuestaEval_Table.personaId.eq(personaId))
+                                .execute(databaseWrapper);
+
+
+                        TransaccionUtils.fastStoreListSave(InstrumentoEncuestaEval.class, list, databaseWrapper, false);
+                    }
+                }).success(new Transaction.Success() {
+                    @Override
+                    public void onSuccess(@NonNull Transaction transaction) {
+                        callback.onLoad(true);
+                    }
+                }).error(new Transaction.Error() {
+                    @Override
+                    public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                        error.printStackTrace();
+                        callback.onLoad(false);
+                    }
+                }).build();
+
+                transaction.execute();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callback.onLoad(false);
+                Log.d(TAG,"onFailure");
+            }
+        });
+        return retrofitCancel;
     }
 
     private void getRecursosFirebase(int actividadAprendizajeId, FBRecursos fbRecursos, List<RecursoDidacticoEventoC> recursoDidacticoEventoList, List<RecursoReferenciaC> recursoReferenciaCList, List<Archivo> archivoList, List<RecursoArchivo> recursoArchivoList){

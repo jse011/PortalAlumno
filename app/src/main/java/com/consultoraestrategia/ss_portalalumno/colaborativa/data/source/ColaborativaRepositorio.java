@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ColaborativaRepositorio {
     List<ColaborativaUi> geListaColobaorativa(int sesionAprendizajeId);
+    List<ColaborativaUi> geListaColobaorativaBaseDatos(int sesionAprendizajeId, int entidadId, int georeferenciaId);
+    List<ColaborativaUi> getListGrabaciones(int sesionAprendizajeId);
 }

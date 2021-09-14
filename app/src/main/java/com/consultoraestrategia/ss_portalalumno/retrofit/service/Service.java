@@ -2,7 +2,10 @@ package com.consultoraestrategia.ss_portalalumno.retrofit.service;
 
 import com.consultoraestrategia.ss_portalalumno.entities.AdminService;
 import com.consultoraestrategia.ss_portalalumno.entities.BEListaPadre;
+import com.consultoraestrategia.ss_portalalumno.entities.GrabacionSalaVirtual;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval;
 import com.consultoraestrategia.ss_portalalumno.entities.Persona;
+import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualServidor;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
@@ -12,7 +15,9 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroAge
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeUser;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroInstrumentoEncustaAlumno;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroLogin;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroSalaVirtual;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroUpdateCalenPeriodo;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
 
@@ -52,4 +57,10 @@ public interface Service {
     Call<RestApiResponse<Boolean>> f_isHabilitadoUsuario(@Body ApiRetrofit.ApiRequestBody<ParametroChangeUser> apiRequestBody);
     @POST(" ")
     Call<RestApiResponse<BEEventoAgenda>> getEventoAgendaFlutter(@Body ApiRetrofit.ApiRequestBody<ParametroAgendaEvento> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<List<GrabacionSalaVirtual>>> getGrabacionesSalaVirtual(@Body ApiRetrofit.ApiRequestBody<ParametroSalaVirtual> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<List<ReunionVirtualServidor>>> getReunionVirtualAlumno(@Body ApiRetrofit.ApiRequestBody<ParametroSalaVirtual> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<List<InstrumentoEncuestaEval>>> getInstrumentoEncuestaEval(@Body ApiRetrofit.ApiRequestBody<ParametroInstrumentoEncustaAlumno> apiRequestBody);
 }

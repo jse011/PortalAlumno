@@ -8,4 +8,6 @@ public interface InstrumentoListaPresenter extends BaseFragmentPresenter<Instrum
     void onClick(InstrumentoUi instrumentoUi);
 
     void notifyChangeFragment();
+
+    void changeInstrumentoEncuestaList();
 }

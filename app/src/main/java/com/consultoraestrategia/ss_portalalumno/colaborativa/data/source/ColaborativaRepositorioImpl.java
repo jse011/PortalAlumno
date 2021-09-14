@@ -5,8 +5,12 @@ import android.text.TextUtils;
 import com.consultoraestrategia.ss_portalalumno.colaborativa.entities.ColaborativaUi;
 import com.consultoraestrategia.ss_portalalumno.entities.ColborativaPA;
 import com.consultoraestrategia.ss_portalalumno.entities.ColborativaPA_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.GrabacionSalaVirtual;
+import com.consultoraestrategia.ss_portalalumno.entities.GrabacionSalaVirtual_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualPA;
 import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualPA_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualServidor;
+import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualServidor_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
@@ -61,6 +65,47 @@ public class ColaborativaRepositorioImpl implements ColaborativaRepositorio{
                     break;
 
             }
+            colaborativaUiList.add(colaborativaUi);
+        }
+        return colaborativaUiList;
+    }
+
+    @Override
+    public List<ColaborativaUi> geListaColobaorativaBaseDatos(int sesionAprendizajeId, int entidadId, int georeferenciaId) {
+        List<ColaborativaUi> colaborativaUiList = new ArrayList<>();
+        for (ReunionVirtualServidor reunionVirtualServidor : SQLite.select()
+                .from(ReunionVirtualServidor.class)
+                .where(ReunionVirtualServidor_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                .and(ReunionVirtualServidor_Table.entidadId.eq(entidadId))
+                .and(ReunionVirtualServidor_Table.georeferenciaId.eq(georeferenciaId))
+                .queryList()){
+
+            ColaborativaUi colaborativaUi = new ColaborativaUi();
+            colaborativaUi.setId("rev_"+reunionVirtualServidor.getReunionVirtualId());
+            colaborativaUi.setNombre(reunionVirtualServidor.getNombreReunion());
+            colaborativaUi.setDescripcion(reunionVirtualServidor.getUrl());
+            if(reunionVirtualServidor.getTipoCanalId() == 613){
+                colaborativaUi.setTipo(ColaborativaUi.Tipo.ZOOM);
+            }else {
+                colaborativaUi.setTipo(ColaborativaUi.Tipo.MEET);
+            }
+            colaborativaUiList.add(colaborativaUi);
+        }
+        return colaborativaUiList;
+    }
+
+    @Override
+    public List<ColaborativaUi> getListGrabaciones(int sesionAprendizajeId) {
+        List<ColaborativaUi> colaborativaUiList = new ArrayList<>();
+        for (GrabacionSalaVirtual grabacionSalaVirtual : SQLite.select()
+                .from(GrabacionSalaVirtual.class)
+                .where(GrabacionSalaVirtual_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                .queryList()){
+            ColaborativaUi colaborativaUi = new ColaborativaUi();
+            colaborativaUi.setId("Grba_"+grabacionSalaVirtual.getGrabacionId());
+            colaborativaUi.setNombre(grabacionSalaVirtual.getNombreGrabacion());
+            colaborativaUi.setDescripcion(grabacionSalaVirtual.getUrlGrabacion());
+            colaborativaUi.setTipo(ColaborativaUi.Tipo.GRABACION);
             colaborativaUiList.add(colaborativaUi);
         }
         return colaborativaUiList;

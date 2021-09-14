@@ -8,7 +8,10 @@ import android.util.Log;
 import com.consultoraestrategia.ss_portalalumno.entities.AdminService;
 import com.consultoraestrategia.ss_portalalumno.entities.BEListaPadre;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
+import com.consultoraestrategia.ss_portalalumno.entities.GrabacionSalaVirtual;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval;
 import com.consultoraestrategia.ss_portalalumno.entities.Persona;
+import com.consultoraestrategia.ss_portalalumno.entities.ReunionVirtualServidor;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDatosAnioAcademico;
 import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
@@ -17,7 +20,9 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroAge
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroChangeUser;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroInstrumentoEncustaAlumno;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroLogin;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroSalaVirtual;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroUpdateCalenPeriodo;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.UsuarioAdminService;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
@@ -191,6 +196,43 @@ public class ApiRetrofit {
         final String representacionJSON = gsons.toJson(apiRequestBody);
         Log.d(TAG, "apiRequestBody : " + representacionJSON);
         return service.getEventoAgendaFlutter(apiRequestBody);
+    }
+
+    public  Call<RestApiResponse<List<GrabacionSalaVirtual>>> getGrabacionesSalaVirtual(int sesionAprendizajeId) {
+        ParametroSalaVirtual parametroSalaVirtual = new ParametroSalaVirtual();
+        parametroSalaVirtual.setSesionAprendizajeId(sesionAprendizajeId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroSalaVirtual> apiRequestBody = new ApiRequestBody<>("getGrabacionesSalaVirtual",parametroSalaVirtual);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getGrabacionesSalaVirtual(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<List<ReunionVirtualServidor>>> getReunionVirtualAlumno(int sesionAprendizajeId, int entidadId, int georeferenciaId) {
+        ParametroSalaVirtual parametroSalaVirtual = new ParametroSalaVirtual();
+        parametroSalaVirtual.setSesionAprendizajeId(sesionAprendizajeId);
+        parametroSalaVirtual.setEntidadId(entidadId);
+        parametroSalaVirtual.setGeoreferenciaId(georeferenciaId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroSalaVirtual> apiRequestBody = new ApiRequestBody<>("getReunionVirtualAlumno",parametroSalaVirtual);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getReunionVirtualAlumno(apiRequestBody);
+    }
+
+    public  Call<RestApiResponse<List<InstrumentoEncuestaEval>>> getInstrumentoEncuestaEval(int sesionAprendizajeId, int personaId, int usuarioId) {
+        ParametroInstrumentoEncustaAlumno parametro = new ParametroInstrumentoEncustaAlumno();
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        parametro.setPersonaId(personaId);
+        parametro.setUsuarioId(usuarioId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroInstrumentoEncustaAlumno> apiRequestBody = new ApiRequestBody<>("getInstrumentoEncuestaEval",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getInstrumentoEncuestaEval(apiRequestBody);
     }
 
     public class ApiRequestBody<T extends Parameters>{

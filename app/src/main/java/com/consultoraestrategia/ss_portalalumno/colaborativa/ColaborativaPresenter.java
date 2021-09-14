@@ -9,4 +9,8 @@ public interface ColaborativaPresenter extends BaseFragmentPresenter<Colaborativ
     void changeReunionVirtualList();
 
     void onClickColobarativa(ColaborativaUi colaborativaUi);
+
+    void changeGrabacionesSalaVirtualList();
+
+    void changeReunionVirtualBaseDatosList();
 }

@@ -6,4 +6,6 @@ public interface TabSesionInstrumentoView {
     void showProgress2();
 
     void hideProgress2();
+
+    void changeInstrumentoEncuestaList();
 }

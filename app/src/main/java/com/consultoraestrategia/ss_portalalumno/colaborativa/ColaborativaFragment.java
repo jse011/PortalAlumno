@@ -23,6 +23,8 @@ import com.consultoraestrategia.ss_portalalumno.colaborativa.data.source.Colabor
 import com.consultoraestrategia.ss_portalalumno.colaborativa.data.source.ColaborativaRepositorioImpl;
 import com.consultoraestrategia.ss_portalalumno.colaborativa.entities.ColaborativaUi;
 import com.consultoraestrategia.ss_portalalumno.colaborativa.useCase.GetListaColaborativa;
+import com.consultoraestrategia.ss_portalalumno.colaborativa.useCase.GetListaColaborativaBaseDatos;
+import com.consultoraestrategia.ss_portalalumno.colaborativa.useCase.GetListaGrabaciones;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionColaborativaView;
@@ -37,6 +39,12 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
     @BindView(R.id.progressBar8)
     ProgressBar progressBar8;
     private ColaborativaAdapter adapter;
+    @BindView(R.id.rc_colaborativa_servidor)
+    RecyclerView rcColaborativaServidor;
+    @BindView(R.id.rc_colaborativa_grabaciones)
+    RecyclerView rcColaborativaGrabaciones;
+    private ColaborativaAdapter adapterServidor;
+    private ColaborativaAdapter adapterGrabaciones;
 
     @Override
     protected String getLogTag() {
@@ -48,6 +56,8 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
         ColaborativaRepositorio colaborativaRepositorio = new ColaborativaRepositorioImpl();
         return new ColaborativaPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(),
                 new GetListaColaborativa(colaborativaRepositorio),
+                new GetListaColaborativaBaseDatos(colaborativaRepositorio),
+                new GetListaGrabaciones(colaborativaRepositorio),
                 new AndroidOnlineImpl(getContext()));
     }
 
@@ -72,6 +82,14 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
         adapter = new ColaborativaAdapter(this);
         rcColaborativa.setLayoutManager(new LinearLayoutManager(getContext()));
         rcColaborativa.setAdapter(adapter);
+
+        adapterServidor = new ColaborativaAdapter(this);
+        rcColaborativaServidor.setLayoutManager(new LinearLayoutManager(getContext()));
+        rcColaborativaServidor.setAdapter(adapterServidor);
+
+        adapterGrabaciones = new ColaborativaAdapter(this);
+        rcColaborativaGrabaciones.setLayoutManager(new LinearLayoutManager(getContext()));
+        rcColaborativaGrabaciones.setAdapter(adapterGrabaciones);
     }
 
     @Override
@@ -120,6 +138,16 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
     }
 
     @Override
+    public void changeGrabacionesSalaVirtualList() {
+        presenter.changeGrabacionesSalaVirtualList();
+    }
+
+    @Override
+    public void changeReunionVirtualBaseDatosList() {
+        presenter.changeReunionVirtualBaseDatosList();
+    }
+
+    @Override
     public void setListColaborativa(List<ColaborativaUi> colaborativaUiList) {
         adapter.setListColaborativa(colaborativaUiList);
     }
@@ -132,5 +160,15 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
             e.printStackTrace();
             Toast.makeText(getContext(), "Error al abrir", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void setListGrabacionesColaborativa(List<ColaborativaUi> colaborativaUiList) {
+        adapterGrabaciones.setListColaborativa(colaborativaUiList);
+    }
+
+    @Override
+    public void setListColaborativaServidor(List<ColaborativaUi> colaborativaUiList) {
+        adapterServidor.setListColaborativa(colaborativaUiList);
     }
 }
