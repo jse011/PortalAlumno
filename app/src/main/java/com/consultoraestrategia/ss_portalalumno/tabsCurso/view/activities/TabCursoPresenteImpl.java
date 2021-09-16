@@ -78,18 +78,23 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         if(view!=null)view.showAppbarBackground(fotoCurso, parametroColor1);
         if(view!=null)view.changeColorToolbar(parametroColor1);
         if(view!=null)view.changeColorFloatButon(parametroColor2);
-        online.online(success -> {
-            if(success){
-                updateFireBaseUnidadAprendizaje();
-                if(view!=null)view.modoOnline();
-            }else {
-                if(view!=null)view.modoOffline();
-            }
-        });
+
     }
 
     private void updateFireBaseUnidadAprendizaje() {
         finishUpdateUnidadFb = false;
+        updateFireBasePersona.execute(cargaCursoId, new UpdateFireBasePersona.CallBack() {
+            @Override
+            public void onSucces() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+
         updateFireBaseUnidadAprendizaje.execute(cargaCursoId, idCalendarioPeriodo, new UpdateFireBaseUnidadAprendizaje.CallBack() {
             @Override
             public void onSucces() {
@@ -105,17 +110,7 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
                 if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
             }
         });
-        updateFireBasePersona.execute(cargaCursoId, new UpdateFireBasePersona.CallBack() {
-            @Override
-            public void onSucces() {
 
-            }
-
-            @Override
-            public void onError(String error) {
-
-            }
-        });
     }
 
     private void setupCalendarioPerio() {

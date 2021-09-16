@@ -21,4 +21,7 @@ public interface UnidadAprendizajeView extends BaseView<UnidadAprendizajePresent
     void hideMensajeListaVacia();
 
     void servicePasarAsistencia(int silaboEventoId);
+
+    void removerItem(UnidadAprendizajeUi unidadAprendizajeUi);
+
 }

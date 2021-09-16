@@ -12,6 +12,7 @@ public class UpdateFireBaseUnidadAprendizaje {
     }
 
     public void execute(int idCargaCurso, int idCalendarioPeriodo, CallBack callBack){
+
         tabCursoRepositorio.updateFirebaseUnidadesList(idCargaCurso, idCalendarioPeriodo,new TabCursoRepositorio.Callback() {
             @Override
             public void onLoad(boolean success) {
@@ -22,6 +23,7 @@ public class UpdateFireBaseUnidadAprendizaje {
                 }
             }
         });
+
     }
 
     public interface CallBack{

@@ -74,7 +74,8 @@ public class ActividadesFragment extends Fragment implements ActividadesView, Ac
     @BindView(R.id.content_actividades)
     CardView contentActividades;
     private TabSesionCallback callback;
-
+    @BindView(R.id.conten_empty)
+    ViewGroup contenEmpty;
 
     public static ActividadesFragment newInstance(Bundle args) {
         ActividadesFragment fragment = new ActividadesFragment();
@@ -121,6 +122,8 @@ public class ActividadesFragment extends Fragment implements ActividadesView, Ac
         recyclerView.setHasFixedSize(false);
         recyclerView.setNestedScrollingEnabled(false);
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+
+
     }
 
     @Override
@@ -173,6 +176,13 @@ public class ActividadesFragment extends Fragment implements ActividadesView, Ac
     public void showListObject(List<Object> objectList) {
         Log.d(TAG, "showListObject :" + objectList.size());
         if (actividadesAdapter != null) actividadesAdapter.setActividadList(objectList);
+
+        if(objectList.isEmpty()){
+            contenEmpty.setVisibility(View.VISIBLE);
+        }else {
+            contenEmpty.setVisibility(View.GONE);
+        }
+
     }
 
     @Override

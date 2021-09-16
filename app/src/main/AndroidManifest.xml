@@ -14,7 +14,7 @@
     <application
         android:name=".global.iCRMEdu"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_educar"
+        android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"

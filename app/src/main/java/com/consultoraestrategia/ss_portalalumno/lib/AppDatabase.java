@@ -27,8 +27,8 @@ public class AppDatabase {
     //public static final int VERSION = 8;//Agregar la tabla Bloueo Usuario
     //public static final int VERSION = 9;
     //public static final int VERSION = 10;//Agrego registro Instrumentos y asus varaibles
-    public static final int VERSION = 11;//Se agrego la table EventoTipos Evento2 Calendario2 EventoAdjunto
-
+    //public static final int VERSION = 11;//Se agrego la table EventoTipos Evento2 Calendario2 EventoAdjunto
+    public static final int VERSION = 12;//Se agrego la table GrabacionSalaVirtual InstrumentoEncuestaEval ReunionVirtualServidor
     @Migration(version = 8, database = AppDatabase.class)
     public static class AlterUsuario extends AlterTableMigration<Usuario> {
 

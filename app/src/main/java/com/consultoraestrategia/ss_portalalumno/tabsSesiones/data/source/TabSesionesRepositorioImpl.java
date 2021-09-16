@@ -53,6 +53,7 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
+import com.consultoraestrategia.ss_portalalumno.util.JSONFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
@@ -62,6 +63,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonObject;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -332,12 +334,45 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
 
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
 
-        mDatabase.child("/AV_Preguntas/silid_"+silaboEventoId+"/unid_" + unidadAprendizajeid+"/sesid_"+sesionAprendizajeId+"/Evaluacion")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getPreguntasEvaluacionAlumno(silaboEventoId, unidadAprendizajeid, sesionAprendizajeId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
+            @Override
+            public void onResponse(JsonObject response) {
+
+                if(response==null){
+
+                }else {
+                    for (JSONFirebase instrumentoSnapshot : JSONFirebase.d(response).getChildren()){
+                        for (JSONFirebase alumnoSnapshot : instrumentoSnapshot.getChildren()){
+                            PreguntaEvaluacionPA preguntaEvaluacionPA = new PreguntaEvaluacionPA();
+                            preguntaEvaluacionPA.setPreguntaId(UtilsFirebase.convert(alumnoSnapshot.child("PreguntaId").getValue(), ""));
+                            preguntaEvaluacionPA.setAlumnoId(UtilsFirebase.convert(alumnoSnapshot.child("AlumnoId").getValue(), 0));
+                            preguntaEvaluacionPA.setVariableId(UtilsFirebase.convert(alumnoSnapshot.child("VariableId").getValue(), ""));
+                            if(personaId==preguntaEvaluacionPA.getAlumnoId()){
+                                preguntaEvaluacionPA.save();
+                            }
+                        }
+                    }
+                }
+
+                SQLite.delete()
+                        .from(PreguntaPA.class)
+                        .where(PreguntaPA_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
+                        .execute();
+
+
+                ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+                apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+                RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getPreguntasAlumno(silaboEventoId, unidadAprendizajeid, sesionAprendizajeId));
+                retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot instrumentoSnapshot : dataSnapshot.getChildren()){
-                            for (DataSnapshot alumnoSnapshot : instrumentoSnapshot.getChildren()){
+                    public void onResponse(JsonObject response) {
+                        if(response==null){
+
+                        }else {
+                            for (JSONFirebase alumnoSnapshot : JSONFirebase.d(response).getChildren()){
                                 PreguntaEvaluacionPA preguntaEvaluacionPA = new PreguntaEvaluacionPA();
                                 preguntaEvaluacionPA.setPreguntaId(UtilsFirebase.convert(alumnoSnapshot.child("PreguntaId").getValue(), ""));
                                 preguntaEvaluacionPA.setAlumnoId(UtilsFirebase.convert(alumnoSnapshot.child("AlumnoId").getValue(), 0));
@@ -347,13 +382,16 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                                 }
                             }
                         }
+                    }
 
-                        SQLite.delete()
-                                .from(PreguntaPA.class)
-                                .where(PreguntaPA_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
-                                .execute();
+                    @Override
+                    public void onFailure(Throwable t) {
 
-                        FirebaseCancel firebaseCancel =  new FirebaseCancelImpl(mDatabase.child("/AV_Preguntas/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeid + "/sesid_" + sesionAprendizajeId + "/Preguntas"), new ChildEventListener() {
+                    }
+                });
+
+                FirebaseCancel firebaseCancel =  new FirebaseCancelImpl(mDatabase.child("/AV_Preguntas/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeid + "/sesid_" + sesionAprendizajeId + "/Preguntas"),
+                        new ChildEventListener() {
 
                             private PreguntaPA convert(DataSnapshot instrumentoSnapshot, int sesionAprendizajeId) {
                                 PreguntaPA preguntaPA = new PreguntaPA();
@@ -420,15 +458,15 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                             }
                         });
 
-                        callback.onPreLoad(firebaseCancel);
-                    }
+                callback.onPreLoad(firebaseCancel);
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
 
-                    }
-                });
+            @Override
+            public void onFailure(Throwable t) {
 
+            }
+        });
 
 
 
@@ -465,7 +503,35 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                 .where(ColborativaPA_Table.sesionAprendizajeId.eq(sesionAprendizajeId))
                 .execute();
 
-        return new FirebaseCancelImpl(mDatabase.child("/AV_ActividadColaborativa/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeid + "/sesid_" + sesionAprendizajeId),
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getActividadColaborativaAlumno(silaboEventoId, unidadAprendizajeid, sesionAprendizajeId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
+            @Override
+            public void onResponse(JsonObject response) {
+                if(response == null){
+                    callbackSimple.onLoad(false);
+                }else {
+                    for (Map.Entry<String,JSONFirebase> entry: JSONFirebase.d(response).getChildren2().entrySet()){
+                        ColborativaPA colborativaPA = new ColborativaPA();
+                        colborativaPA.setKey(entry.getKey());
+                        JSONFirebase colaborativaSnapshot = entry.getValue();
+                        colborativaPA.setDescripcion(UtilsFirebase.convert(colaborativaSnapshot.child("descripcion").getValue(), ""));
+                        colborativaPA.setNombre(UtilsFirebase.convert(colaborativaSnapshot.child("nombre").getValue(), ""));
+                        colborativaPA.setTipo(UtilsFirebase.convert(colaborativaSnapshot.child("tipo").getValue(), ""));
+                        colborativaPA.save();
+                    }
+                    callbackSimple.onLoad(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callbackSimple.onLoad(false);
+            }
+        });
+
+        FirebaseCancel firebaseCancel = new FirebaseCancelImpl(mDatabase.child("/AV_ActividadColaborativa/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeid + "/sesid_" + sesionAprendizajeId),
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -486,12 +552,17 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                     }
                 });
 
+        return () -> {
+            firebaseCancel.cancel();
+            retrofitCancel.cancel();
+        };
+
 
     }
 
     @Override
     public FirebaseCancel updateFirebaseReunionVirtual(int sesionAprendizajeId, int cargaCursoId, CallbackSimple callbackSimple) {
-        Webconfig webconfig = SQLite.select()
+       /* Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
                 .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
                 .querySingle();
@@ -547,7 +618,9 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         callbackSimple.onLoad(false);
                     }
-                });
+                });*/
+        callbackSimple.onLoad(true);
+        return null;
     }
 
     @Override

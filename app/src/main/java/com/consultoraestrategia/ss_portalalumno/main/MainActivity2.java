@@ -368,6 +368,10 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         finish();
     }
 
+    @Override
+    public void showMessage(CharSequence error) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+    }
 
     @Override
     public void showTabCursoActivity() {
@@ -405,7 +409,6 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
             public void onClick(DialogInterface dialog, int which) {
                 presenter.onClickDialogoCerrarSesion();
                 dialog.cancel();
-
             }
         });
 
@@ -465,7 +468,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser==null){
-            initializingFirebase(usuarioFirebase, passwordFirebase, new OnCompleteListener<AuthResult>() {
+            /*initializingFirebase(usuarioFirebase, passwordFirebase, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
@@ -478,7 +481,8 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
                         Log.w(getTag(), "signInWithEmail:failure", task.getException());
                     }
                 }
-            });
+            });*/
+            initializingFirebase();
         }
     }
 
@@ -492,6 +496,24 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
                         if(callback!=null)callback.onComplete(task);
                     }
                 });
+
+    }
+
+    private void initializingFirebase(){
+
+        mAuth.signInAnonymously()
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            presenter.onInitCuentaFirebase();
+                        } else {
+                            presenter.onErrotCuentaFirebase();
+                        }
+
+                    }
+                });
+
     }
 
     private void  createAccountFirebase(String email, String password){

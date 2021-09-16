@@ -1,5 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.util;
 
+import com.google.gson.JsonPrimitive;
+
 public class UtilsFirebase {
 
     public static <T extends Comparable<T>>T convert(Object o,T convert){
@@ -22,9 +24,13 @@ public class UtilsFirebase {
                         }else {
                             return (T)Integer.valueOf(0);
                         }
+                    }else if(o.getClass().equals(JsonPrimitive.class)){
+                        return (T)Integer.valueOf(((JsonPrimitive)o).getAsInt());
                     }else {
                         return (T)o;
                     }
+
+
                 }else if(convert.getClass().equals(Long.class)){
                     if(o.getClass().equals(String.class)){
                         return (T)Long.valueOf((String) o);
@@ -40,6 +46,8 @@ public class UtilsFirebase {
                         }else {
                             return (T)Long.valueOf(0);
                         }
+                    }else if(o.getClass().equals(JsonPrimitive.class)){
+                        return (T)Long.valueOf(((JsonPrimitive)o).getAsLong());
                     }else {
                         return (T)o;
                     }
@@ -52,6 +60,8 @@ public class UtilsFirebase {
                         return (T)Float.valueOf(((Double) o).floatValue());
                     }else if(o.getClass().equals(Long.class)){
                         return (T)Float.valueOf(((Long)o).floatValue());
+                    }else if(o.getClass().equals(JsonPrimitive.class)){
+                        return (T)Float.valueOf(((JsonPrimitive)o).getAsFloat());
                     }else {
                         return (T)o;
                     }
@@ -64,6 +74,8 @@ public class UtilsFirebase {
                         return (T)Double.valueOf(((Long)o).doubleValue());
                     }else if(o.getClass().equals(Float.class)){
                         return (T)Double.valueOf(((Float) o).doubleValue());
+                    }else if(o.getClass().equals(JsonPrimitive.class)){
+                        return (T)Double.valueOf(((JsonPrimitive)o).getAsDouble());
                     }else {
                         return (T)o;
                     }
@@ -82,6 +94,8 @@ public class UtilsFirebase {
                         }else {
                             return (T)new Boolean(false);
                         }
+                    }else if(o.getClass().equals(JsonPrimitive.class)){
+                        return (T)new Boolean(((JsonPrimitive)o).getAsBoolean());
                     }else {
                         return (T)o;
                     }

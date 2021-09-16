@@ -12,6 +12,8 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.Sesio
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class UnidadesAdapter extends RecyclerView.Adapter<UnidadViewHolder>  {
@@ -54,6 +56,15 @@ public class UnidadesAdapter extends RecyclerView.Adapter<UnidadViewHolder>  {
             notifyItemChanged(position);
         }
     }
+
+    public void remover(UnidadAprendizajeUi unidadAprendizajeUi) {
+        int position = unidadAprendizajes.indexOf(unidadAprendizajeUi);
+        if(position!=-1){
+            unidadAprendizajes.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
 
     public interface UnidadListener {
         void onClickUnidadAprendizaje(UnidadAprendizajeUi unidadAprendizajeUi);

@@ -327,16 +327,6 @@ public class TabSesionPresenterImpl extends BasePresenterImpl<TabSesionView> imp
         online.restarOnline(success -> {
             if(success){
                 if(view!=null)view.modoOnline();
-                if(view!=null)view.servicePasarAsistencia(silaboEventoId);
-                if(reunionVirtualCancel==null||colaborativaCancel==null){
-                    updateFirebaseColaborativa();
-                }
-                if(preguntasCancel==null){
-                    updateFirebasePreguntas();
-                }
-                if(!this.updateInstrumento){
-                    updateFirebaseInstrumento();
-                }
             }else {
                 if(view!=null)view.modoOffline();
             }

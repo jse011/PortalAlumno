@@ -17,9 +17,14 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroCha
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroInstrumentoEncustaAlumno;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroLogin;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroPortalEvaFirebase;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroSalaVirtual;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroUpdateCalenPeriodo;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
+import com.consultoraestrategia.ss_portalalumno.util.JSONFirebase;
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -63,4 +68,6 @@ public interface Service {
     Call<RestApiResponse<List<ReunionVirtualServidor>>> getReunionVirtualAlumno(@Body ApiRetrofit.ApiRequestBody<ParametroSalaVirtual> apiRequestBody);
     @POST(" ")
     Call<RestApiResponse<List<InstrumentoEncuestaEval>>> getInstrumentoEncuestaEval(@Body ApiRetrofit.ApiRequestBody<ParametroInstrumentoEncustaAlumno> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<JsonObject>> getUnidadAprendizajeAlumno(@Body ApiRetrofit.ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody);
 }

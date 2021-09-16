@@ -6,6 +6,8 @@ public class EncuestaUi {
     private int cantidadPregunta;
     private int puntos;
     private boolean verResultados;
+    private String urlEncuesta;
+    private String urlResultado;
 
     public String getNombre() {
         return nombre;
@@ -37,5 +39,21 @@ public class EncuestaUi {
 
     public void setVerResultados(boolean verResultados) {
         this.verResultados = verResultados;
+    }
+
+    public void setUrlEncuesta(String urlEncuesta) {
+        this.urlEncuesta = urlEncuesta;
+    }
+
+    public String getUrlEncuesta() {
+        return urlEncuesta;
+    }
+
+    public void setUrlResultado(String urlResultado) {
+        this.urlResultado = urlResultado;
+    }
+
+    public String getUrlResultado() {
+        return urlResultado;
     }
 }

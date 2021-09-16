@@ -11,10 +11,13 @@ import com.consultoraestrategia.ss_portalalumno.entities.CargaCursos_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.DesempenioIcd;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
 import com.consultoraestrategia.ss_portalalumno.entities.Icds;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval;
+import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEncuestaEval_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionEventoCompetenciaDesempenioIcd;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionEventoCompetenciaDesempenioIcd_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento;
 import com.consultoraestrategia.ss_portalalumno.entities.SilaboEvento_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.T_GC_REL_UNIDAD_APREN_EVENTO_TIPO;
@@ -28,8 +31,12 @@ import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBSesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBUnidadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
+import com.consultoraestrategia.ss_portalalumno.util.JSONFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
@@ -38,6 +45,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -45,13 +54,17 @@ import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeRepositorio {
 
@@ -155,8 +168,21 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
     }
 
     @Override
-    public void updateFirebaseUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int plancursoId, List<UnidadAprendizajeUi> unidadAprendizajeUiList, Callback callback) {
+    public void saveToogleUnidad(UnidadAprendizajeUi unidadAprendizajeUi) {
 
+        UnidadAprendizaje unidadAprendizaje = SQLite.select()
+                .from(UnidadAprendizaje.class)
+                .where(UnidadAprendizaje_Table.unidadAprendizajeId.eq(unidadAprendizajeUi.getUnidadAprendizajeId()))
+                .querySingle();
+        if(unidadAprendizaje!=null) {
+            unidadAprendizaje.setToogle(unidadAprendizajeUi.isToogle());
+            unidadAprendizaje.save();
+        }
+
+    }
+
+    @Override
+    public RetrofitCancel updateServidorUnidadesList(int idCargaCurso, int idCalendarioPeriodo, int idAnioAcademico, int planCursoId, List<UnidadAprendizajeUi> unidadAprendizajeUiList, Callback callback) {
         Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
                 .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
@@ -176,133 +202,147 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 .querySingle();
 
         int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
 
-        mDatabase.child("/AV_Sesion/silid_"+silaboEventoId+"/peid_"+tipoPeriodoId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        TransaccionUtils.deleteTable(SesionEventoCompetenciaDesempenioIcd.class, SesionEventoCompetenciaDesempenioIcd_Table.sesionAprendizajeId.in(
-                                SQLite.select(SesionAprendizaje_Table.sesionAprendizajeId.withTable())
-                                        .from(SesionAprendizaje.class)
-                                        .innerJoin(UnidadAprendizaje.class)
-                                        .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
-                                                .eq(SesionAprendizaje_Table.unidadAprendizajeId.withTable()))
-                                        .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
-                                        .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
-                                                .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
-                                        .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
-                                        .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId)))
-                        );
-
-
-                        TransaccionUtils.deleteTable(SesionAprendizaje.class, SesionAprendizaje_Table.unidadAprendizajeId.in(
-                                SQLite.select(UnidadAprendizaje_Table.unidadAprendizajeId.withTable())
-                                    .from(UnidadAprendizaje.class)
-                                    .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
-                                    .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
-                                            .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
-                                    .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
-                                    .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId)))
-                        );
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getSesionAprendizajedAlumno(silaboEventoId, tipoPeriodoId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
+            @Override
+            public void onResponse(JsonObject object) {
+                if(object==null){
+                    callback.onLoad(false);
+                }else {
+                    DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                    Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                        @Override
+                        public void execute(DatabaseWrapper databaseWrapper) {
+                            TransaccionUtils.deleteTable(SesionEventoCompetenciaDesempenioIcd.class, SesionEventoCompetenciaDesempenioIcd_Table.sesionAprendizajeId.in(
+                                    SQLite.select(SesionAprendizaje_Table.sesionAprendizajeId.withTable())
+                                            .from(SesionAprendizaje.class)
+                                            .innerJoin(UnidadAprendizaje.class)
+                                            .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
+                                                    .eq(SesionAprendizaje_Table.unidadAprendizajeId.withTable()))
+                                            .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
+                                            .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
+                                                    .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
+                                            .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
+                                            .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId)))
+                            );
 
 
-                        List<SesionAprendizaje> sesionAprendizajeList = new ArrayList<>();
-                        List<DesempenioIcd> desempenioIcdList = new ArrayList<>();
-                        List<Icds> icdsList = new ArrayList<>();
-                        List<SesionEventoCompetenciaDesempenioIcd> sesionEventoCompetenciaDesempenioIcdList = new ArrayList<>();
-                        for (DataSnapshot unidadSnapshot: dataSnapshot.getChildren()){
-                            for (DataSnapshot sesionSnapshot: unidadSnapshot.getChildren()){
-                                FBSesionAprendizaje fbSesionAprendizaje = sesionSnapshot.getValue(FBSesionAprendizaje.class);
-                                SesionAprendizaje sesionAprendizaje = new SesionAprendizaje();
-                                sesionAprendizaje.setSesionAprendizajeId(fbSesionAprendizaje.getSesionAprendizajeId());
-                                sesionAprendizaje.setTitulo(fbSesionAprendizaje.getTitulo());
-                                sesionAprendizaje.setEstadoId(fbSesionAprendizaje.getEstadoId());
-                                sesionAprendizaje.setRolId(6);
-                                sesionAprendizaje.setEstadoId(SesionAprendizaje.AUTORIZADO_ESTADO);
-                                sesionAprendizaje.setNroSesion(fbSesionAprendizaje.getNroSesion());
-                                sesionAprendizaje.setHoras(fbSesionAprendizaje.getHoras());
-                                try {
-                                    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                                    Date todayCalendar = simpleDateFormat1.parse(fbSesionAprendizaje.getFechaEjecucion());
-                                    sesionAprendizaje.setFechaEjecucion(todayCalendar.getTime());
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
-                                sesionAprendizaje.setUnidadAprendizajeId(fbSesionAprendizaje.getUnidadAprendizajeId());
-                                sesionAprendizaje.setEstadoEjecucionId(fbSesionAprendizaje.getEstadoEjecucionId());
+                            TransaccionUtils.deleteTable(SesionAprendizaje.class, SesionAprendizaje_Table.unidadAprendizajeId.in(
+                                    SQLite.select(UnidadAprendizaje_Table.unidadAprendizajeId.withTable())
+                                            .from(UnidadAprendizaje.class)
+                                            .innerJoin(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO.class)
+                                            .on(UnidadAprendizaje_Table.unidadAprendizajeId.withTable()
+                                                    .eq(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.unidadaprendizajeId.withTable()))
+                                            .where(UnidadAprendizaje_Table.silaboEventoId.withTable().eq(silaboEventoId))
+                                            .and(T_GC_REL_UNIDAD_APREN_EVENTO_TIPO_Table.tipoid.withTable().eq(tipoPeriodoId)))
+                            );
 
-                                sesionAprendizajeList.add(sesionAprendizaje);
 
-                                if(sesionSnapshot.child("DesempenioIcd").exists()){
-                                    for (DataSnapshot desempenioSnapshot: sesionSnapshot.child("DesempenioIcd").getChildren()){
-                                        DesempenioIcd desempenioIcd = new DesempenioIcd();
-                                        desempenioIcd.setDesempenioIcdId(UtilsFirebase.convert(desempenioSnapshot.child("DesempenioIcdId").getValue(), 0));
-                                        desempenioIcd.setIcdId(UtilsFirebase.convert(desempenioSnapshot.child("IcdId").getValue(), 0));
-                                        desempenioIcd.setDescripcion(UtilsFirebase.convert(desempenioSnapshot.child("Descripcion").getValue(), ""));
-                                        desempenioIcdList.add(desempenioIcd);
-                                        Icds icds = new Icds();
-                                        icds.setIcdId(UtilsFirebase.convert(desempenioSnapshot.child("IcdId").getValue(), 0));
-                                        icds.setTipoId(UtilsFirebase.convert(desempenioSnapshot.child("IcdTipoId").getValue(), 0));
-                                        icds.setTitulo(UtilsFirebase.convert(desempenioSnapshot.child("IcdTitulo").getValue(), ""));
-                                        icdsList.add(icds);
-                                        SesionEventoCompetenciaDesempenioIcd sesionEventoCompetenciaDesempenioIcd = new SesionEventoCompetenciaDesempenioIcd();
-                                        sesionEventoCompetenciaDesempenioIcd.setDesempenioIcdId(UtilsFirebase.convert(desempenioSnapshot.child("DesempenioIcdId").getValue(), 0));
-                                        sesionEventoCompetenciaDesempenioIcd.setSesionAprendizajeId(sesionAprendizaje.getSesionAprendizajeId());
-                                        sesionEventoCompetenciaDesempenioIcdList.add(sesionEventoCompetenciaDesempenioIcd);
+                            List<SesionAprendizaje> sesionAprendizajeList = new ArrayList<>();
+                            List<DesempenioIcd> desempenioIcdList = new ArrayList<>();
+                            List<Icds> icdsList = new ArrayList<>();
+                            List<SesionEventoCompetenciaDesempenioIcd> sesionEventoCompetenciaDesempenioIcdList = new ArrayList<>();
+
+
+                            for (JSONFirebase unidadSnapshot: JSONFirebase.d(object).getChildren()){
+                                for (JSONFirebase sesionSnapshot: unidadSnapshot.getChildren()){
+                                    FBSesionAprendizaje fbSesionAprendizaje = sesionSnapshot.getValue(FBSesionAprendizaje.class);
+                                    SesionAprendizaje sesionAprendizaje = new SesionAprendizaje();
+                                    sesionAprendizaje.setSesionAprendizajeId(fbSesionAprendizaje.getSesionAprendizajeId());
+                                    sesionAprendizaje.setTitulo(fbSesionAprendizaje.getTitulo());
+                                    sesionAprendizaje.setEstadoId(fbSesionAprendizaje.getEstadoId());
+                                    sesionAprendizaje.setRolId(6);
+                                    sesionAprendizaje.setEstadoId(SesionAprendizaje.AUTORIZADO_ESTADO);
+                                    sesionAprendizaje.setNroSesion(fbSesionAprendizaje.getNroSesion());
+                                    sesionAprendizaje.setHoras(fbSesionAprendizaje.getHoras());
+                                    try {
+                                        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                                        Date todayCalendar = simpleDateFormat1.parse(fbSesionAprendizaje.getFechaEjecucion());
+                                        sesionAprendizaje.setFechaEjecucion(todayCalendar.getTime());
+                                    }catch (Exception e){
+                                        e.printStackTrace();
                                     }
+                                    sesionAprendizaje.setUnidadAprendizajeId(fbSesionAprendizaje.getUnidadAprendizajeId());
+                                    sesionAprendizaje.setEstadoEjecucionId(fbSesionAprendizaje.getEstadoEjecucionId());
+
+                                    sesionAprendizajeList.add(sesionAprendizaje);
+
+                                    if(sesionSnapshot.child("DesempenioIcd").exists()){
+                                        for (JSONFirebase desempenioSnapshot: sesionSnapshot.child("DesempenioIcd").getChildren()){
+                                            DesempenioIcd desempenioIcd = new DesempenioIcd();
+                                            desempenioIcd.setDesempenioIcdId(UtilsFirebase.convert(desempenioSnapshot.child("DesempenioIcdId").getValue(), 0));
+                                            desempenioIcd.setIcdId(UtilsFirebase.convert(desempenioSnapshot.child("IcdId").getValue(), 0));
+                                            desempenioIcd.setDescripcion(UtilsFirebase.convert(desempenioSnapshot.child("Descripcion").getValue(), ""));
+                                            desempenioIcdList.add(desempenioIcd);
+                                            Icds icds = new Icds();
+                                            icds.setIcdId(UtilsFirebase.convert(desempenioSnapshot.child("IcdId").getValue(), 0));
+                                            icds.setTipoId(UtilsFirebase.convert(desempenioSnapshot.child("IcdTipoId").getValue(), 0));
+                                            icds.setTitulo(UtilsFirebase.convert(desempenioSnapshot.child("IcdTitulo").getValue(), ""));
+                                            icdsList.add(icds);
+                                            SesionEventoCompetenciaDesempenioIcd sesionEventoCompetenciaDesempenioIcd = new SesionEventoCompetenciaDesempenioIcd();
+                                            sesionEventoCompetenciaDesempenioIcd.setDesempenioIcdId(UtilsFirebase.convert(desempenioSnapshot.child("DesempenioIcdId").getValue(), 0));
+                                            sesionEventoCompetenciaDesempenioIcd.setSesionAprendizajeId(sesionAprendizaje.getSesionAprendizajeId());
+                                            sesionEventoCompetenciaDesempenioIcdList.add(sesionEventoCompetenciaDesempenioIcd);
+                                        }
+                                    }
+
+
+
                                 }
-
-
-
                             }
+
+                            DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                            Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                                @Override
+                                public void execute(DatabaseWrapper databaseWrapper) {
+                                    TransaccionUtils.fastStoreListInsert(SesionAprendizaje.class, sesionAprendizajeList, databaseWrapper, false);
+                                    TransaccionUtils.fastStoreListInsert(DesempenioIcd.class, desempenioIcdList, databaseWrapper, false);
+                                    TransaccionUtils.fastStoreListInsert(Icds.class, icdsList, databaseWrapper, false);
+                                    TransaccionUtils.fastStoreListInsert(SesionEventoCompetenciaDesempenioIcd.class, sesionEventoCompetenciaDesempenioIcdList, databaseWrapper, false);
+                                }
+                            }).success(new Transaction.Success() {
+                                @Override
+                                public void onSuccess(@NonNull Transaction transaction) {
+                                    callback.onLoad(true);
+                                }
+                            }).error(new Transaction.Error() {
+                                @Override
+                                public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                                    error.printStackTrace();
+                                    callback.onLoad(false);
+                                }
+                            }).build();
+
+                            transaction.execute();
                         }
+                    }).success(new Transaction.Success() {
+                        @Override
+                        public void onSuccess(@NonNull Transaction transaction) {
+                            callback.onLoad(true);
+                        }
+                    }).error(new Transaction.Error() {
+                        @Override
+                        public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                            error.printStackTrace();
+                            callback.onLoad(false);
+                        }
+                    }).build();
 
-                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
-                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-                            @Override
-                            public void execute(DatabaseWrapper databaseWrapper) {
-                                TransaccionUtils.fastStoreListInsert(SesionAprendizaje.class, sesionAprendizajeList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(DesempenioIcd.class, desempenioIcdList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(Icds.class, icdsList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(SesionEventoCompetenciaDesempenioIcd.class, sesionEventoCompetenciaDesempenioIcdList, databaseWrapper, false);
-                            }
-                        }).success(new Transaction.Success() {
-                            @Override
-                            public void onSuccess(@NonNull Transaction transaction) {
-                                callback.onLoad(true);
-                            }
-                        }).error(new Transaction.Error() {
-                            @Override
-                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
-                                error.printStackTrace();
-                                callback.onLoad(false);
-                            }
-                        }).build();
+                    transaction.execute();
+                }
 
-                        transaction.execute();
-                    }
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        callback.onLoad(false);
-                    }
-                });
-    }
-
-    @Override
-    public void saveToogleUnidad(UnidadAprendizajeUi unidadAprendizajeUi) {
-
-        UnidadAprendizaje unidadAprendizaje = SQLite.select()
-                .from(UnidadAprendizaje.class)
-                .where(UnidadAprendizaje_Table.unidadAprendizajeId.eq(unidadAprendizajeUi.getUnidadAprendizajeId()))
-                .querySingle();
-        if(unidadAprendizaje!=null) {
-            unidadAprendizaje.setToogle(unidadAprendizajeUi.isToogle());
-            unidadAprendizaje.save();
-        }
-
+            @Override
+            public void onFailure(Throwable t) {
+                callback.onLoad(false);
+                Log.d(TAG,"onFailure");
+            }
+        });
+        return retrofitCancel;
     }
 
 }

@@ -444,6 +444,8 @@ public class InstrumentoRepositoryImpl implements InstrumentoRepository {
             encuestaUi.setNombre(instrumentoEncuestaEval.getNombre());
             encuestaUi.setCantidadPregunta(instrumentoEncuestaEval.getCantPregunta());
             encuestaUi.setPuntos(instrumentoEncuestaEval.getPuntaje());
+            encuestaUi.setUrlEncuesta(instrumentoEncuestaEval.getUrlEncuesta());
+            encuestaUi.setUrlResultado(instrumentoEncuestaEval.getUrlResultado());
 
             if(instrumentoEncuestaEval.getTipoInstrumentoId() == 1 && instrumentoEncuestaEval.getEstadoId() == 410){
                 encuestaUi.setVerResultados(true);

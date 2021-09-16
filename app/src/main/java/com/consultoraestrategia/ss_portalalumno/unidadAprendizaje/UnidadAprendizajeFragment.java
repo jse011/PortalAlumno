@@ -159,6 +159,11 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     }
 
     @Override
+    public void removerItem(UnidadAprendizajeUi unidadAprendizajeUi) {
+        listAdapter.remover(unidadAprendizajeUi);
+    }
+
+    @Override
     public void onClickUnidadAprendizaje(UnidadAprendizajeUi unidadAprendizajeUi) {
         presenter.onClickUnidadAprendizaje(unidadAprendizajeUi);
     }

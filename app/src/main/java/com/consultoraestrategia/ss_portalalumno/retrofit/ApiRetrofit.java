@@ -22,6 +22,7 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroCha
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroIdDrive;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroInstrumentoEncustaAlumno;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroLogin;
+import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroPortalEvaFirebase;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroSalaVirtual;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.ParametroUpdateCalenPeriodo;
 import com.consultoraestrategia.ss_portalalumno.retrofit.parametros.UsuarioAdminService;
@@ -29,6 +30,7 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiRespons
 import com.consultoraestrategia.ss_portalalumno.retrofit.service.Service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
@@ -234,6 +236,94 @@ public class ApiRetrofit {
         Log.d(TAG, "apiRequestBody : " + representacionJSON);
         return service.getInstrumentoEncuestaEval(apiRequestBody);
     }
+
+    public Call<RestApiResponse<JsonObject>> getSesionAprendizajedAlumno(int silaboEventoId, int tipoPeriodoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setTipoPeriodoId(tipoPeriodoId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getSesionAprendizajedAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<JsonObject>> getUnidadAprendizajeAlumno(int silaboEventoId, int tipoPeriodoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setTipoPeriodoId(tipoPeriodoId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getUnidadAprendizajeAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<JsonObject>> getPersonaAlumno(int silaboEventoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getPersonaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<JsonObject>> getActividadColaborativaAlumno(int silaboEventoId, int unidadAprendizajeid, int sesionAprendizajeId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeid);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getActividadColaborativaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<JsonObject>> getPreguntasEvaluacionAlumno(int silaboEventoId, int unidadAprendizajeid, int sesionAprendizajeId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeid);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getPreguntasEvaluacionAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<JsonObject>> getPreguntasAlumno(int silaboEventoId, int unidadAprendizajeid, int sesionAprendizajeId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeid);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getPreguntasAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<JsonObject>> getActividadesAlumno(int silaboEventoId, int unidadAprendizajeid, int sesionAprendizajeId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeid);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getActividadesAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+    }
+
 
     public class ApiRequestBody<T extends Parameters>{
         @SerializedName("interface")

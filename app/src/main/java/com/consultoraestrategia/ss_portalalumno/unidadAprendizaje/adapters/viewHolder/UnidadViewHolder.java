@@ -87,15 +87,20 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
             txtVerMas.setVisibility(View.GONE);
         }
 
-        if(!unidadAprendizaje.isVisibleVerMas()){
-            setListColumanas();
-            //setViewMore();
-        }else if(unidadAprendizaje.isToogle()){
-            setListColumanas();
-            setViewLess();
+        if(unidadAprendizaje.isToogle()){
+            if(unidadAprendizaje.isVisibleVerMas()){
+                setListColumanas();
+                setViewLess();
+            }else {
+                setListHorizontal();
+            }
         }else {
-            setListHorizontal();
-            setViewMore();
+            if(unidadAprendizaje.isVisibleVerMas()){
+                setListHorizontal();
+                setViewMore();
+            }else {
+                setListHorizontal();
+            }
         }
     }
 

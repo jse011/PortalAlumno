@@ -39,8 +39,12 @@ import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBActividadAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBRecursos;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
+import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
+import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
+import com.consultoraestrategia.ss_portalalumno.util.JSONFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
@@ -50,6 +54,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonObject;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.Method;
@@ -62,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kike on 08/02/2018.
@@ -114,114 +120,119 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
 
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
 
-        mDatabase.child("/AV_Actividad/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/sesid_"+sesionAprendizajeId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        List<ActividadAprendizaje> actividadAprendizajeList = new ArrayList<>();
-                        List<Tipos> tiposList = new ArrayList<>();
-                        List<RecursoDidacticoEventoC> recursoDidacticoEventoList = new ArrayList<>();
-                        List<RecursoReferenciaC> recursoReferenciaCList = new ArrayList<>();
-                        List<Archivo> archivoList = new ArrayList<>();
-                        List<RecursoArchivo> recursoArchivoList = new ArrayList<>();
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getActividadesAlumno(silaboEventoId, unidadAprendizajeId, sesionAprendizajeId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
+            @Override
+            public void onResponse(JsonObject response) {
+                if(response==null){
+                    callbackSimple.onLoad(false);
+                }else {
+                    List<ActividadAprendizaje> actividadAprendizajeList = new ArrayList<>();
+                    List<Tipos> tiposList = new ArrayList<>();
+                    List<RecursoDidacticoEventoC> recursoDidacticoEventoList = new ArrayList<>();
+                    List<RecursoReferenciaC> recursoReferenciaCList = new ArrayList<>();
+                    List<Archivo> archivoList = new ArrayList<>();
+                    List<RecursoArchivo> recursoArchivoList = new ArrayList<>();
 
-                        for (DataSnapshot actividadSnapshot : dataSnapshot.getChildren()){
+                    for (JSONFirebase actividadSnapshot : JSONFirebase.d(response).getChildren()){
 
 
 
 
-                            ActividadAprendizaje actividadAprendizaje = new ActividadAprendizaje();
-                            actividadAprendizaje.setActividad(UtilsFirebase.convert(actividadSnapshot.child("Actividad").getValue(),""));
-                            actividadAprendizaje.setActividadAprendizajeId(UtilsFirebase.convert(actividadSnapshot.child("ActividadAprendizajeId").getValue(),0));
-                            actividadAprendizaje.setDescripcionActividad(UtilsFirebase.convert(actividadSnapshot.child("DescripcionActividad").getValue(),""));
-                            actividadAprendizaje.setSesionAprendizajeId(UtilsFirebase.convert(actividadSnapshot.child("SesionAprendizajeId").getValue(),0));
-                            actividadAprendizaje.setTipoActividadId(UtilsFirebase.convert(actividadSnapshot.child("TipoActividadId").getValue(),0));
-                            actividadAprendizaje.setInstrumentoEvalId(UtilsFirebase.convert(actividadSnapshot.child("InstrumentoEvalId").getValue(),0));
-                            actividadAprendizajeList.add(actividadAprendizaje);
-                            Tipos tipos = new Tipos();
-                            tipos.setTipoId(actividadAprendizaje.getTipoActividadId());
-                            tipos.setNombre(UtilsFirebase.convert(actividadSnapshot.child("TipoActividad").getValue(),""));
-                            tiposList.add(tipos);
+                        ActividadAprendizaje actividadAprendizaje = new ActividadAprendizaje();
+                        actividadAprendizaje.setActividad(UtilsFirebase.convert(actividadSnapshot.child("Actividad").getValue(),""));
+                        actividadAprendizaje.setActividadAprendizajeId(UtilsFirebase.convert(actividadSnapshot.child("ActividadAprendizajeId").getValue(),0));
+                        actividadAprendizaje.setDescripcionActividad(UtilsFirebase.convert(actividadSnapshot.child("DescripcionActividad").getValue(),""));
+                        actividadAprendizaje.setSesionAprendizajeId(UtilsFirebase.convert(actividadSnapshot.child("SesionAprendizajeId").getValue(),0));
+                        actividadAprendizaje.setTipoActividadId(UtilsFirebase.convert(actividadSnapshot.child("TipoActividadId").getValue(),0));
+                        actividadAprendizaje.setInstrumentoEvalId(UtilsFirebase.convert(actividadSnapshot.child("InstrumentoEvalId").getValue(),0));
+                        actividadAprendizajeList.add(actividadAprendizaje);
+                        Tipos tipos = new Tipos();
+                        tipos.setTipoId(actividadAprendizaje.getTipoActividadId());
+                        tipos.setNombre(UtilsFirebase.convert(actividadSnapshot.child("TipoActividad").getValue(),""));
+                        tiposList.add(tipos);
 
-                            if(actividadSnapshot.child("RecursoActividad").exists()){
-                                for (DataSnapshot recusoActividadSnapshot : actividadSnapshot.child("RecursoActividad").getChildren()){
-                                    getRecursosFirebase(actividadAprendizaje.getActividadAprendizajeId(),recusoActividadSnapshot, recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
-                                }
+                        if(actividadSnapshot.child("RecursoActividad").exists()){
+                            for (JSONFirebase recusoActividadSnapshot : actividadSnapshot.child("RecursoActividad").getChildren()){
+                                getRecursosFirebase(actividadAprendizaje.getActividadAprendizajeId(),recusoActividadSnapshot, recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
                             }
+                        }
 
-                            if(actividadSnapshot.child("SubActividad").exists()){
-                                for (DataSnapshot subActividadSnapshot : actividadSnapshot.child("SubActividad").getChildren()){
+                        if(actividadSnapshot.child("SubActividad").exists()){
+                            for (JSONFirebase subActividadSnapshot : actividadSnapshot.child("SubActividad").getChildren()){
 
-                                    ActividadAprendizaje subActividad = new ActividadAprendizaje();
-                                    subActividad.setActividad(UtilsFirebase.convert(subActividadSnapshot.child("Actividad").getValue(),""));
-                                    subActividad.setActividadAprendizajeId(UtilsFirebase.convert(subActividadSnapshot.child("ActividadAprendizajeId").getValue(),0));
-                                    subActividad.setDescripcionActividad(UtilsFirebase.convert(subActividadSnapshot.child("DescripcionActividad").getValue(),""));
-                                    subActividad.setParentId(actividadAprendizaje.getActividadAprendizajeId());
-                                    subActividad.setInstrumentoEvalId(UtilsFirebase.convert(subActividadSnapshot.child("InstrumentoEvalId").getValue(),0));
-                                    actividadAprendizajeList.add(subActividad);
+                                ActividadAprendizaje subActividad = new ActividadAprendizaje();
+                                subActividad.setActividad(UtilsFirebase.convert(subActividadSnapshot.child("Actividad").getValue(),""));
+                                subActividad.setActividadAprendizajeId(UtilsFirebase.convert(subActividadSnapshot.child("ActividadAprendizajeId").getValue(),0));
+                                subActividad.setDescripcionActividad(UtilsFirebase.convert(subActividadSnapshot.child("DescripcionActividad").getValue(),""));
+                                subActividad.setParentId(actividadAprendizaje.getActividadAprendizajeId());
+                                subActividad.setInstrumentoEvalId(UtilsFirebase.convert(subActividadSnapshot.child("InstrumentoEvalId").getValue(),0));
+                                actividadAprendizajeList.add(subActividad);
 
-                                    if(subActividadSnapshot.child("RecursoActividad").exists()){
-                                        for (DataSnapshot recusoActividadSnapshot : subActividadSnapshot.child("RecursoActividad").getChildren()){
-                                            getRecursosFirebase(subActividad.getActividadAprendizajeId(),recusoActividadSnapshot, recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
-                                        }
+                                if(subActividadSnapshot.child("RecursoActividad").exists()){
+                                    for (JSONFirebase recusoActividadSnapshot : subActividadSnapshot.child("RecursoActividad").getChildren()){
+                                        getRecursosFirebase(subActividad.getActividadAprendizajeId(),recusoActividadSnapshot, recursoDidacticoEventoList, recursoReferenciaCList, archivoList, recursoArchivoList);
                                     }
                                 }
                             }
                         }
-
-                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
-                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-                            @Override
-                            public void execute(DatabaseWrapper databaseWrapper) {
-
-                                RecursoReferenciaC result = SQLite.select(Method.max(RecursoReferenciaC_Table.recursoReferenciaId).as("recursoReferenciaId")).from(RecursoReferenciaC.class)
-                                        .querySingle();
-
-                                int max = result!=null?result.getRecursoReferenciaId()+1:1;
-                                for(RecursoReferenciaC recursoReferenciaC: recursoReferenciaCList){
-                                    max++;
-                                    recursoReferenciaC.setRecursoReferenciaId(max);
-                                }
-
-                                List<Integer> actividadAprendizajeIdList = new ArrayList<>();
-                                for (ActividadAprendizaje actividadAprendizaje : actividadAprendizajeList){
-                                    actividadAprendizajeIdList.add(actividadAprendizaje.getActividadAprendizajeId());
-                                }
-
-                                //TransaccionUtils.deleteTable(RecursoDidacticoEventoC.class, RecursoDidacticoEventoC_Table.recursoDidacticoId.in(recursoIdList));
-                                TransaccionUtils.deleteTable(RecursoReferenciaC.class, RecursoReferenciaC_Table.actividadAprendizajeId.in(actividadAprendizajeIdList));
-                                //TransaccionUtils.deleteTable(RecursoArchivo.class, RecursoArchivo_Table.recursoDidacticoId.in(recursoIdList));
-                                TransaccionUtils.deleteTable(ActividadAprendizaje.class, ActividadAprendizaje_Table.sesionAprendizajeId.eq(sesionAprendizajeId));
-
-                                TransaccionUtils.fastStoreListInsert(ActividadAprendizaje.class, actividadAprendizajeList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(Tipos.class, tiposList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(RecursoDidacticoEventoC.class, recursoDidacticoEventoList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(RecursoReferenciaC.class, recursoReferenciaCList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(Archivo.class, archivoList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(RecursoArchivo.class, recursoArchivoList, databaseWrapper, false);
-                            }
-                        }).success(new Transaction.Success() {
-                            @Override
-                            public void onSuccess(@NonNull Transaction transaction) {
-                                callbackSimple.onLoad(true);
-                            }
-                        }).error(new Transaction.Error() {
-                            @Override
-                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
-                                error.printStackTrace();
-                                callbackSimple.onLoad(false);
-                            }
-                        }).build();
-
-                        transaction.execute();
-
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        callbackSimple.onLoad(false);
-                    }
-                });
+                    DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                    Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                        @Override
+                        public void execute(DatabaseWrapper databaseWrapper) {
+
+                            RecursoReferenciaC result = SQLite.select(Method.max(RecursoReferenciaC_Table.recursoReferenciaId).as("recursoReferenciaId")).from(RecursoReferenciaC.class)
+                                    .querySingle();
+
+                            int max = result!=null?result.getRecursoReferenciaId()+1:1;
+                            for(RecursoReferenciaC recursoReferenciaC: recursoReferenciaCList){
+                                max++;
+                                recursoReferenciaC.setRecursoReferenciaId(max);
+                            }
+
+                            List<Integer> actividadAprendizajeIdList = new ArrayList<>();
+                            for (ActividadAprendizaje actividadAprendizaje : actividadAprendizajeList){
+                                actividadAprendizajeIdList.add(actividadAprendizaje.getActividadAprendizajeId());
+                            }
+
+                            //TransaccionUtils.deleteTable(RecursoDidacticoEventoC.class, RecursoDidacticoEventoC_Table.recursoDidacticoId.in(recursoIdList));
+                            TransaccionUtils.deleteTable(RecursoReferenciaC.class, RecursoReferenciaC_Table.actividadAprendizajeId.in(actividadAprendizajeIdList));
+                            //TransaccionUtils.deleteTable(RecursoArchivo.class, RecursoArchivo_Table.recursoDidacticoId.in(recursoIdList));
+                            TransaccionUtils.deleteTable(ActividadAprendizaje.class, ActividadAprendizaje_Table.sesionAprendizajeId.eq(sesionAprendizajeId));
+
+                            TransaccionUtils.fastStoreListInsert(ActividadAprendizaje.class, actividadAprendizajeList, databaseWrapper, false);
+                            TransaccionUtils.fastStoreListInsert(Tipos.class, tiposList, databaseWrapper, false);
+                            TransaccionUtils.fastStoreListInsert(RecursoDidacticoEventoC.class, recursoDidacticoEventoList, databaseWrapper, false);
+                            TransaccionUtils.fastStoreListInsert(RecursoReferenciaC.class, recursoReferenciaCList, databaseWrapper, false);
+                            TransaccionUtils.fastStoreListInsert(Archivo.class, archivoList, databaseWrapper, false);
+                            TransaccionUtils.fastStoreListInsert(RecursoArchivo.class, recursoArchivoList, databaseWrapper, false);
+                        }
+                    }).success(new Transaction.Success() {
+                        @Override
+                        public void onSuccess(@NonNull Transaction transaction) {
+                            callbackSimple.onLoad(true);
+                        }
+                    }).error(new Transaction.Error() {
+                        @Override
+                        public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                            error.printStackTrace();
+                            callbackSimple.onLoad(false);
+                        }
+                    }).build();
+
+                    transaction.execute();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callbackSimple.onLoad(false);
+            }
+        });
 
     }
 
@@ -231,7 +242,7 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
     }
 
 
-    private void getRecursosFirebase(int actividadAprendizajeId, DataSnapshot dataSnapshot, List<RecursoDidacticoEventoC> recursoDidacticoEventoList, List<RecursoReferenciaC> recursoReferenciaCList, List<Archivo> archivoList, List<RecursoArchivo> recursoArchivoList){
+    private void getRecursosFirebase(int actividadAprendizajeId, JSONFirebase dataSnapshot, List<RecursoDidacticoEventoC> recursoDidacticoEventoList, List<RecursoReferenciaC> recursoReferenciaCList, List<Archivo> archivoList, List<RecursoArchivo> recursoArchivoList){
 
             RecursoDidacticoEventoC recursoDidacticoEventoC = new RecursoDidacticoEventoC();
             recursoDidacticoEventoC.setRecursoDidacticoId(UtilsFirebase.convert(dataSnapshot.child("RecursoDidacticoId").getValue(),""));

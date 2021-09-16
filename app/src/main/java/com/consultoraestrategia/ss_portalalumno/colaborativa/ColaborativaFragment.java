@@ -45,6 +45,8 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
     RecyclerView rcColaborativaGrabaciones;
     private ColaborativaAdapter adapterServidor;
     private ColaborativaAdapter adapterGrabaciones;
+    @BindView(R.id.conten_empty)
+    ViewGroup contenEmpty;
 
     @Override
     protected String getLogTag() {
@@ -90,6 +92,22 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
         adapterGrabaciones = new ColaborativaAdapter(this);
         rcColaborativaGrabaciones.setLayoutManager(new LinearLayoutManager(getContext()));
         rcColaborativaGrabaciones.setAdapter(adapterGrabaciones);
+
+        contenEmpty.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                validarSiEstaVacio();
+            }
+        }, 6000);
+    }
+
+    private void validarSiEstaVacio(){
+        if(adapter.getItemCount()==0&&adapterServidor.getItemCount()==0&&adapterGrabaciones.getItemCount()==0)
+        {
+            if(contenEmpty!=null)contenEmpty.setVisibility(View.VISIBLE);
+        } else{
+            if(contenEmpty!=null)contenEmpty.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -150,6 +168,7 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
     @Override
     public void setListColaborativa(List<ColaborativaUi> colaborativaUiList) {
         adapter.setListColaborativa(colaborativaUiList);
+        validarSiEstaVacio();
     }
 
     @Override
@@ -165,10 +184,19 @@ public class ColaborativaFragment extends BaseFragment<ColaborativaView, Colabor
     @Override
     public void setListGrabacionesColaborativa(List<ColaborativaUi> colaborativaUiList) {
         adapterGrabaciones.setListColaborativa(colaborativaUiList);
+        validarSiEstaVacio();
     }
 
     @Override
     public void setListColaborativaServidor(List<ColaborativaUi> colaborativaUiList) {
         adapterServidor.setListColaborativa(colaborativaUiList);
+        validarSiEstaVacio();
+    }
+
+    @Override
+    public void onDestroyView() {
+        contenEmpty=null;
+        super.onDestroyView();
+
     }
 }

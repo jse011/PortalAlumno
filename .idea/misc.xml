@@ -3,9 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/actividades_fragment.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tabs_curso.xml" value="0.11068895643363728" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_encuesta_sesion.xml" value="0.11068895643363728" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_colaborativa.xml" value="0.18432971014492755" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_instrumento.xml" value="0.18659420289855072" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_pregunta.xml" value="0.20520833333333333" />
       </map>
     </option>
   </component>

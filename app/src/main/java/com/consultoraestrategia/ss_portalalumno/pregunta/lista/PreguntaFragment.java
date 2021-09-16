@@ -42,6 +42,8 @@ public class PreguntaFragment extends BaseFragment<PreguntaView, PreguntaPresent
     ConstraintLayout root;
     @BindView(R.id.progressBar7)
     ProgressBar progressBar7;
+    @BindView(R.id.conten_empty)
+    ViewGroup contenEmpty;
     private PreguntasAdapter preguntaAdapter;
 
     @Override
@@ -80,6 +82,23 @@ public class PreguntaFragment extends BaseFragment<PreguntaView, PreguntaPresent
         rcPregunta.setAdapter(preguntaAdapter);
         rcPregunta.setLayoutManager(new LinearLayoutManager(getContext()));
         ((SimpleItemAnimator) rcPregunta.getItemAnimator()).setSupportsChangeAnimations(false);
+
+        contenEmpty.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                validarSiEstaVacio();
+            }
+        }, 6000);
+    }
+
+    private void validarSiEstaVacio(){
+        if(preguntaAdapter.getItemCount()==0){
+            if(contenEmpty!=null)contenEmpty.setVisibility(View.VISIBLE);
+        }
+        else{
+            if(contenEmpty!=null)contenEmpty.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -140,16 +159,19 @@ public class PreguntaFragment extends BaseFragment<PreguntaView, PreguntaPresent
     @Override
     public void updatePreguntaListView(PreguntaUi preguntaUi) {
         preguntaAdapter.updateOrSave(preguntaUi);
+        validarSiEstaVacio();
     }
 
     @Override
     public void removePreguntaListView(PreguntaUi preguntaUi) {
         preguntaAdapter.remover(preguntaUi);
+        validarSiEstaVacio();
     }
 
     @Override
     public void clearAlumnoList() {
         preguntaAdapter.clear();
+        validarSiEstaVacio();
     }
 
     @Override
@@ -161,11 +183,18 @@ public class PreguntaFragment extends BaseFragment<PreguntaView, PreguntaPresent
     @Override
     public void setListPregunta(List<PreguntaUi> preguntaUiList) {
         preguntaAdapter.setList(preguntaUiList);
+        validarSiEstaVacio();
     }
 
     @Override
     public void onClickPregunta(PreguntaUi preguntaUi) {
         Log.d(getTag(), "onClickPregunta");
         presenter.onClickPregunta(preguntaUi);
+    }
+
+    @Override
+    public void onDestroyView() {
+        contenEmpty=null;
+        super.onDestroyView();
     }
 }

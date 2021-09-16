@@ -48,6 +48,8 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     @BindView(R.id.rc_lista_encuesta)
     RecyclerView rcListaEncuesta;
     InstrumentoEncuestaAdapter adapterEncuesta;
+    @BindView(R.id.conten_empty)
+    ViewGroup contenEmpty;
 
     @Override
     protected String getLogTag() {
@@ -96,8 +98,22 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
         rcListaEncuesta.setLayoutManager(new LinearLayoutManager(getContext()));
         ((SimpleItemAnimator) rcListaEncuesta.getItemAnimator()).setSupportsChangeAnimations(false);
 
+        contenEmpty.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                validarSiEstaVacio();
+            }
+        }, 6000);
     }
 
+    private void validarSiEstaVacio(){
+        if(adapter.getItemCount()==0&&adapterEncuesta.getItemCount()==0){
+            if(contenEmpty!=null)contenEmpty.setVisibility(View.VISIBLE);
+        } else{
+            if(contenEmpty!=null)contenEmpty.setVisibility(View.GONE);
+        }
+
+    }
     @Override
     protected ProgressBar getProgressBar() {
         return progressBar14;
@@ -131,6 +147,7 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     @Override
     public void showListInstrumento(List<InstrumentoUi> instrumentoUiList) {
         adapter.setList(instrumentoUiList);
+        validarSiEstaVacio();
     }
 
     @Override
@@ -141,6 +158,7 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
     @Override
     public void showListaInstrumentoEncuesta(List<EncuestaUi> encuestaUiList) {
         adapterEncuesta.setList(encuestaUiList);
+        validarSiEstaVacio();
     }
 
     @Override
@@ -175,11 +193,27 @@ public class InstrumentoListaFragment extends BaseFragment<InstrumentoListaView,
 
     @Override
     public void onClickEncuesta(EncuestaUi instrumentoUi) {
-
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(instrumentoUi.getUrlEncuesta())));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Error al abrir el vínculo", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onClickEncuestaVerResultados(EncuestaUi instrumentoUi) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(instrumentoUi.getUrlResultado())));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Error al abrir el vínculo", Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    @Override
+    public void onDestroyView() {
+        contenEmpty=null;
+        super.onDestroyView();
     }
 }

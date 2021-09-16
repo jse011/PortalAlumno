@@ -599,6 +599,11 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         tabFamiliaView = null;
     }
 
+    @Override
+    public void onErrotCuentaFirebase() {
+        if(view!=null)view.showMessage("User is signed out");
+    }
+
     boolean actualizarUnavezTipoNota;
     @Override
     public void onStart() {
