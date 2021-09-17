@@ -34,7 +34,6 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.pregunta.adapter.RespuestaAdapter;
 import com.consultoraestrategia.ss_portalalumno.pregunta.data.source.PreguntaRepositorio;
 import com.consultoraestrategia.ss_portalalumno.pregunta.data.source.PreguntaRepositorioImpl;

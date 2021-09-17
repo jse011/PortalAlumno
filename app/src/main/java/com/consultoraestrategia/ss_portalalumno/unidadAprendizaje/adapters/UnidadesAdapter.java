@@ -29,12 +29,12 @@ public class UnidadesAdapter extends RecyclerView.Adapter<UnidadViewHolder>  {
     @NonNull
     @Override
     public UnidadViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new UnidadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_unidades, parent, false));
+        return new UnidadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_unidades, parent, false),unidadListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UnidadViewHolder holder, int position) {
-        holder.bind(unidadAprendizajes.get(position),color,unidadListener);
+        holder.bind(unidadAprendizajes.get(position),color);
     }
 
     @Override

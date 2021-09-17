@@ -49,6 +49,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.OrderBy;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
@@ -120,13 +121,16 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
             unidad.setDesafio(unidadAprendizaje.getDesafio());
             unidad.setReto(unidadAprendizaje.getReto());
             unidad.setToogle(unidadAprendizaje.isToogle());
+            List<OrderBy> orderByList = new ArrayList<>();
+            orderByList.add(SesionAprendizaje_Table.fechaEjecucion.desc());
+            orderByList.add(SesionAprendizaje_Table.nroSesion.desc());
 
             List<SesionAprendizaje> sesionAprendizajes = SQLite.select()
                     .from(SesionAprendizaje.class)
                     .where(SesionAprendizaje_Table.unidadAprendizajeId.eq(unidadAprendizaje.getUnidadAprendizajeId()))
                     .and(SesionAprendizaje_Table.rolId.eq(6))
                     .and(SesionAprendizaje_Table.estadoId.in(SesionAprendizaje.CREADO_ESTADO,SesionAprendizaje.AUTORIZADO_ESTADO))//297
-                    .orderBy(SesionAprendizaje_Table.fechaEjecucion.desc())
+                    .orderByAll(orderByList)
                     .queryList();
 
             List<SesionAprendizajeUi>sesionAprendizajeUiList= new ArrayList<>();

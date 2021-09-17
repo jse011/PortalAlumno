@@ -29,6 +29,8 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioEstadoFileU;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioTipoFileU;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
+import com.consultoraestrategia.ss_portalalumno.util.LinkUtils;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
 import butterknife.BindView;
@@ -81,7 +83,7 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
 
         setupEstado(repositorioFileUi.getEstadoFileU());
         setupIcono(repositorioFileUi.getTipoFileU());
-
+        LinkUtils.autoLink(txtdescripcion, null);
         try {
             cardView.setCardBackgroundColor(Color.parseColor(((RecursosUI)repositorioFileUi).getColor1()));
         }catch (Exception e){
@@ -196,7 +198,13 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
     }
 
     private void onClickArchivo() {
-        listener.onClickArchivo(repositorioFileUi);
+        if(repositorioFileUi.getTipoFileU() != RepositorioTipoFileU.VINCULO){
+            listener.onClickArchivo(repositorioFileUi);
+        }else {
+            LinkUtils.SensibleLinkMovementMethod sensibleLinkMovementMethod = (LinkUtils.SensibleLinkMovementMethod)txtdescripcion.getMovementMethod();
+            listener.onClickOpenLinkArchivo(repositorioFileUi, sensibleLinkMovementMethod.getClickedLink());
+
+        }
     }
 
     private void onClickDownload() {

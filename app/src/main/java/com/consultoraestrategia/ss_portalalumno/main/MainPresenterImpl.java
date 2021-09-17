@@ -600,7 +600,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     }
 
     @Override
-    public void onErrotCuentaFirebase() {
+    public void onErrorCuentaFirebase() {
         if(view!=null)view.showMessage("User is signed out");
     }
 
@@ -613,8 +613,8 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
             if(view!=null)view.showNuevaversion(nuevaVersionUi);
             nuevaVersionUi = null;
         }
-        String usuarioFirebase = firebaseNode + "_" + (!TextUtils.isEmpty(usuario)?usuario.replaceAll(" ","_"):usuario) +"@gmail.com";
-        if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
+        //String usuarioFirebase = firebaseNode + "_" + (!TextUtils.isEmpty(usuario)?usuario.replaceAll(" ","_"):usuario) +"@gmail.com";
+        //if(view!=null)view.validateFirebase(usuarioFirebase, usuarioFirebase);
         if(!actualizarUnavezTipoNota){
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override

@@ -9,10 +9,10 @@
     android:fitsSystemWindows="true"
     tools:context=".tabsCurso.view.activities.TabsCursoActivity">
 
-    <FrameLayout
+    <!--<FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/pattern_repeat"/>
+        android:background="@drawable/pattern_repeat"/>-->
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -49,7 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="32dp"
                     android:layout_marginBottom="8dp"
                     android:ellipsize="marquee"
@@ -93,7 +93,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="24dp"
                     android:layout_marginEnd="40dp"
                     android:orientation="horizontal"
                     android:textColor="@color/md_white_1000"
@@ -126,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="6dp"
                 app:tabIndicatorColor="@color/md_white_1000"
                 app:tabMaxWidth="0dp"
                 app:tabGravity="fill"
@@ -159,7 +159,6 @@
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="-16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.cardview.widget.CardView
@@ -209,7 +208,7 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/msg_error"
             app:layout_constraintVertical_bias="0.0">
@@ -219,7 +218,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerPeriodo"
             android:layout_width="@dimen/width_tab_cal_periodo"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

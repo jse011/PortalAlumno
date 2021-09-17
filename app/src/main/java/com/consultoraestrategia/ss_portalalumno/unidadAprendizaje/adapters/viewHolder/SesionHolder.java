@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.view
 
 import android.content.DialogInterface;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -76,6 +77,7 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
 
         txttiempo.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.md_blue_700));
         txttiempo_medida.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.md_blue_700));
+        txt_fechasesion.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.md_blue_700));
         //endregion
 
         txt_numsesion.setText(sesionAprendizaje.getNroSesion()+"");
@@ -133,6 +135,7 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
             cardvSesiones.setCardBackgroundColor(colorEstado);
             txttiempo_medida.setTextColor(colorEstado);
             txttiempo.setTextColor(colorEstado);
+            txt_fechasesion.setTextColor(colorEstado);
             Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
             circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
             cantRecursos.setBackground(circle);
@@ -147,6 +150,7 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
             cardvSesiones.setCardBackgroundColor(colorEstado);
             txttiempo_medida.setTextColor(colorEstado);
             txttiempo.setTextColor(colorEstado);
+            txt_fechasesion.setTextColor(colorEstado);
             Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
             circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
             cantRecursos.setBackground(circle);
@@ -163,11 +167,47 @@ public class SesionHolder extends RecyclerView.ViewHolder implements View.OnClic
             cardvSesiones.setCardBackgroundColor(colorEstado);
             txttiempo_medida.setTextColor(colorEstado);
             txttiempo.setTextColor(colorEstado);
+            txt_fechasesion.setTextColor(colorEstado);
             Drawable circle = ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_circle_unidades);
             circle.mutate().setColorFilter(colorEstado, PorterDuff.Mode.SRC_ATOP);
             cantRecursos.setBackground(circle);
         }
 
+    }
+
+    public static class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int spanCount;
+        private int spacing;
+        private boolean includeEdge;
+
+        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+            this.spanCount = spanCount;
+            this.spacing = spacing;
+            this.includeEdge = includeEdge;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view); // item position
+            int column = position % spanCount; // item column
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+
+                if (position < spanCount) { // top edge
+                    outRect.top = spacing;
+                }
+                outRect.bottom = spacing; // item bottom
+            } else {
+                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+                if (position >= spanCount) {
+                    outRect.top = spacing; // item top
+                }
+            }
+        }
     }
 
 }

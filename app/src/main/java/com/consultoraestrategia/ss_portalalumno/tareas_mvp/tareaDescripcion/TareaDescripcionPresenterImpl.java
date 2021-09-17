@@ -399,18 +399,19 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
                     }
 
                 }
-                compressImage.execute(fileList, new CompressImage.Callback() {
-                    @Override
-                    public void onload(boolean success, List<File> mFileList) {
-                        if(!success){
-                            Log.d(getTag(), "Error Compress");
+                if(view!=null){
+                    compressImage.execute(fileList, new CompressImage.Callback() {
+                        @Override
+                        public void onload(boolean success, List<File> mFileList) {
+                            if(!success){
+                                Log.d(getTag(), "Error Compress");
+                            }
+                            for (File file : mFileList){
+                                convertFileTareArchivoUi(file);
+                            }
                         }
-                        for (File file : mFileList){
-                            convertFileTareArchivoUi(file);
-                        }
-                    }
-                });
-
+                    });
+                }
             }
         }
     }
@@ -526,7 +527,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
     @Override
     public void onBtnEntregarClicked() {
         boolean state = false;
-        for (TareaArchivoUi tareaArchivoUi : tareasUIList){
+        for (TareaArchivoUi tareaArchivoUi : new ArrayList<>(tareasUIList)){
             if(tareaArchivoUi.isDisabled()){
                 state=true;
                 if(view!=null)view.showMessageTop("Subida de archivos en pausa, para la entrega eliminar (X) los archivos en pausa");
@@ -555,7 +556,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
                         if(!disabledEntregado){
                             if(view!=null)view.diabledButtons();
 
-                            for (TareaArchivoUi tareaArchivoUi : tareasUIList){
+                            for (TareaArchivoUi tareaArchivoUi : new ArrayList<>(tareasUIList)){
                                 tareaArchivoUi.setEntregado(true);
                                 if(view!=null)view.update(tareaArchivoUi);
                             }
@@ -658,8 +659,10 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
 
             tareaArchivoUi.setFile(uri);
             tareasUIList.add(tareaArchivoUi);
-            if(view!=null)view.addTareaArchivo(tareaArchivoUi);
-            uploadArchivoStorageFB(tareaArchivoUi);
+            if(view!=null){
+                view.addTareaArchivo(tareaArchivoUi);
+                uploadArchivoStorageFB(tareaArchivoUi);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -677,6 +680,16 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
         tareasUIList.add(tareaArchivoUi);
         if(view!=null)view.addTareaArchivo(tareaArchivoUi);
         uploadLinkFB(tareaArchivoUi);
+    }
+
+    @Override
+    public void onClickOpenLink(TareaArchivoUi tareaArchivoUi, String clickedLink) {
+        if(view!=null)view.showVinculo(clickedLink);
+    }
+
+    @Override
+    public void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink) {
+        if(view!=null)view.showVinculo(clickedLink);
     }
 
     private void uploadLinkFB(TareaArchivoUi tareaArchivoUi) {

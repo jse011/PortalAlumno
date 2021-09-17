@@ -43,7 +43,7 @@ public class LinkUtils {
         }
     }
 
-    static class SensibleLinkMovementMethod extends LinkMovementMethod {
+    public static class SensibleLinkMovementMethod extends LinkMovementMethod {
 
         private boolean mLinkClicked;
 

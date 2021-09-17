@@ -446,6 +446,11 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
     }
 
     @Override
+    public void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink) {
+
+    }
+
+    @Override
     public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
         presenter.notifyChangeFragment(finishUpdateUnidadFb);
     }

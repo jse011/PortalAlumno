@@ -211,42 +211,6 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
         vpCurso.setOffscreenPageLimit(2);
         tabCurso.setupWithViewPager(vpCurso);
         toolsTitleToolbar = new ToolsTitleToolbar(vpCurso, ctlTabcursos);
-        appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = false;
-            int scrollRange = -1;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    isShow = true;
-
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tabCurso.getLayoutParams();
-                    params.bottomMargin = 0;
-                    params.topMargin = (int) UtilsPortalAlumno.convertDpToPixel(8f, getApplicationContext());
-
-                    ViewGroup.MarginLayoutParams paramsContent = (ViewGroup.MarginLayoutParams) content.getLayoutParams();
-                    paramsContent.topMargin = 4;
-                    content.requestLayout();
-                    tabCurso.requestLayout();
-
-                } else if (isShow) {
-                    isShow = false;
-
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tabCurso.getLayoutParams();
-                    params.bottomMargin = (int) UtilsPortalAlumno.convertDpToPixel(20f, getApplicationContext());
-                    params.topMargin = 0;
-
-                    ViewGroup.MarginLayoutParams paramsContent = (ViewGroup.MarginLayoutParams) content.getLayoutParams();
-                    paramsContent.topMargin = (int) UtilsPortalAlumno.convertDpToPixel(-16f, getApplicationContext());
-
-                    content.requestLayout();
-                    tabCurso.requestLayout();
-                }
-            }
-        });
         vpCurso.setSaveFromParentEnabled(false);
         vpCurso.setAdapter(fragmentAdapter);
     }

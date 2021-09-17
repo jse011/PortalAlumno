@@ -384,6 +384,7 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
     @Override
     public void showVinculo(String url) {
         try {
+            if(!TextUtils.isEmpty(url))url = url.trim();
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -469,6 +470,11 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
     }
 
     @Override
+    public void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink) {
+        presenter.onClickOpenLinkArchivo(repositorioFileUi, clickedLink);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
         return super.onOptionsItemSelected(item);
@@ -517,7 +523,7 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
                     .setPreSelectedUrls(photoSelected);                             //Pre selected Image Urls
         }
         options
-                .setExcludeVideos(true)                                         //Option to exclude videos
+                .setMode(Options.Mode.All)                                      //Option to exclude videos
                 //.setVideoDurationLimitinSeconds(30)                            //Duration for video recording
                 .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT)     //Orientaion
                 .setPath(getResources().getString(R.string.app_name) + "/images")//Custom Path For media Storage
@@ -661,6 +667,11 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
     @Override
     public void onClickOpenTareaArchivo(TareaArchivoUi tareaArchivoUi) {
         presenter.onClickOpenTareaArchivo(tareaArchivoUi);
+    }
+
+    @Override
+    public void oClickOpenLink(TareaArchivoUi tareaArchivoUi, String clickedLink) {
+        presenter.onClickOpenLink(tareaArchivoUi, clickedLink);
     }
 
     @OnClick(R.id.btn_comentario_private)

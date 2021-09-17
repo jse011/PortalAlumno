@@ -144,7 +144,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
             try {
                 InputStream inputStream = FirebaseStorage.getInstance().getApp().getApplicationContext().getContentResolver().openInputStream(uri);
                 int length = (inputStream!=null?inputStream.available():0)/(1024*1024);
-                if(length<=40){
+                if(length<=200){
                     validate = 1;
                 }
 

@@ -19,7 +19,6 @@ public class UnidadAprendizajeUi {
     private String reto;
     private boolean toogle;
     private List<SesionAprendizajeUi> objectListSesiones;
-    private boolean visibleVerMas;
 
     public List<SesionAprendizajeUi> getObjectListSesiones() {
         return objectListSesiones;
@@ -137,11 +136,5 @@ public class UnidadAprendizajeUi {
     }
 
 
-    public boolean isVisibleVerMas() {
-        return visibleVerMas;
-    }
 
-    public void setVisibleVerMas(boolean visibleVerMas) {
-        this.visibleVerMas = visibleVerMas;
-    }
 }

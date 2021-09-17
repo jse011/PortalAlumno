@@ -20,7 +20,6 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragment;
 import com.consultoraestrategia.ss_portalalumno.base.fragment.BaseFragmentListener;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoUnidadView;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.TabSesionesActivity2;

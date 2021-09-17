@@ -40,7 +40,6 @@ import com.consultoraestrategia.ss_portalalumno.actividades.entidades.RecursosUi
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionActividadView;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionCallback;

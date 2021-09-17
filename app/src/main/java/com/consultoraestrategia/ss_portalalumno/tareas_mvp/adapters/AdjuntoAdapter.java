@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.gadgets.staticProgressBar.CustomProgress;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
+import com.consultoraestrategia.ss_portalalumno.util.LinkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +106,6 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
 
         private Listener listener;
         private TareaArchivoUi tareaArchivoUi;
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -119,6 +119,7 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
             btnRecurso.setOnClickListener(this);
             txtNombreRecurso.setText(tareaArchivoUi.getNombre());
             txtdescripcion.setText(tareaArchivoUi.getDescripcion());
+            LinkUtils.autoLink(txtdescripcion, null);
             float progress = (float) tareaArchivoUi.getProgress()/(float) 100;
             customProgress.setMaximumPercentage(progress);
             customProgress.setDisabledMovementProgress(true);
@@ -207,10 +208,17 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
                     listener.onClickRemoveTareaArchivo(tareaArchivoUi);
                     break;
                 case R.id.card_view:
-                    listener.onClickOpenTareaArchivo(tareaArchivoUi);
+                    if(tareaArchivoUi.getTipo() != TareaArchivoUi.Tipo.LINK){
+                        listener.onClickOpenTareaArchivo(tareaArchivoUi);
+                    }else {
+                        LinkUtils.SensibleLinkMovementMethod sensibleLinkMovementMethod = (LinkUtils.SensibleLinkMovementMethod)txtdescripcion.getMovementMethod();
+                        listener.oClickOpenLink(tareaArchivoUi, sensibleLinkMovementMethod.getClickedLink());
+
+                    }
                     break;
             }
         }
+
     }
 
 
@@ -218,5 +226,6 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
         void onClickActionTareaArchivo(TareaArchivoUi tareaArchivoUi);
         void onClickRemoveTareaArchivo(TareaArchivoUi tareaArchivoUi);
         void onClickOpenTareaArchivo(TareaArchivoUi tareaArchivoUi);
+        void oClickOpenLink(TareaArchivoUi tareaArchivoUi, String clickedLink);
     }
 }

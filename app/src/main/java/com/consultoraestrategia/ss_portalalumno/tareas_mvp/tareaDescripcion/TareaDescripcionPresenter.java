@@ -35,4 +35,8 @@ public interface TareaDescripcionPresenter extends BaseFragmentPresenter<TareasD
     void onResultDoc(Uri uri, String nombre);
 
     void onClickAddLink(String descripcion, String vinculo);
+
+    void onClickOpenLink(TareaArchivoUi tareaArchivoUi, String clickedLink);
+
+    void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink);
 }

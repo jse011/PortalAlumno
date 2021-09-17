@@ -26,7 +26,6 @@ import com.consultoraestrategia.ss_portalalumno.colaborativa.useCase.GetListaCol
 import com.consultoraestrategia.ss_portalalumno.colaborativa.useCase.GetListaColaborativaBaseDatos;
 import com.consultoraestrategia.ss_portalalumno.colaborativa.useCase.GetListaGrabaciones;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionColaborativaView;
 
 import java.util.List;

@@ -5,8 +5,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.util.AsyncTaskExecutionHelper;
 
 import java.net.HttpURLConnection;
@@ -40,7 +42,7 @@ public class AndroidOnlineImpl implements Online {
             Log.d(TAG, "modo offline");
         }else if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
             //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, false)  );
-            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Response(true));
+            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Request(context.getString(R.string.admin_service)),new Response(true));
             simpleCounterAsync.execute();
         } else {
             Log.d(TAG, "No network available!");
@@ -62,7 +64,7 @@ public class AndroidOnlineImpl implements Online {
         }
 
         if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
-            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Response(true));
+            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Request(context.getString(R.string.admin_service)) ,new Response(true));
             simpleCounterAsync.execute();
             //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, true) );
         } else {
@@ -75,11 +77,13 @@ public class AndroidOnlineImpl implements Online {
     private static class SimpleCounterAsync extends CourtineAsync<Boolean>{
         private Callback callback;;
         private Response response;
+        private Request request;
         //private boolean success;
 
-        public SimpleCounterAsync(Callback callback, Response response) {
+        public SimpleCounterAsync(Callback callback, Request request, Response response) {
             this.callback = callback;
             this.response = response;
+            this.request = request;
         }
 
         @Override
@@ -92,7 +96,8 @@ public class AndroidOnlineImpl implements Online {
                 //success = false;
                 //autoCancel();
                 try {
-                    HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
+                   String url = TextUtils.isEmpty(request.getUrl())?"https://www.google.com": request.getUrl();
+                    HttpURLConnection urlc = (HttpURLConnection) (new URL(url).openConnection());
                     urlc.setRequestProperty("User-Agent", "Test");
                     urlc.setRequestProperty("Connection", "close");
                     urlc.setConnectTimeout(1500);
@@ -200,6 +205,18 @@ public class AndroidOnlineImpl implements Online {
     };
 
 */
+    private static  class Request{
+        String url;
+
+        public Request(String url) {
+            this.url = url;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+    }
+
     private static class Response{
         //private Callback callback;;//
         private boolean restart;

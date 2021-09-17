@@ -9,4 +9,6 @@ public interface DownloadItemListener {
     void onClickClose(RepositorioFileUi repositorioFileUi);
 
     void onClickArchivo(RepositorioFileUi repositorioFileUi);
+
+    void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink);
 }

@@ -25,7 +25,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.consultoraestrategia.ss_portalalumno.colaborativa.ColaborativaFragment;
 import com.consultoraestrategia.ss_portalalumno.evidencia.EvidenciaFragment;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
-import com.consultoraestrategia.ss_portalalumno.firebase.online.FirebaseOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.pregunta.lista.PreguntaFragment;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.actividades.principal.ActividadesFragment;
@@ -218,13 +217,13 @@ public class TabSesionesActivity extends BaseActivity<TabSesionView, TabSesionPr
     @Override
     public void setNombreSesion(String nombreApredizaje) {
         Log.d(getTag(), "nombreApredizaje: " + nombreApredizaje);
-        txtDetalleSesion.setText(UtilsPortalAlumno.limpiarAcentos(nombreApredizaje));
+        txtDetalleSesion.setText(nombreApredizaje);
     }
 
     @Override
     public void setNumeroSession(int numero) {
         Log.d(getTag(), "setNumeroSession: " + numero);
-        txtNombreSesion.setText(UtilsPortalAlumno.limpiarAcentos("Sesión " + numero));
+        txtNombreSesion.setText("Sesión " + numero);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -16,24 +17,17 @@ public class AdapterSesiones extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final UnidadesAdapter.UnidadListener listener;
     String TAG= AdapterSesiones.class.getSimpleName();
     private List<SesionAprendizajeUi> sesionesArrayList;
-    private boolean landscape;
 
     // Constructor
     public AdapterSesiones(List<SesionAprendizajeUi> sesionesArrayList, boolean landscape, UnidadesAdapter.UnidadListener unidadListener) {
         this.sesionesArrayList = sesionesArrayList;
-        this.landscape = landscape;
         this.listener = unidadListener;
     }
 
     // Create new views (invoked by the layout managxer)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(landscape){
-            return new SesionHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_sesiones, parent, false));
-        }else {
-            return new SesionHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_sesiones_land_scape, parent, false));
-        }
-
+        return new SesionHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_sesiones_land_scape, parent, false));
     }
 
     // Reemplaza en contenido de la vista
@@ -46,6 +40,13 @@ public class AdapterSesiones extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount() {
         return sesionesArrayList.size();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setList(List<SesionAprendizajeUi> listSesiones) {
+        sesionesArrayList.clear();
+        sesionesArrayList.addAll(listSesiones);
+        notifyDataSetChanged();
     }
 
     public interface showMessageCollback{

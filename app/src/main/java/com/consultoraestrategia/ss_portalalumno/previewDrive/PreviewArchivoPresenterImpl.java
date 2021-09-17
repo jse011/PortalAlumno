@@ -157,57 +157,11 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
         if(view!=null)view.hideButons();
         dowloadProgress=false;
         if(cancelIdDrive!=null)cancelIdDrive.cancel();
-        online.online(new Online.Callback() {
+        /*online.online(new Online.Callback() {
             @Override
             public void onLoad(boolean success) {
                 if(success){
-                    if(TextUtils.isEmpty(driveId)){
-                        if(!TextUtils.isEmpty(tareaId)){
-                            cancelIdDrive = getIdDrive.execute(tareaId, archivoPreview, new GetIdDriveTarea.Callback() {
-                                @Override
-                                public void onLoad(boolean success, DriveUi driveUi) {
-                                    if(success){
-                                        driveUiSelected = driveUi;
-                                        if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
-                                            PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
-                                        if(view!=null)view.showButons();
-                                    }else {
-                                        if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null){
-                                            PreviewArchivoPresenterImpl.this.archivoPreviewView.hideProgress();
-                                            PreviewArchivoPresenterImpl.this.archivoPreviewView.showBtnReload();
-                                        }
 
-                                    }
-                                }
-                            });
-                        }else {
-                            cancelIdDrive = getIdDriveEvidencia.execute(sesionAprendizajeId, archivoPreview, new GetIdDriveEvidencia.Callback() {
-                                @Override
-                                public void onLoad(boolean success, DriveUi driveUi) {
-                                    if(success){
-                                        driveUiSelected = driveUi;
-                                        if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
-                                            PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
-                                        if(view!=null)view.showButons();
-                                    }else {
-                                        if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null){
-                                            PreviewArchivoPresenterImpl.this.archivoPreviewView.hideProgress();
-                                            PreviewArchivoPresenterImpl.this.archivoPreviewView.showBtnReload();
-                                        }
-
-                                    }
-                                }
-                            });
-
-                        }
-
-                    }else {
-                        driveUiSelected = new DriveUi();
-                        driveUiSelected.setIdDrive(driveId);
-                        if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
-                            PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUiSelected.getIdDrive());
-                        if(view!=null)view.showButons();
-                    }
                 }else {
                     if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null){
                         PreviewArchivoPresenterImpl.this.archivoPreviewView.hideProgress();
@@ -217,7 +171,55 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
                 }
 
             }
-        });
+        });*/
+
+        if(TextUtils.isEmpty(driveId)){
+            if(!TextUtils.isEmpty(tareaId)){
+                cancelIdDrive = getIdDrive.execute(tareaId, archivoPreview, new GetIdDriveTarea.Callback() {
+                    @Override
+                    public void onLoad(boolean success, DriveUi driveUi) {
+                        if(success){
+                            driveUiSelected = driveUi;
+                            if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
+                                PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
+                            if(view!=null)view.showButons();
+                        }else {
+                            if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null){
+                                PreviewArchivoPresenterImpl.this.archivoPreviewView.hideProgress();
+                                PreviewArchivoPresenterImpl.this.archivoPreviewView.showBtnReload();
+                            }
+
+                        }
+                    }
+                });
+            }else {
+                cancelIdDrive = getIdDriveEvidencia.execute(sesionAprendizajeId, archivoPreview, new GetIdDriveEvidencia.Callback() {
+                    @Override
+                    public void onLoad(boolean success, DriveUi driveUi) {
+                        if(success){
+                            driveUiSelected = driveUi;
+                            if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
+                                PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
+                            if(view!=null)view.showButons();
+                        }else {
+                            if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null){
+                                PreviewArchivoPresenterImpl.this.archivoPreviewView.hideProgress();
+                                PreviewArchivoPresenterImpl.this.archivoPreviewView.showBtnReload();
+                            }
+
+                        }
+                    }
+                });
+
+            }
+
+        }else {
+            driveUiSelected = new DriveUi();
+            driveUiSelected.setIdDrive(driveId);
+            if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
+                PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUiSelected.getIdDrive());
+            if(view!=null)view.showButons();
+        }
 
     }
 

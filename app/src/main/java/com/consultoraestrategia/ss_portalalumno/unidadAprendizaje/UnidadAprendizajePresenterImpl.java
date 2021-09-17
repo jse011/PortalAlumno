@@ -60,62 +60,9 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     }
 
     private void getListUnidades(){
-        List<UnidadAprendizajeUi> unidadAprendizajeUiList = getUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId);
-        int columnas = 0;//3
-        if(view!=null)columnas = view.getColumnasSesionesList();
-        Log.d(getTag(),"columnas: " + columnas);
-        for (UnidadAprendizajeUi unidadAprendizajeUi: unidadAprendizajeUiList){
-            List<SesionAprendizajeUi> sesionAprendizajeUiList = unidadAprendizajeUi.getObjectListSesiones();
-            unidadAprendizajeUi.setVisibleVerMas(sesionAprendizajeUiList != null && columnas < sesionAprendizajeUiList.size());
-        }
+        this.unidadAprendizajeUiList.clear();
+        this.unidadAprendizajeUiList.addAll(getUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId));
 
-
-        if(this.unidadAprendizajeUiList.isEmpty()){
-            this.unidadAprendizajeUiList.addAll(unidadAprendizajeUiList);
-            if(view !=null) view.showListUnidadAprendizaje( this.unidadAprendizajeUiList, color1);
-        }else {
-            List<UnidadAprendizajeUi> agregarlist = new ArrayList<>();
-            for(UnidadAprendizajeUi newUnidadAprendizajeUi : unidadAprendizajeUiList ){
-                boolean agregar = true;
-                for(UnidadAprendizajeUi unidadAprendizajeUi : this.unidadAprendizajeUiList ){
-                    if(newUnidadAprendizajeUi.getUnidadAprendizajeId() == unidadAprendizajeUi.getUnidadAprendizajeId()){
-                        unidadAprendizajeUi.setTitulo(newUnidadAprendizajeUi.getTitulo());
-                        unidadAprendizajeUi.setNroUnidad(newUnidadAprendizajeUi.getNroUnidad());
-                        unidadAprendizajeUi.setObjectListSesiones(newUnidadAprendizajeUi.getObjectListSesiones());
-                        //Update
-                        agregar = false;
-                        if(view !=null) view.updateItem(unidadAprendizajeUi);
-                        break;
-                    }
-                }
-
-                if(agregar){
-                    agregarlist.add(newUnidadAprendizajeUi);
-                }
-
-            }
-
-            List<UnidadAprendizajeUi> removerlist = new ArrayList<>();
-            for(UnidadAprendizajeUi unidadAprendizajeUi : this.unidadAprendizajeUiList ){
-                boolean remover = true;
-                for(UnidadAprendizajeUi newUnidadAprendizajeUi : unidadAprendizajeUiList ){
-                    if(newUnidadAprendizajeUi.getUnidadAprendizajeId() == unidadAprendizajeUi.getUnidadAprendizajeId()){
-                        remover = false;
-                        break;
-                    }
-                }
-
-                if(remover){
-                    removerlist.add(unidadAprendizajeUi);
-                    if(view !=null) view.removerItem(unidadAprendizajeUi);
-                }
-            }
-            this.unidadAprendizajeUiList.removeAll(removerlist);
-            this.unidadAprendizajeUiList.addAll(agregarlist);
-            if(!agregarlist.isEmpty()){
-                if(view !=null) view.showListUnidadAprendizaje( this.unidadAprendizajeUiList, color1);
-            }
-        }
 
         Collections.sort(this.unidadAprendizajeUiList, new Comparator<UnidadAprendizajeUi>() {
             @Override
@@ -123,10 +70,8 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
                 return Integer.compare(o2.getNroUnidad(),o1.getNroUnidad());
             }
         });
-
-
         if(view!=null)view.hideProgress();
-        //if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
+        if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
     }
 
     @Override

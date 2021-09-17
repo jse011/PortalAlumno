@@ -3,6 +3,7 @@ package com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.view
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,8 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.Adapt
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.SesionColumnCountProvider;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters.UnidadesAdapter;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,18 +51,22 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
     private UnidadAprendizajeUi unidadAprendizaje;
     private String color;
     private UnidadesAdapter.UnidadListener unidadListener;
+    private AdapterSesiones adapter;
+    private int columnas;
 
-    public UnidadViewHolder(@NonNull View itemView) {
+    public UnidadViewHolder(@NonNull View itemView, UnidadesAdapter.UnidadListener unidadListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        this.unidadListener = unidadListener;
+        setListColumanas();
     }
 
-    public void bind(UnidadAprendizajeUi unidadAprendizaje, String color, UnidadesAdapter.UnidadListener unidadListener) {
+    public void bind(UnidadAprendizajeUi unidadAprendizaje, String color) {
         this.unidadAprendizaje = unidadAprendizaje;
         this.color = color;
-        this.unidadListener = unidadListener;
 
-        String titulo = "Unidad "+unidadAprendizaje.getNroUnidad()+": "+unidadAprendizaje.getTitulo();
+
+        String titulo = "U"+unidadAprendizaje.getNroUnidad()+": "+unidadAprendizaje.getTitulo();
         txtTituloUnidad.setText(titulo);
         try {
             view3.setBackgroundColor(Color.parseColor(color));
@@ -78,8 +85,9 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
             txtVerMas.setVisibility(View.VISIBLE);
         }
 
+        boolean isVisibleVerMas = columnas < unidadAprendizaje.getObjectListSesiones().size();
 
-        if(unidadAprendizaje.isVisibleVerMas()){
+        if(isVisibleVerMas){
             cardView.setOnClickListener(this);
             txtVerMas.setVisibility(View.VISIBLE);
         }else {
@@ -88,30 +96,16 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
         }
 
         if(unidadAprendizaje.isToogle()){
-            if(unidadAprendizaje.isVisibleVerMas()){
-                setListColumanas();
+            if(isVisibleVerMas){
                 setViewLess();
-            }else {
-                setListHorizontal();
             }
         }else {
-            if(unidadAprendizaje.isVisibleVerMas()){
-                setListHorizontal();
+            if(isVisibleVerMas){
                 setViewMore();
-            }else {
-                setListHorizontal();
             }
         }
-    }
 
-
-    private void setListHorizontal(){
-        Log.d(TAG, "setListHorizontal");
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(itemView.getContext(),LinearLayoutManager.HORIZONTAL, false);
-        rvSesiones.setLayoutManager(linearLayoutManager);
-        rvSesiones.setNestedScrollingEnabled(false);
-        rvSesiones.setHasFixedSize(false);
-        rvSesiones.setAdapter(new AdapterSesiones(unidadAprendizaje.getObjectListSesiones(), true, unidadListener));
+        adapter.setList(unidadAprendizaje.getObjectListSesiones());
     }
 
     private void setViewMore(){
@@ -133,8 +127,11 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
         rvSesiones.setNestedScrollingEnabled(false);
         rvSesiones.setHasFixedSize(false);
         rvSesiones.setLayoutManager(autoColumnGridLayoutManager);
-        rvSesiones.setAdapter(new AdapterSesiones(unidadAprendizaje.getObjectListSesiones(), false, unidadListener));
-
+        adapter = new AdapterSesiones( new ArrayList<>(), false, unidadListener);
+        rvSesiones.setAdapter(adapter);
+        int spacing = 15; // 50px
+        this.columnas = SesionColumnCountProvider.columnsForWidth(rvSesiones.getContext(), rvSesiones.getWidth());
+        rvSesiones.addItemDecoration(new SesionHolder.GridSpacingItemDecoration(columnas, spacing,false));
     }
 
     private void setViewLess(){

@@ -80,7 +80,7 @@ public interface MainPresenter extends BasePresenter<MainView> {
 
     void onTabFamiliaDestroy();
 
-    void onErrotCuentaFirebase();
+    void onErrorCuentaFirebase();
 
 
     interface Callback<T> {

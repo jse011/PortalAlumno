@@ -420,4 +420,9 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
         presenter.onClickArchivo(repositorioFileUi);
     }
 
+    @Override
+    public void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink) {
+
+    }
+
 }

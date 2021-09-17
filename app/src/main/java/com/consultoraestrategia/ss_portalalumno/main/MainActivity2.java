@@ -63,7 +63,6 @@ import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.SaveLike;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ConfiguracionUi;
-import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.EventoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.NuevaVersionUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
@@ -92,7 +91,6 @@ import com.robohorse.gpversionchecker.domain.Version;
 import com.robohorse.gpversionchecker.domain.VersionInfoListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -129,6 +127,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     CircleImageView navBarImagenProfile;
     @BindView(R.id.txt_nombre_usuario)
     TextView txtNombreUsuario;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     private MenuAdapter menuAdapter;
     private FirebaseAuth mAuth;
@@ -169,6 +168,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     @Override
     protected void setContentView() {
         setContentView(R.layout.activity_main_two);
+        mAuth = FirebaseAuth.getInstance();
         ButterKnife.bind(this);
         AXEmojiManager.install(this,new AXIOSEmojiProvider(this));
         initView();
@@ -177,11 +177,31 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         setupVersion();
         setupTabMenu();
         setupRecyclerProgramas();
-
+        initializingFirebase();
+        ValidarLogueoFirebase();
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_host_fragment);
         NavigationUI.setupWithNavController(bnve, navHostFragment.getNavController());
 
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(new LifecycleImpl(0,this),true);
+    }
+
+    private void ValidarLogueoFirebase() {
+        // active listen to user logged in or not.
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(getTag(), "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(getTag(), "onAuthStateChanged:signed_out");
+                }
+            }
+        };
+
+
     }
 
     private void setupTabMenu() {
@@ -369,6 +389,16 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser!=null){
+            Log.d(getTag(), "current: "+currentUser.getDisplayName());
+        }
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
     public void showMessage(CharSequence error) {
         Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
@@ -464,11 +494,11 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     }
 
     @Override
+    @Deprecated
     public void validateFirebase(String usuarioFirebase, String passwordFirebase) {
-        mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser==null){
-            /*initializingFirebase(usuarioFirebase, passwordFirebase, new OnCompleteListener<AuthResult>() {
+            initializingFirebase(usuarioFirebase, passwordFirebase, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
@@ -481,8 +511,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
                         Log.w(getTag(), "signInWithEmail:failure", task.getException());
                     }
                 }
-            });*/
-            initializingFirebase();
+            });
         }
     }
 
@@ -500,20 +529,18 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     }
 
     private void initializingFirebase(){
-
         mAuth.signInAnonymously()
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
-                            presenter.onInitCuentaFirebase();
+                            presenter.onErrorCuentaFirebase();
                         } else {
-                            presenter.onErrotCuentaFirebase();
+                            presenter.onInitCuentaFirebase();
                         }
 
                     }
                 });
-
     }
 
     private void  createAccountFirebase(String email, String password){
@@ -664,6 +691,14 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
             presenter.onTabCursosDestroy();
         }else if(f instanceof TabFamilia){
             presenter.onTabFamiliaDestroy();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 
