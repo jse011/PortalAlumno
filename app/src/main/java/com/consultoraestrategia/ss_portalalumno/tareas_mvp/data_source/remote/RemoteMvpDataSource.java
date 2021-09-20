@@ -698,6 +698,28 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                                     }else{
                                         nota = valorTipoNotaC!=null?valorTipoNotaC.getTitulo():"";
                                     }
+
+                                    SQLite.delete()
+                                            .from(TareaAlumnoArchivos.class)
+                                            .where(TareaAlumnoArchivos_Table.tareaId.eq(tareaAlumno.getTareaId()))
+                                            .and(TareaAlumnoArchivos_Table.alumnoId.eq(alumnoId))
+                                            .execute();
+
+                                    if(dataSnapshot.child("Archivos").exists()){
+                                        for (Map.Entry<String,JSONFirebase> entry : dataSnapshot.child("Archivos").getChildren2().entrySet()){
+                                            JSONFirebase archivosSnapshot = entry.getValue();
+                                            TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                                            tareaAlumnoArchivos.setTareaAlumnoArchivoId(entry.getKey());
+                                            tareaAlumnoArchivos.setTareaId(tareaAlumno.getTareaId());
+                                            tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                                            tareaAlumnoArchivos.setNombre(UtilsFirebase.convert(archivosSnapshot.child("Nombre").getValue(),""));
+                                            tareaAlumnoArchivos.setPath(UtilsFirebase.convert(archivosSnapshot.child("Path").getValue(),""));
+                                            tareaAlumnoArchivos.setRepositorio(UtilsFirebase.convert(archivosSnapshot.child("Repositorio").getValue(),false));
+                                            tareaAlumnoArchivos.save();
+                                        }
+                                    }
+
+
                                     callbackTareaAlumno.onChangeTareaAlumno(tareaAlumno.getTareaId(), nota, tipoId);
                                 }
 
@@ -746,6 +768,26 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                             }else{
                                 nota = valorTipoNotaC!=null?valorTipoNotaC.getTitulo():"";
                             }
+
+                            /*SQLite.delete()
+                                    .from(TareaAlumnoArchivos.class)
+                                    .where(TareaAlumnoArchivos_Table.tareaId.eq(tareaAlumno.getTareaId()))
+                                    .and(TareaAlumnoArchivos_Table.alumnoId.eq(alumnoId))
+                                    .execute();
+
+                            if(dataSnapshot.child("Archivos").exists()){
+                                for (DataSnapshot archivosSnapshot : dataSnapshot.child("Archivos").getChildren()){
+                                    TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                                    tareaAlumnoArchivos.setTareaAlumnoArchivoId(archivosSnapshot.getKey());
+                                    tareaAlumnoArchivos.setTareaId(tareaAlumno.getTareaId());
+                                    tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                                    tareaAlumnoArchivos.setNombre(UtilsFirebase.convert(archivosSnapshot.child("Nombre").getValue(),""));
+                                    tareaAlumnoArchivos.setPath(UtilsFirebase.convert(archivosSnapshot.child("Path").getValue(),""));
+                                    tareaAlumnoArchivos.setRepositorio(UtilsFirebase.convert(archivosSnapshot.child("Repositorio").getValue(),false));
+                                    tareaAlumnoArchivos.save();
+                                }
+                            }*/
+
                             callbackTareaAlumno.onChangeTareaAlumno(tareaAlumno.getTareaId(), nota, tipoId);
                         }
 
@@ -780,6 +822,27 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                             }else{
                                 nota = valorTipoNotaC!=null?valorTipoNotaC.getTitulo():"";
                             }
+
+
+
+                            /*SQLite.delete()
+                                    .from(TareaAlumnoArchivos.class)
+                                    .where(TareaAlumnoArchivos_Table.tareaId.eq(tareaAlumno.getTareaId()))
+                                    .and(TareaAlumnoArchivos_Table.alumnoId.eq(alumnoId))
+                                    .execute();
+
+                            if(dataSnapshot.child("Archivos").exists()){
+                                for (DataSnapshot archivosSnapshot : dataSnapshot.child("Archivos").getChildren()){
+                                    TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                                    tareaAlumnoArchivos.setTareaAlumnoArchivoId(archivosSnapshot.getKey());
+                                    tareaAlumnoArchivos.setTareaId(tareaAlumno.getTareaId());
+                                    tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                                    tareaAlumnoArchivos.setNombre(UtilsFirebase.convert(archivosSnapshot.child("Nombre").getValue(),""));
+                                    tareaAlumnoArchivos.setPath(UtilsFirebase.convert(archivosSnapshot.child("Path").getValue(),""));
+                                    tareaAlumnoArchivos.setRepositorio(UtilsFirebase.convert(archivosSnapshot.child("Repositorio").getValue(),false));
+                                    tareaAlumnoArchivos.save();
+                                }
+                            }*/
 
                             callbackTareaAlumno.onChangeTareaAlumno(tareaAlumno.getTareaId(), nota, tipoId);
                         }

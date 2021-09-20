@@ -10,7 +10,9 @@ public class OpenIntents {
      *
      * @param uri path to file
      */
+    @Deprecated
     public static void openFile(Uri uri, Context context)  throws Exception {
+
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);

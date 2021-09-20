@@ -12,7 +12,7 @@ import java.util.Locale;
 
 public class UtilsStorage {
     public static String getMimeType(String url) {
-        url = !TextUtils.isEmpty(url)?url:"";
+        url = !TextUtils.isEmpty(url)? "archivo"+"." + UtilsStorage.getExtencion(url):"";//se le reduce el nombre del archivo no afecta que tengo otro nombre
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(url);
         if (extension != null) {

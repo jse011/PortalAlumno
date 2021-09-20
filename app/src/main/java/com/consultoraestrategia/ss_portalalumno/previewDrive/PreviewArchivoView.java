@@ -27,4 +27,6 @@ public interface PreviewArchivoView extends BaseView<PreviewArchivoPresenter> {
     void showMultimendia();
 
     void showDocument();
+
+    void openForceDrive(String driveId, String archivoPreview);
 }

@@ -1,7 +1,10 @@
 package com.consultoraestrategia.ss_portalalumno.previewDrive;
 
+
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,7 +14,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,13 +27,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.FileProvider;
+import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
-import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
 import com.consultoraestrategia.ss_portalalumno.base.viewpager.LifecycleImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineSimpleImpl;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.archivo.ArchivoPreviewFragment;
@@ -40,21 +41,20 @@ import com.consultoraestrategia.ss_portalalumno.previewDrive.data.source.Preview
 import com.consultoraestrategia.ss_portalalumno.previewDrive.data.source.PreviewDriveRepositoyImpl;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.multimedia.MultimediaPreview2Fragment;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.multimedia.MultimediaPreviewView;
+import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetDriveTareaTemporal;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveEvidencia;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveTarea;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
-import com.consultoraestrategia.ss_portalalumno.util.OpenIntents;
+import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsStorage;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
 import com.consultoraestrategia.ss_portalalumno.youtube.YoutubeConfig;
-
-import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, PreviewArchivoPresenter> implements PreviewArchivoView, LifecycleImpl.LifecycleListener {
+public class PreviewArchivoActivity extends BasePrevArchivoActivity implements PreviewArchivoView, LifecycleImpl.LifecycleListener {
     @BindView(R.id.backPrincipal)
     FrameLayout backPrincipal;
     @BindView(R.id.btnDownload)
@@ -85,6 +85,7 @@ public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, Pre
         return new PreviewArchivoPresenterImpl(new UseCaseHandler(new UseCaseThreadPoolScheduler()), getResources(),
                 new GetIdDriveTarea(previewDriveRepository),
                 new GetIdDriveEvidencia(previewDriveRepository),
+                new GetDriveTareaTemporal(previewDriveRepository),
                 new AndroidOnlineSimpleImpl(this));
     }
 
@@ -158,31 +159,45 @@ public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, Pre
 
     @Override
     public void dowloadArchivo(String idDrive, String archivoPreview) {
-        String dowload = "https://drive.google.com/uc?export=download&id=" + idDrive;
+        //archivoPreview = archivoPreview.replaceAll(" ", "%20");
+        //archivoPreview = archivoPreview.replaceAll("/", "");
+        String download = "https://drive.google.com/uc?export=download&id=" + idDrive;
         try {
-            DownloadManager.Request r = new DownloadManager.Request(Uri.parse(dowload));
-            r.setTitle(archivoPreview);
-            r.setDescription(getResources().getString(R.string.app_name));
-            r.setMimeType(UtilsStorage.getMimeType(archivoPreview));
-            // This put the download in the same Download dir the browser uses
-            r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, archivoPreview);
-
-            // When downloading music and videos they will be listed in the player
-            // (Seems to be available since Honeycomb only)
-            r.allowScanningByMediaScanner();
-
-            // Notify user when download is completed
-            // (Seems to be available since Honeycomb only)
-            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
-            // Start download
-            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-            presenter.onStarDownload(dm.enqueue(r));
-
-        } catch (Exception e) {
+            presenter.onStarDownload(downloadManager(download, archivoPreview));
+        } catch (IllegalArgumentException e){
             e.printStackTrace();
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(dowload)));
+            try {
+                presenter.onStarDownload(downloadManager(download, IdGenerator.generateId()+"."+ UtilsStorage.getExtencion(archivoPreview)));
+            } catch (Exception e1){
+                e1.printStackTrace();
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(download)));
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(download)));
         }
+    }
+
+    private long downloadManager(String download, String archivoPreview){
+        DownloadManager.Request r = new DownloadManager.Request(Uri.parse(download));
+        r.setTitle(archivoPreview);
+        r.setDescription(getResources().getString(R.string.app_name));
+        r.setMimeType(UtilsStorage.getMimeType(archivoPreview));
+        // This put the download in the same Download dir the browser uses
+        r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, archivoPreview);
+
+        // When downloading music and videos they will be listed in the player
+        // (Seems to be available since Honeycomb only)
+        r.allowScanningByMediaScanner();
+
+        // Notify user when download is completed
+        // (Seems to be available since Honeycomb only)
+        r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+        // Start download
+        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        return dm.enqueue(r);
     }
 
     @Override
@@ -192,7 +207,7 @@ public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, Pre
 
     @Override
     public void openDownloadFile(long downloadID) {
-        DownloadManager.Query query = new DownloadManager.Query();
+        /*DownloadManager.Query query = new DownloadManager.Query();
         query.setFilterById(downloadID);
         DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         Cursor c = downloadManager.query(query);
@@ -203,7 +218,9 @@ public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, Pre
                 String fileUri = c.getString(fileUriIdx);
                 try {
                     if (!TextUtils.isEmpty(fileUri)) {
-                        OpenIntents.openFile(FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", new File(Uri.parse(fileUri).getPath())), this);
+                        Uri localUri = Uri.parse(fileUri);
+
+                        OpenIntents.openFile(FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", ), this);
                     }
 
                 } catch (Exception e) {
@@ -211,9 +228,76 @@ public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, Pre
                     Toast.makeText(this, getString(R.string.cannot_open_file), Toast.LENGTH_SHORT).show();
                 }
             }
-        }
+        }*/
+
+        openDownloadedAttachment( this, downloadID);
+
     }
 
+    /**
+     * Used to open the downloaded attachment.
+     *
+     * @param context    Content.
+     * @param downloadId Id of the downloaded file to open.
+     */
+    private void openDownloadedAttachment(final Context context, final long downloadId) {
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterById(downloadId);
+        Cursor cursor = downloadManager.query(query);
+        if (cursor.moveToFirst()) {
+            int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+            String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+            String downloadMimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
+            if ((downloadStatus == DownloadManager.STATUS_SUCCESSFUL) && downloadLocalUri != null) {
+                openDownloadedAttachment(context, Uri.parse(downloadLocalUri), downloadMimeType);
+            }
+        }
+        cursor.close();
+    }
+
+    /**
+     * Used to open the downloaded attachment.
+     * <p/>
+     * 1. Fire intent to open download file using external application.
+     *
+     * 2. Note:
+     * 2.a. We can't share fileUri directly to other application (because we will get FileUriExposedException from Android7.0).
+     * 2.b. Hence we can only share content uri with other application.
+     * 2.c. We must have declared FileProvider in manifest.
+     * 2.c. Refer - https://developer.android.com/reference/android/support/v4/content/FileProvider.html
+     *
+     * @param context            Context.
+     * @param attachmentUri      Uri of the downloaded attachment to be opened.
+     * @param attachmentMimeType MimeType of the downloaded attachment.
+     */
+    private void openDownloadedAttachment(final Context context, Uri attachmentUri, final String attachmentMimeType) {
+        if(attachmentUri!=null) {
+            // Get Content Uri.
+            if (ContentResolver.SCHEME_FILE.equals(attachmentUri.getScheme())) {
+                // FileUri - Convert it to contentUri.
+                //File file = new File(attachmentUri.getPath());
+                //attachmentUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);;
+                attachmentUri = getUriFromPath(attachmentUri.getPath());
+
+            }
+
+            Intent openAttachmentIntent = new Intent(Intent.ACTION_VIEW);
+            openAttachmentIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            openAttachmentIntent.setDataAndType(attachmentUri,attachmentMimeType);
+            openAttachmentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            //openAttachmentIntent.putExtra(Intent.EXTRA_STREAM, attachmentUri);
+
+            //openAttachmentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            try {
+                context.startActivity(openAttachmentIntent);
+            } catch (ActivityNotFoundException e) {
+                //Toast.makeText(context, context.getString(R.string.unable_to_open_file), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.cannot_open_file), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     @Override
     public void showYoutube(String youtube) {
         if (youtubeConfig == null) youtubeConfig = new YoutubeConfig(this);
@@ -258,6 +342,28 @@ public class PreviewArchivoActivity extends BaseActivity<PreviewArchivoView, Pre
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.contentContainer, new ArchivoPreviewFragment())
                 .commit();
+    }
+
+    @Override
+    public void openForceDrive(String driveId, String archivoPreview) {
+        try {
+            /*String download = "";
+            Uri pdfUri = Uri.parse(download);
+            Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                    .setText(archivoPreview)
+                    .setType(UtilsStorage.getMimeType(archivoPreview))
+                    .setStream(pdfUri )
+                    .getIntent()
+                    .setPackage("com.google.android.apps.docs");
+            startActivity(shareIntent);*/
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/" + driveId + "/preview"));
+            intent.setPackage("com.google.android.apps.docs");
+            startActivity(intent);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

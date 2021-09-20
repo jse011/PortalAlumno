@@ -8,6 +8,8 @@ public interface PreviewDriveRepository {
 
     RetrofitCancel getIdDriveEvidencia(int sesionAprendizajeId, String nombreArchivo, Callback<DriveUi> driveUiCallback);
 
+    String getIdDriveTemporal(String tareaId, String nombreArchivo);
+
     interface Callback <T>{
         void onLoad(boolean success, T item);
     }

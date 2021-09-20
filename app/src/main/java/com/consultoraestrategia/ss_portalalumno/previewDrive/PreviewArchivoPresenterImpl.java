@@ -9,6 +9,7 @@ import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbPreview;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetDriveTareaTemporal;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveEvidencia;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveTarea;
@@ -20,6 +21,7 @@ import com.consultoraestrategia.ss_portalalumno.util.UtilsStorage;
 public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchivoView> implements PreviewArchivoPresenter {
 
 
+    private final GetDriveTareaTemporal getDriveTareaTemporal;
     private String tareaId;
     private String archivoPreview;
     private GetIdDriveTarea getIdDrive;
@@ -37,11 +39,12 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
     private int tipo;
 
     public PreviewArchivoPresenterImpl(UseCaseHandler handler, Resources res, GetIdDriveTarea getIdDrive,
-                                       GetIdDriveEvidencia getIdDriveEvidencia, Online online) {
+                                       GetIdDriveEvidencia getIdDriveEvidencia, GetDriveTareaTemporal getDriveTareaTemporal, Online online) {
         super(handler, res);
         this.getIdDrive = getIdDrive;
         this.getIdDriveEvidencia = getIdDriveEvidencia;
         this.online = online;
+        this.getDriveTareaTemporal = getDriveTareaTemporal;
     }
 
     @Override
@@ -83,6 +86,15 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             if(tipo == GbPreview.MULTIMEDIA){
                 if(view!=null)view.showMultimendia();
             }else {
+                if(!TextUtils.isEmpty(driveId)&&!TextUtils.isEmpty(archivoPreview)){
+                    if(view!=null)view.openForceDrive(driveId, archivoPreview);
+                }else if(!TextUtils.isEmpty(tareaId)&&!TextUtils.isEmpty(archivoPreview)){
+                    driveId = getDriveTareaTemporal.execute(tareaId, archivoPreview);
+                    if(!TextUtils.isEmpty(driveId)){
+                        if(view!=null)view.openForceDrive(driveId, archivoPreview);
+                    }
+
+                }
                 if(view!=null)view.showDocument();
             }
         }
