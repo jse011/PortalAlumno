@@ -192,6 +192,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
                     public void onLoad(boolean success, DriveUi driveUi) {
                         if(success){
                             driveUiSelected = driveUi;
+                            if(view!=null)view.openForceDrive(driveUiSelected.getIdDrive(), archivoPreview);
                             if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
                                 PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
                             if(view!=null)view.showButons();
