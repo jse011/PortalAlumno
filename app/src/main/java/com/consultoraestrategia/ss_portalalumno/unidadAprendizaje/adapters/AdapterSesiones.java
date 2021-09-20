@@ -17,7 +17,7 @@ public class AdapterSesiones extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final UnidadesAdapter.UnidadListener listener;
     String TAG= AdapterSesiones.class.getSimpleName();
     private List<SesionAprendizajeUi> sesionesArrayList;
-
+    private int itemCount = 0;
     // Constructor
     public AdapterSesiones(List<SesionAprendizajeUi> sesionesArrayList, boolean landscape, UnidadesAdapter.UnidadListener unidadListener) {
         this.sesionesArrayList = sesionesArrayList;
@@ -39,15 +39,25 @@ public class AdapterSesiones extends RecyclerView.Adapter<RecyclerView.ViewHolde
     // Retorna el tamano de nuestra data
     @Override
     public int getItemCount() {
-        return sesionesArrayList.size();
+        return itemCount;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setList(List<SesionAprendizajeUi> listSesiones, int size) {
+        sesionesArrayList.clear();
+        sesionesArrayList.addAll(listSesiones);
+        itemCount = size;
+        notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setList(List<SesionAprendizajeUi> listSesiones) {
         sesionesArrayList.clear();
         sesionesArrayList.addAll(listSesiones);
+        itemCount = sesionesArrayList.size();
         notifyDataSetChanged();
     }
+
 
     public interface showMessageCollback{
         void onClickAceptar();

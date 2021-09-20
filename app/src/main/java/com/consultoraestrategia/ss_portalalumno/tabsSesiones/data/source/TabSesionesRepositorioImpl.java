@@ -107,8 +107,12 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                 List<InstrumentoEvaluacion> instrumentoEvaluacionList = new ArrayList<>();
                 List<Variable> variableList = new ArrayList<>();
                 List<Valor> valorList = new ArrayList<>();
+
+                List<InstrumentoEvaluacionObservado> instrumentoEvaluacionObsList = new ArrayList<>();
+                List<VariableObservado> variableObservadoList = new ArrayList<>();
+
                 if(response==null){
-                    callbackSimple.onLoad(false);
+
                 }else {
 
                     if(response.has("preguntas")){
@@ -186,10 +190,6 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                         }
                     }
 
-                    List<InstrumentoEvaluacionObservado> instrumentoEvaluacionObsList = new ArrayList<>();
-                    List<VariableObservado> variableObservadoList = new ArrayList<>();
-
-
                     if(response.has("respuestas")){
                         JsonElement jsonElement = response.get("respuestas");
 
@@ -242,66 +242,62 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                         }
                     }
 
-
-
-
-
-                    DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
-                    Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-                        @Override
-                        public void execute(DatabaseWrapper databaseWrapper) {
-                            List<InstrumentoEvaluacion> instrumentoEvaluacions = SQLite.select()
-                                    .from(InstrumentoEvaluacion.class)
-                                    .where(InstrumentoEvaluacion_Table.SesionId.eq(sesionAprendizajeId))
-                                    .queryList(databaseWrapper);
-
-                            List<Integer> instrumentoEvaluacionIdList = new ArrayList<>();
-                            for (InstrumentoEvaluacion instrumentoEvaluacion : instrumentoEvaluacions)instrumentoEvaluacionIdList.add(instrumentoEvaluacion.getInstrumentoEvalId());
-                            List<Variable> variables = SQLite.select()
-                                    .from(Variable.class)
-                                    .where(Variable_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList))
-                                    .queryList(databaseWrapper);
-                            List<Integer> variableIdList = new ArrayList<>();
-                            for (Variable variable : variables)variableIdList.add(variable.getVariableId());
-
-                            TransaccionUtils.deleteTable(InstrumentoEvaluacion.class, InstrumentoEvaluacion_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList));
-                            TransaccionUtils.deleteTable(Variable.class, Variable_Table.VariableId.in(variableIdList));
-                            TransaccionUtils.deleteTable(Valor.class, Valor_Table.ValorId.in(variableIdList));
-
-                            List<InstrumentoEvaluacionObservado> instrumentoEvaluacionObservados = SQLite.select()
-                                    .from(InstrumentoEvaluacionObservado.class)
-                                    .where(InstrumentoEvaluacionObservado_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList))
-                                    .queryList(databaseWrapper);
-
-                            List<String> instrumentoEvaluacionObservadaIdList = new ArrayList<>();
-                            for (InstrumentoEvaluacionObservado instrumentoEvaluacionObs : instrumentoEvaluacionObservados)instrumentoEvaluacionObservadaIdList.add(instrumentoEvaluacionObs.getInstrumentoObservadoId());
-
-                            TransaccionUtils.deleteTable(InstrumentoEvaluacionObservado.class, InstrumentoEvaluacionObservado_Table.InstrumentoObservadoId.in(instrumentoEvaluacionObservadaIdList));
-                            TransaccionUtils.deleteTable(VariableObservado.class, VariableObservado_Table.InstrumentoObservadoId.in(instrumentoEvaluacionObservadaIdList));
-
-
-                            TransaccionUtils.fastStoreListInsert(InstrumentoEvaluacion.class, instrumentoEvaluacionList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(Variable.class, variableList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(Valor.class, valorList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(InstrumentoEvaluacionObservado.class, instrumentoEvaluacionObsList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(VariableObservado.class, variableObservadoList, databaseWrapper, false);
-                        }
-                    }).success(new Transaction.Success() {
-                        @Override
-                        public void onSuccess(@NonNull Transaction transaction) {
-                            callbackSimple.onLoad(true);
-                        }
-                    }).error(new Transaction.Error() {
-                        @Override
-                        public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
-                            error.printStackTrace();
-                            callbackSimple.onLoad(false);
-                        }
-                    }).build();
-
-                    transaction.execute();
-
                 }
+
+                DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                    @Override
+                    public void execute(DatabaseWrapper databaseWrapper) {
+                        List<InstrumentoEvaluacion> instrumentoEvaluacions = SQLite.select()
+                                .from(InstrumentoEvaluacion.class)
+                                .where(InstrumentoEvaluacion_Table.SesionId.eq(sesionAprendizajeId))
+                                .queryList(databaseWrapper);
+
+                        List<Integer> instrumentoEvaluacionIdList = new ArrayList<>();
+                        for (InstrumentoEvaluacion instrumentoEvaluacion : instrumentoEvaluacions)instrumentoEvaluacionIdList.add(instrumentoEvaluacion.getInstrumentoEvalId());
+                        List<Variable> variables = SQLite.select()
+                                .from(Variable.class)
+                                .where(Variable_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList))
+                                .queryList(databaseWrapper);
+                        List<Integer> variableIdList = new ArrayList<>();
+                        for (Variable variable : variables)variableIdList.add(variable.getVariableId());
+
+                        TransaccionUtils.deleteTable(InstrumentoEvaluacion.class, InstrumentoEvaluacion_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList));
+                        TransaccionUtils.deleteTable(Variable.class, Variable_Table.VariableId.in(variableIdList));
+                        TransaccionUtils.deleteTable(Valor.class, Valor_Table.ValorId.in(variableIdList));
+
+                        List<InstrumentoEvaluacionObservado> instrumentoEvaluacionObservados = SQLite.select()
+                                .from(InstrumentoEvaluacionObservado.class)
+                                .where(InstrumentoEvaluacionObservado_Table.InstrumentoEvalId.in(instrumentoEvaluacionIdList))
+                                .queryList(databaseWrapper);
+
+                        List<String> instrumentoEvaluacionObservadaIdList = new ArrayList<>();
+                        for (InstrumentoEvaluacionObservado instrumentoEvaluacionObs : instrumentoEvaluacionObservados)instrumentoEvaluacionObservadaIdList.add(instrumentoEvaluacionObs.getInstrumentoObservadoId());
+
+                        TransaccionUtils.deleteTable(InstrumentoEvaluacionObservado.class, InstrumentoEvaluacionObservado_Table.InstrumentoObservadoId.in(instrumentoEvaluacionObservadaIdList));
+                        TransaccionUtils.deleteTable(VariableObservado.class, VariableObservado_Table.InstrumentoObservadoId.in(instrumentoEvaluacionObservadaIdList));
+
+
+                        TransaccionUtils.fastStoreListInsert(InstrumentoEvaluacion.class, instrumentoEvaluacionList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(Variable.class, variableList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(Valor.class, valorList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(InstrumentoEvaluacionObservado.class, instrumentoEvaluacionObsList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(VariableObservado.class, variableObservadoList, databaseWrapper, false);
+                    }
+                }).success(new Transaction.Success() {
+                    @Override
+                    public void onSuccess(@NonNull Transaction transaction) {
+                        callbackSimple.onLoad(true);
+                    }
+                }).error(new Transaction.Error() {
+                    @Override
+                    public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                        error.printStackTrace();
+                        callbackSimple.onLoad(false);
+                    }
+                }).build();
+
+                transaction.execute();
             }
 
             @Override
@@ -516,7 +512,7 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
             @Override
             public void onResponse(JsonObject response) {
                 if(response == null){
-                    callbackSimple.onLoad(false);
+
                 }else {
                     for (Map.Entry<String,JSONFirebase> entry: JSONFirebase.d(response).getChildren2().entrySet()){
                         ColborativaPA colborativaPA = new ColborativaPA();
@@ -527,8 +523,8 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                         colborativaPA.setTipo(UtilsFirebase.convert(colaborativaSnapshot.child("tipo").getValue(), ""));
                         colborativaPA.save();
                     }
-                    callbackSimple.onLoad(true);
                 }
+                callbackSimple.onLoad(true);
             }
 
             @Override

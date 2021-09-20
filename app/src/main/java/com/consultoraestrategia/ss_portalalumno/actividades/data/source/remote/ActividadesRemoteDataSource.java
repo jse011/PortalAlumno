@@ -126,20 +126,18 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
         retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
             @Override
             public void onResponse(JsonObject response) {
+
+                List<ActividadAprendizaje> actividadAprendizajeList = new ArrayList<>();
+                List<Tipos> tiposList = new ArrayList<>();
+                List<RecursoDidacticoEventoC> recursoDidacticoEventoList = new ArrayList<>();
+                List<RecursoReferenciaC> recursoReferenciaCList = new ArrayList<>();
+                List<Archivo> archivoList = new ArrayList<>();
+                List<RecursoArchivo> recursoArchivoList = new ArrayList<>();
+
                 if(response==null){
-                    callbackSimple.onLoad(false);
+
                 }else {
-                    List<ActividadAprendizaje> actividadAprendizajeList = new ArrayList<>();
-                    List<Tipos> tiposList = new ArrayList<>();
-                    List<RecursoDidacticoEventoC> recursoDidacticoEventoList = new ArrayList<>();
-                    List<RecursoReferenciaC> recursoReferenciaCList = new ArrayList<>();
-                    List<Archivo> archivoList = new ArrayList<>();
-                    List<RecursoArchivo> recursoArchivoList = new ArrayList<>();
-
                     for (JSONFirebase actividadSnapshot : JSONFirebase.d(response).getChildren()){
-
-
-
 
                         ActividadAprendizaje actividadAprendizaje = new ActividadAprendizaje();
                         actividadAprendizaje.setActividad(UtilsFirebase.convert(actividadSnapshot.child("Actividad").getValue(),""));
@@ -179,53 +177,53 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
                             }
                         }
                     }
-
-                    DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
-                    Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-                        @Override
-                        public void execute(DatabaseWrapper databaseWrapper) {
-
-                            RecursoReferenciaC result = SQLite.select(Method.max(RecursoReferenciaC_Table.recursoReferenciaId).as("recursoReferenciaId")).from(RecursoReferenciaC.class)
-                                    .querySingle();
-
-                            int max = result!=null?result.getRecursoReferenciaId()+1:1;
-                            for(RecursoReferenciaC recursoReferenciaC: recursoReferenciaCList){
-                                max++;
-                                recursoReferenciaC.setRecursoReferenciaId(max);
-                            }
-
-                            List<Integer> actividadAprendizajeIdList = new ArrayList<>();
-                            for (ActividadAprendizaje actividadAprendizaje : actividadAprendizajeList){
-                                actividadAprendizajeIdList.add(actividadAprendizaje.getActividadAprendizajeId());
-                            }
-
-                            //TransaccionUtils.deleteTable(RecursoDidacticoEventoC.class, RecursoDidacticoEventoC_Table.recursoDidacticoId.in(recursoIdList));
-                            TransaccionUtils.deleteTable(RecursoReferenciaC.class, RecursoReferenciaC_Table.actividadAprendizajeId.in(actividadAprendizajeIdList));
-                            //TransaccionUtils.deleteTable(RecursoArchivo.class, RecursoArchivo_Table.recursoDidacticoId.in(recursoIdList));
-                            TransaccionUtils.deleteTable(ActividadAprendizaje.class, ActividadAprendizaje_Table.sesionAprendizajeId.eq(sesionAprendizajeId));
-
-                            TransaccionUtils.fastStoreListInsert(ActividadAprendizaje.class, actividadAprendizajeList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(Tipos.class, tiposList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(RecursoDidacticoEventoC.class, recursoDidacticoEventoList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(RecursoReferenciaC.class, recursoReferenciaCList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(Archivo.class, archivoList, databaseWrapper, false);
-                            TransaccionUtils.fastStoreListInsert(RecursoArchivo.class, recursoArchivoList, databaseWrapper, false);
-                        }
-                    }).success(new Transaction.Success() {
-                        @Override
-                        public void onSuccess(@NonNull Transaction transaction) {
-                            callbackSimple.onLoad(true);
-                        }
-                    }).error(new Transaction.Error() {
-                        @Override
-                        public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
-                            error.printStackTrace();
-                            callbackSimple.onLoad(false);
-                        }
-                    }).build();
-
-                    transaction.execute();
                 }
+
+                DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+                    @Override
+                    public void execute(DatabaseWrapper databaseWrapper) {
+
+                        RecursoReferenciaC result = SQLite.select(Method.max(RecursoReferenciaC_Table.recursoReferenciaId).as("recursoReferenciaId")).from(RecursoReferenciaC.class)
+                                .querySingle();
+
+                        int max = result!=null?result.getRecursoReferenciaId()+1:1;
+                        for(RecursoReferenciaC recursoReferenciaC: recursoReferenciaCList){
+                            max++;
+                            recursoReferenciaC.setRecursoReferenciaId(max);
+                        }
+
+                        List<Integer> actividadAprendizajeIdList = new ArrayList<>();
+                        for (ActividadAprendizaje actividadAprendizaje : actividadAprendizajeList){
+                            actividadAprendizajeIdList.add(actividadAprendizaje.getActividadAprendizajeId());
+                        }
+
+                        //TransaccionUtils.deleteTable(RecursoDidacticoEventoC.class, RecursoDidacticoEventoC_Table.recursoDidacticoId.in(recursoIdList));
+                        TransaccionUtils.deleteTable(RecursoReferenciaC.class, RecursoReferenciaC_Table.actividadAprendizajeId.in(actividadAprendizajeIdList));
+                        //TransaccionUtils.deleteTable(RecursoArchivo.class, RecursoArchivo_Table.recursoDidacticoId.in(recursoIdList));
+                        TransaccionUtils.deleteTable(ActividadAprendizaje.class, ActividadAprendizaje_Table.sesionAprendizajeId.eq(sesionAprendizajeId));
+
+                        TransaccionUtils.fastStoreListInsert(ActividadAprendizaje.class, actividadAprendizajeList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(Tipos.class, tiposList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(RecursoDidacticoEventoC.class, recursoDidacticoEventoList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(RecursoReferenciaC.class, recursoReferenciaCList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(Archivo.class, archivoList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(RecursoArchivo.class, recursoArchivoList, databaseWrapper, false);
+                    }
+                }).success(new Transaction.Success() {
+                    @Override
+                    public void onSuccess(@NonNull Transaction transaction) {
+                        callbackSimple.onLoad(true);
+                    }
+                }).error(new Transaction.Error() {
+                    @Override
+                    public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                        error.printStackTrace();
+                        callbackSimple.onLoad(false);
+                    }
+                }).build();
+
+                transaction.execute();
             }
 
             @Override

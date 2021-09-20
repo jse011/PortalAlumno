@@ -58,7 +58,7 @@ class ViewHolderUnidades extends SectioningAdapter.HeaderViewHolder implements  
         Log.d("ParametroDisenioDocente", "TareasUI : " + parametroDisenioUi.toString());
         this.headerTareasAprendizajeUI = headerTareasAprendizajeUI;
         this.listener = listener;
-        String titulo = "Unidad "+headerTareasAprendizajeUI.getNroUnidad()+": "+headerTareasAprendizajeUI.getTituloSesionAprendizaje();
+        String titulo = "U"+headerTareasAprendizajeUI.getNroUnidad()+": "+headerTareasAprendizajeUI.getTituloSesionAprendizaje();
         txtTituloSesion.setText(titulo);
 
         try {

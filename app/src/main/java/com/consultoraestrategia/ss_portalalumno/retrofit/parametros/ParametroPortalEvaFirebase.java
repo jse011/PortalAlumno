@@ -14,6 +14,10 @@ public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
     private int sesionAprendizajeId;
     @SerializedName("vint_alumnoId")
     private int alumnoId;
+    @SerializedName("vint_ProgramaEducativoId")
+    private int programaEducativoId;
+    @SerializedName("vint_TareaId")
+    private String tareaId;
 
     public int getSilaboEventoId() {
         return silaboEventoId;
@@ -53,5 +57,21 @@ public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
 
     public int getAlumnoId() {
         return alumnoId;
+    }
+
+    public int getProgramaEducativoId() {
+        return programaEducativoId;
+    }
+
+    public void setProgramaEducativoId(int programaEducativoId) {
+        this.programaEducativoId = programaEducativoId;
+    }
+
+    public void setTareaId(String tareaId) {
+        this.tareaId = tareaId;
+    }
+
+    public String getTareaId() {
+        return tareaId;
     }
 }

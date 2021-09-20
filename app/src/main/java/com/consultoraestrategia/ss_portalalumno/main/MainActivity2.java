@@ -76,13 +76,21 @@ import com.consultoraestrategia.ss_portalalumno.userbloqueo.UserBloqueoActivity;
 import com.consultoraestrategia.ss_portalalumno.util.FabBottomNavigationView;
 import com.consultoraestrategia.ss_portalalumno.util.FloatingButtonGradiente;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsGlide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -131,6 +139,8 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
 
     private MenuAdapter menuAdapter;
     private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static  final int RC_SIGN_IN = 15264;
 
     @Override
     protected String getTag() {
@@ -394,6 +404,23 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
             Log.d(getTag(), "current: "+currentUser.getDisplayName());
+            //Eliminar el usuario antiguo y vover a logearse anonimamente
+            if(!currentUser.isAnonymous()){
+                currentUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            initializingFirebase();
+                            Toast.makeText(MainActivity2.this, "Success connect", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(getTag(),"Ocurrio un error durante la eliminación del usuario", e);
+                    }
+                });
+            }
         }
         mAuth.addAuthStateListener(mAuthListener);
     }
@@ -471,6 +498,9 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if(currentUser!=null) currentUser.delete();
         } catch (Exception ignored) {
         }
     }
@@ -497,6 +527,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     @Deprecated
     public void validateFirebase(String usuarioFirebase, String passwordFirebase) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
         if(currentUser==null){
             initializingFirebase(usuarioFirebase, passwordFirebase, new OnCompleteListener<AuthResult>() {
                 @Override
@@ -645,6 +676,82 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
     @Override
     public void servicePasarAsistencia(int silaboEventoId) {
         iCRMEdu.getiCRMEdu(this).pasarAsistencia(silaboEventoId);
+    }
+
+    @Override
+    public void accederGoogle() {
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        if(firebaseUser!=null){
+            firebaseUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        signInGoogle();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(MainActivity2.this, "Error session", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else {
+            signInGoogle();
+        }
+    }
+
+    void signInGoogle(){
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                Log.d(getTag(), "firebaseAuthWithGoogle:" + account.getId());
+                firebaseAuthWithGoogle(account.getIdToken());
+
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(getTag(), "Google sign in failed", e);
+                Toast.makeText(MainActivity2.this, "Error connect google", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(getTag(), "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(MainActivity2.this, "Success connect", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(getTag(), "signInWithCredential:failure", task.getException());
+                            Toast.makeText(MainActivity2.this, "Error auth", Toast.LENGTH_SHORT).show();;
+                        }
+                    }
+                });
     }
 
     @Override

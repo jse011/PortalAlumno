@@ -80,7 +80,11 @@ public class UtilsFirebase {
                         return (T)o;
                     }
                 }else if(convert.getClass().equals(String.class)){
-                    return (T)(o.toString());
+                    if(o.getClass().equals(JsonPrimitive.class)){
+                        return (T)String.valueOf(((JsonPrimitive)o).getAsString());
+                    }else {
+                        return (T)(o.toString());
+                    }
                 }else if(convert.getClass().equals(Boolean.class)){
                     if(o.getClass().equals(String.class)){
                         if(o.equals("true")||o.equals("1")){

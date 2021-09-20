@@ -86,6 +86,7 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
+import com.consultoraestrategia.ss_portalalumno.util.JSONFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
@@ -97,6 +98,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.JsonObject;
 import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -111,6 +113,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 
@@ -147,8 +150,10 @@ public class MainRepositorioImpl implements MainRepositorio {
         String fileName = persona!=null?persona.getFoto():"";
         int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
         fileName = fileName.substring(p + 1);
-        if(!TextUtils.isEmpty(fileName) &&"default.png".equals(fileName)){
-            alumnoUi.setFoto(persona.getFoto());
+        if(TextUtils.isEmpty(fileName)){
+            alumnoUi.setFoto(urlFoto+"default.png");
+        }else if("default.png".equals(fileName)){
+            alumnoUi.setFoto(urlFoto+"default.png");
         }else {
             alumnoUi.setFoto(urlFoto+personaId+"/"+fileName);
         }
@@ -1011,80 +1016,89 @@ public class MainRepositorioImpl implements MainRepositorio {
                 .querySingle();
 
         String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getTipoNotaEva(programaEducativoId));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
+            @Override
+            public void onResponse(JsonObject response) {
+                List<TipoNotaC> tipoNotaCList = new ArrayList<>();
+                List<ValorTipoNotaC> valorTipoNotaCList = new ArrayList<>();
+                List<RelProgramaEducativoTipoNota> programaEducativoTipoNotaList = new ArrayList<>();
 
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
-        mDatabase.child("AV_TipoNota/pgrid_"+programaEducativoId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        List<TipoNotaC> tipoNotaCList = new ArrayList<>();
-                        List<ValorTipoNotaC> valorTipoNotaCList = new ArrayList<>();
-                        List<RelProgramaEducativoTipoNota> programaEducativoTipoNotaList = new ArrayList<>();
-                        for (DataSnapshot tipoSnapshot : dataSnapshot.getChildren()){
-                            TipoNotaC tipoNotaC = new TipoNotaC();
-                            tipoNotaC.setKey(UtilsFirebase.convert(tipoSnapshot.child("TipoNotaId").getValue(), ""));
-                            tipoNotaC.setTipoNotaId(tipoNotaC.getKey());
-                            tipoNotaC.setNombre(UtilsFirebase.convert(tipoSnapshot.child("Nombre").getValue(), ""));
-                            tipoNotaC.setTipoId(UtilsFirebase.convert(tipoSnapshot.child("TipoId").getValue(), 0));
-                            tipoNotaC.setValorMaximo(UtilsFirebase.convert(tipoSnapshot.child("ValorMaximo").getValue(), 0));
-                            tipoNotaC.setValorMinino(UtilsFirebase.convert(tipoSnapshot.child("ValorMinimo").getValue(), 0));
-                            tipoNotaC.setIntervalo(UtilsFirebase.convert(tipoSnapshot.child("Intervalo").getValue(), false));
-                            tipoNotaCList.add(tipoNotaC);
-                            RelProgramaEducativoTipoNota relProgramaEducativoTipoNota = new RelProgramaEducativoTipoNota();
-                            relProgramaEducativoTipoNota.setTipoNotaId(tipoNotaC.getTipoNotaId());
-                            relProgramaEducativoTipoNota.setProgramaEducativoId(programaEducativoId);
-                            relProgramaEducativoTipoNota.setEstado(true);
-                            programaEducativoTipoNotaList.add(relProgramaEducativoTipoNota);
-                            if(tipoSnapshot.child("Valores").exists()){
-                                for (DataSnapshot valoresDataSnapshot: tipoSnapshot.child("Valores").getChildren()){
-                                    ValorTipoNotaC valorTipoNotaC = new ValorTipoNotaC();
-                                    valorTipoNotaC.setKey(UtilsFirebase.convert(valoresDataSnapshot.child("ValorTipoNotaId").getValue(), ""));
-                                    valorTipoNotaC.setValorTipoNotaId(valorTipoNotaC.getKey());
-                                    valorTipoNotaC.setAlias(UtilsFirebase.convert(valoresDataSnapshot.child("Alias").getValue(), ""));
-                                    valorTipoNotaC.setIcono(UtilsFirebase.convert(valoresDataSnapshot.child("Icono").getValue(), ""));
-                                    valorTipoNotaC.setTipoNotaId(UtilsFirebase.convert(valoresDataSnapshot.child("TipoNotaId").getValue(), ""));
-                                    valorTipoNotaC.setTitulo(UtilsFirebase.convert(valoresDataSnapshot.child("Titulo").getValue(), ""));
-                                    valorTipoNotaC.setValorNumerico(UtilsFirebase.convert(valoresDataSnapshot.child("ValorNumerico").getValue(), 0.0D));
+                if(response==null){
 
-                                    valorTipoNotaC.setIncluidoLInferior(UtilsFirebase.convert(valoresDataSnapshot.child("IncluidoLInferior").getValue(), false));
-                                    valorTipoNotaC.setIncluidoLSuperior(UtilsFirebase.convert(valoresDataSnapshot.child("IncluidoLSuperior").getValue(), false));
-                                    valorTipoNotaC.setLimiteInferior(UtilsFirebase.convert(valoresDataSnapshot.child("LimiteInferior").getValue(), 0.0D));
-                                    valorTipoNotaC.setLimiteSuperior(UtilsFirebase.convert(valoresDataSnapshot.child("LimiteSuperior").getValue(), 0.0D));
-                                    valorTipoNotaCList.add(valorTipoNotaC);
-                                }
+                }else {
+                    for (JSONFirebase tipoSnapshot : JSONFirebase.d(response).getChildren()){
+                        TipoNotaC tipoNotaC = new TipoNotaC();
+                        tipoNotaC.setKey(UtilsFirebase.convert(tipoSnapshot.child("TipoNotaId").getValue(), ""));
+                        tipoNotaC.setTipoNotaId(tipoNotaC.getKey());
+                        tipoNotaC.setNombre(UtilsFirebase.convert(tipoSnapshot.child("Nombre").getValue(), ""));
+                        tipoNotaC.setTipoId(UtilsFirebase.convert(tipoSnapshot.child("TipoId").getValue(), 0));
+                        tipoNotaC.setValorMaximo(UtilsFirebase.convert(tipoSnapshot.child("ValorMaximo").getValue(), 0));
+                        tipoNotaC.setValorMinino(UtilsFirebase.convert(tipoSnapshot.child("ValorMinimo").getValue(), 0));
+                        tipoNotaC.setIntervalo(UtilsFirebase.convert(tipoSnapshot.child("Intervalo").getValue(), false));
+                        tipoNotaCList.add(tipoNotaC);
+                        RelProgramaEducativoTipoNota relProgramaEducativoTipoNota = new RelProgramaEducativoTipoNota();
+                        relProgramaEducativoTipoNota.setTipoNotaId(tipoNotaC.getTipoNotaId());
+                        relProgramaEducativoTipoNota.setProgramaEducativoId(programaEducativoId);
+                        relProgramaEducativoTipoNota.setEstado(true);
+                        programaEducativoTipoNotaList.add(relProgramaEducativoTipoNota);
+                        if(tipoSnapshot.child("Valores").exists()){
+                            for (JSONFirebase valoresDataSnapshot: tipoSnapshot.child("Valores").getChildren()){
+                                ValorTipoNotaC valorTipoNotaC = new ValorTipoNotaC();
+                                valorTipoNotaC.setKey(UtilsFirebase.convert(valoresDataSnapshot.child("ValorTipoNotaId").getValue(), ""));
+                                valorTipoNotaC.setValorTipoNotaId(valorTipoNotaC.getKey());
+                                valorTipoNotaC.setAlias(UtilsFirebase.convert(valoresDataSnapshot.child("Alias").getValue(), ""));
+                                valorTipoNotaC.setIcono(UtilsFirebase.convert(valoresDataSnapshot.child("Icono").getValue(), ""));
+                                valorTipoNotaC.setTipoNotaId(UtilsFirebase.convert(valoresDataSnapshot.child("TipoNotaId").getValue(), ""));
+                                valorTipoNotaC.setTitulo(UtilsFirebase.convert(valoresDataSnapshot.child("Titulo").getValue(), ""));
+                                valorTipoNotaC.setValorNumerico(UtilsFirebase.convert(valoresDataSnapshot.child("ValorNumerico").getValue(), 0.0D));
 
+                                valorTipoNotaC.setIncluidoLInferior(UtilsFirebase.convert(valoresDataSnapshot.child("IncluidoLInferior").getValue(), false));
+                                valorTipoNotaC.setIncluidoLSuperior(UtilsFirebase.convert(valoresDataSnapshot.child("IncluidoLSuperior").getValue(), false));
+                                valorTipoNotaC.setLimiteInferior(UtilsFirebase.convert(valoresDataSnapshot.child("LimiteInferior").getValue(), 0.0D));
+                                valorTipoNotaC.setLimiteSuperior(UtilsFirebase.convert(valoresDataSnapshot.child("LimiteSuperior").getValue(), 0.0D));
+                                valorTipoNotaCList.add(valorTipoNotaC);
                             }
+
                         }
-                        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
-                        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
-                            @Override
-                            public void execute(DatabaseWrapper databaseWrapper) {
-                                TransaccionUtils.deleteTable(RelProgramaEducativoTipoNota.class);
-                                TransaccionUtils.fastStoreListInsert(RelProgramaEducativoTipoNota.class, programaEducativoTipoNotaList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(TipoNotaC.class, tipoNotaCList, databaseWrapper, false);
-                                TransaccionUtils.fastStoreListInsert(ValorTipoNotaC.class, valorTipoNotaCList, databaseWrapper, false);
-                            }
-                        }).success(new Transaction.Success() {
-                            @Override
-                            public void onSuccess(@NonNull Transaction transaction) {
-                                callback.onLoad(true);
-                            }
-                        }).error(new Transaction.Error() {
-                            @Override
-                            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
-                                error.printStackTrace();
-                                callback.onLoad(false);
-                            }
-                        }).build();
-
-                        transaction.execute();
                     }
+                }
 
+                DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+                Transaction transaction = database.beginTransactionAsync(new ITransaction() {
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    public void execute(DatabaseWrapper databaseWrapper) {
+                        TransaccionUtils.deleteTable(RelProgramaEducativoTipoNota.class);
+                        TransaccionUtils.fastStoreListInsert(RelProgramaEducativoTipoNota.class, programaEducativoTipoNotaList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(TipoNotaC.class, tipoNotaCList, databaseWrapper, false);
+                        TransaccionUtils.fastStoreListInsert(ValorTipoNotaC.class, valorTipoNotaCList, databaseWrapper, false);
+                    }
+                }).success(new Transaction.Success() {
+                    @Override
+                    public void onSuccess(@NonNull Transaction transaction) {
+                        callback.onLoad(true);
+                    }
+                }).error(new Transaction.Error() {
+                    @Override
+                    public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                        error.printStackTrace();
                         callback.onLoad(false);
                     }
-                });
+                }).build();
+
+                transaction.execute();
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callback.onLoad(false);
+            }
+        });
+
+
 
 
 

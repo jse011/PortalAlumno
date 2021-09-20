@@ -62,7 +62,9 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     private void getListUnidades(){
         this.unidadAprendizajeUiList.clear();
         this.unidadAprendizajeUiList.addAll(getUnidadAprendizajeList.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId));
-
+        for(UnidadAprendizajeUi unidadAprendizajeUi : unidadAprendizajeUiList){
+            unidadAprendizajeUi.setCantidadUnidades(unidadAprendizajeUiList.size());
+        }
 
         Collections.sort(this.unidadAprendizajeUiList, new Comparator<UnidadAprendizajeUi>() {
             @Override

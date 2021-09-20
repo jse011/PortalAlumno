@@ -59,6 +59,8 @@ public interface MainView extends BaseView<MainPresenter> {
 
     void servicePasarAsistencia(int silaboEventoId);
 
+    void accederGoogle();
+
     interface TabEvento {
 
         void setTiposList(List<TipoEventoUi> tipoEventoUiList);

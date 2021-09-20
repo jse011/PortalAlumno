@@ -243,7 +243,9 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
             case ALARMA:
                 //if(view!=null) view.mostrarDialogoConfigAlarma();
                 break;
-
+            case Acceso_con_Google:
+                if(view!=null) view.accederGoogle();
+                break;
 
         }
     }
@@ -275,6 +277,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         //configuracionUiList.add(ConfiguracionUi.BORRAR_CACHE);
         //configuracionUiList.add(ConfiguracionUi.CONTACTOS);
         //configuracionUiList.add(ConfiguracionUi.ALARMA);
+        configuracionUiList.add(ConfiguracionUi.Acceso_con_Google);
         configuracionUiList.add(ConfiguracionUi.CERRAR_SESION);
 
 

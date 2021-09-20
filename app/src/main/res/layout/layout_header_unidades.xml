@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView2"
@@ -49,12 +50,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
 
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="28dp"
 
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="8dp"
                 android:text="tituloSesisionAprendizajetituloSesisionAprendizajetituloSesisionAprendizaje"
-                android:textSize="13sp"
+                android:textSize="14dp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/constraintLayout6"
                 app:layout_constraintStart_toStartOf="parent"

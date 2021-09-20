@@ -66,8 +66,6 @@ public class ActividadesFragment extends Fragment implements ActividadesView, Ac
     ActividadesPresenter presenter;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
-    @BindView(R.id.txtmensaje)
-    TextView txtmensaje;
 
     ActividadesAdapter actividadesAdapter;
     @BindView(R.id.content_actividades)
@@ -192,12 +190,12 @@ public class ActividadesFragment extends Fragment implements ActividadesView, Ac
 
     @Override
     public void showMessage() {
-        txtmensaje.setVisibility(View.VISIBLE);
+        //txtmensaje.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideMessage() {
-        txtmensaje.setVisibility(View.GONE);
+        //txtmensaje.setVisibility(View.GONE);
     }
 
     @Override

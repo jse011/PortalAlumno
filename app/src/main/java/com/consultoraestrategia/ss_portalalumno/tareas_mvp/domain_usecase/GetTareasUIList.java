@@ -21,22 +21,9 @@ public class GetTareasUIList {
     }
 
 
-    public void executeUseCase(RequestValues requestValues, Callback callback) {
+    public List<HeaderTareasAprendizajeUI>  execute(RequestValues requestValues) {
 
-        repository.getTareasUIList(requestValues.getIdUsuario(), requestValues.getIdCargaCurso(), requestValues.getTipoTarea(), requestValues.getmSesionAprendizajeId(), requestValues.getCalendarioPeriodoId(),requestValues.getAnioAcademicoId(), requestValues.getPlanCursoId(),
-                new GetTareasListCallback() {
-                    @Override
-                    public void onTareasListLoaded(List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList) {
-                        callback.onSuccess(new ResponseValue(headerTareasAprendizajeUIList));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        callback.onError(error);
-                    }
-                });
-
-
+        return repository.getTareasUIList(requestValues.getIdUsuario(), requestValues.getIdCargaCurso(), requestValues.getTipoTarea(), requestValues.getmSesionAprendizajeId(), requestValues.getCalendarioPeriodoId(),requestValues.getAnioAcademicoId(), requestValues.getPlanCursoId());
     }
 
     public static final class RequestValues  {

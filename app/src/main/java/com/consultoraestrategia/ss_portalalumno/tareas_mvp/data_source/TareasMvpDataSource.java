@@ -5,6 +5,7 @@ import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.DownloadCancelUi;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.ParametroDisenioUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
@@ -69,7 +70,7 @@ public interface TareasMvpDataSource {
         void onErrorMaxSize();
     }
 
-    void getTareasUIList(int idUsuario, int idCargaCurso, int tipoTarea, int sesionAprendizajeId, int calendarioPeriodoId, int anioAcademicoId, int planCursoId, GetTareasListCallback callback);
+    List<HeaderTareasAprendizajeUI> getTareasUIList(int idUsuario, int idCargaCurso, int tipoTarea, int sesionAprendizajeId, int calendarioPeriodoId, int anioAcademicoId, int planCursoId);
 
     void getParametroDisenio(int parametroDisenioId, CallbackTareas callbackTareas);
 
@@ -77,7 +78,7 @@ public interface TareasMvpDataSource {
 
     void dowloadImage(String url, String nombre, String carpeta, CallbackProgress<String> stringCallbackProgress);
 
-    FirebaseCancel updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackTareaAlumno callbackTareaAlumno);
+    FirebaseCancel updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, CallbackTareaAlumno callbackTareaAlumno);
 
     void updateFirebaseTareaSesion(int idCargaCurso, int calendarioPeriodoId, int SesionAprendizajeId,List<TareasUI> tareasUIList, CallbackSimple callbackSimple);
 

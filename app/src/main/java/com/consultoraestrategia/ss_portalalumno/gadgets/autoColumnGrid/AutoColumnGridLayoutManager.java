@@ -20,6 +20,7 @@ public class AutoColumnGridLayoutManager extends GridLayoutManager {
         int getColumnCount(int recyclerViewWidth);
     }
 
+    private int spanCount;
     public static class DefaultColumnCountProvider implements ColumnCountProvider {
         @NonNull
         private final Context context;
@@ -76,12 +77,18 @@ public class AutoColumnGridLayoutManager extends GridLayoutManager {
 
     private void updateSpanCount(int width) {
         if (columnCountProvider != null) {
-            int spanCount = columnCountProvider.getColumnCount(width);
+            spanCount = columnCountProvider.getColumnCount(width);
             setSpanCount(spanCount > 0 ? spanCount : 1);
         }
     }
 
     public void setColumnCountProvider(@Nullable ColumnCountProvider provider) {
         this.columnCountProvider = provider;
+    }
+
+
+    @Override
+    public int getSpanCount() {
+        return spanCount;
     }
 }

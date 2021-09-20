@@ -1,5 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.adapters;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 

@@ -82,8 +82,13 @@ import com.consultoraestrategia.ss_portalalumno.youtube.YoutubeConfig;
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
 import com.fxn.utility.PermUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -229,6 +234,7 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
     protected Bundle getExtrasInf() {
         return getIntent().getExtras();
     }
+
 
     @Override
     protected void setContentView() {
@@ -486,11 +492,17 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
         ButterKnife.bind(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
     @OnClick(R.id.btn_adjuntar)
     public void onViewClicked() {
         FilterChooserBottomSheetDialog filterChooserBottomSheetDialog = new FilterChooserBottomSheetDialog();
         filterChooserBottomSheetDialog.show(getSupportFragmentManager(), "FilterChooserBottomSheetDialog");
     }
+
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {

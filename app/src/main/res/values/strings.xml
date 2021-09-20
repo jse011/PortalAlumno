@@ -1,4 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="server_client_id">108585189219302292278</string>
     <string name="app_name">EVA Student</string>
     <!--<string name="app_name">Educar Student</string>-->
    <string name="activity_login_title">Iniciar Sesión</string>

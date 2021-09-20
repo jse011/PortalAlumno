@@ -532,6 +532,11 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
 
     }
 
+    @Override
+    public void accederGoogle() {
+
+    }
+
     private void initializingFirebase(String email, String password, OnCompleteListener<AuthResult> callback){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

@@ -1,10 +1,12 @@
 package com.consultoraestrategia.ss_portalalumno.unidadAprendizaje;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -33,6 +35,8 @@ import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.domain.usecase
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.SesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -43,7 +47,7 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     @BindView(R.id.rv_Unidades)
     RecyclerView rvUnidades;
     @BindView(R.id.mensaje)
-    TextView mensaje;
+    LinearLayout mensaje;
     private UnidadesAdapter listAdapter;
 
     @Override
@@ -175,5 +179,18 @@ public class UnidadAprendizajeFragment extends BaseFragment<UnidadAprendizajeVie
     @Override
     public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
         presenter.notifyChangeFragment(finishUpdateUnidadFb);
+    }
+
+    @Override
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            listAdapter.notifyDataSetChanged();
+
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            listAdapter.notifyDataSetChanged();
+
+        }
     }
 }

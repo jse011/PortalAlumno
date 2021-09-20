@@ -14,8 +14,8 @@ public class UpdateFireBaseTareaSilabo {
         this.repository = repository;
     }
 
-    public FirebaseCancel execute(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallBack callBack){
-        return repository.updateFirebaseTarea(idCargaCurso, calendarioPeriodoId, tareasUIList, new TareasMvpDataSource.CallbackTareaAlumno() {
+    public FirebaseCancel execute(int idCargaCurso, int calendarioPeriodoId, CallBack callBack){
+        return repository.updateFirebaseTarea(idCargaCurso, calendarioPeriodoId, new TareasMvpDataSource.CallbackTareaAlumno() {
             @Override
             public void onLoad(boolean success) {
                 if(success){

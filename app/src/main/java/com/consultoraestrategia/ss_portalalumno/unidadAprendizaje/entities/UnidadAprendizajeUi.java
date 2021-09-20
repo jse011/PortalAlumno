@@ -19,6 +19,7 @@ public class UnidadAprendizajeUi {
     private String reto;
     private boolean toogle;
     private List<SesionAprendizajeUi> objectListSesiones;
+    private int cantidadUnidades;
 
     public List<SesionAprendizajeUi> getObjectListSesiones() {
         return objectListSesiones;
@@ -136,5 +137,11 @@ public class UnidadAprendizajeUi {
     }
 
 
+    public void setCantidadUnidades(int cantidadUnidades) {
+        this.cantidadUnidades = cantidadUnidades;
+    }
 
+    public int getCantidadUnidades() {
+        return cantidadUnidades;
+    }
 }

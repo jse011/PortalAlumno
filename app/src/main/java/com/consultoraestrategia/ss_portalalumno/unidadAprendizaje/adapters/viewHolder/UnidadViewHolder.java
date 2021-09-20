@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,12 +48,19 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
     @BindView(R.id.rv_sesiones)
     RecyclerView rvSesiones;
     @BindView(R.id.txt_vacio)
-    TextView txtVacio;
+    LinearLayout txtVacio;
+    @BindView(R.id.card_view_2)
+    CardView cardView2;
+    @BindView(R.id.txt_ver_mas_sesiones)
+    TextView txtVerMasSesiones;
+
     private UnidadAprendizajeUi unidadAprendizaje;
     private String color;
     private UnidadesAdapter.UnidadListener unidadListener;
     private AdapterSesiones adapter;
     private int columnas;
+    private SesionColumnCountProvider columnCountProvider;
+    private SesionHolder.GridSpacingItemDecoration addItemDecoration;
 
     public UnidadViewHolder(@NonNull View itemView, UnidadesAdapter.UnidadListener unidadListener) {
         super(itemView);
@@ -79,33 +87,54 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
         if (unidadAprendizaje.getObjectListSesiones().size() <= 0){
             txtVerMas.setVisibility(View.GONE);
             txtVacio.setVisibility(View.VISIBLE);
-            txtVacio.setText("En esta Unidad no hay sesiones por el momento");
         }else{
             txtVacio.setVisibility(View.GONE);
             txtVerMas.setVisibility(View.VISIBLE);
         }
 
-        boolean isVisibleVerMas = columnas < unidadAprendizaje.getObjectListSesiones().size();
+        int spacing = 15; // 50px
+        columnas = columnCountProvider.getColumnCount(rvSesiones.getWidth());
+        if(addItemDecoration!=null)rvSesiones.removeItemDecoration(addItemDecoration);
+        addItemDecoration = new SesionHolder.GridSpacingItemDecoration(columnas, spacing,false);
+        rvSesiones.addItemDecoration(addItemDecoration);
 
+        int cantidad = columnas * 2;
+        boolean isVisibleVerMas = cantidad < unidadAprendizaje.getObjectListSesiones().size();
+        if(unidadAprendizaje.getCantidadUnidades()==1){
+            isVisibleVerMas = false;
+        }
         if(isVisibleVerMas){
             cardView.setOnClickListener(this);
+            cardView2.setOnClickListener(this);
             txtVerMas.setVisibility(View.VISIBLE);
+            cardView2.setVisibility(View.VISIBLE);
         }else {
             cardView.setOnClickListener(null);
+            cardView2.setOnClickListener(null);
             txtVerMas.setVisibility(View.GONE);
+            cardView2.setVisibility(View.GONE);
         }
+
+
 
         if(unidadAprendizaje.isToogle()){
             if(isVisibleVerMas){
                 setViewLess();
+                txtVerMasSesiones.setText("Ver solo las últimas sesiones");
             }
+            adapter.setList(unidadAprendizaje.getObjectListSesiones());
         }else {
             if(isVisibleVerMas){
                 setViewMore();
+                txtVerMasSesiones.setText("Ver más sesiones");
+                adapter.setList(unidadAprendizaje.getObjectListSesiones(), cantidad);
+            }else {
+                adapter.setList(unidadAprendizaje.getObjectListSesiones());
             }
+
         }
 
-        adapter.setList(unidadAprendizaje.getObjectListSesiones());
+
     }
 
     private void setViewMore(){
@@ -122,16 +151,14 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
     private void setListColumanas(){
         Log.d(TAG, "setListColumanas");
         AutoColumnGridLayoutManager autoColumnGridLayoutManager = new AutoColumnGridLayoutManager(itemView.getContext(), OrientationHelper.VERTICAL, false);
-        SesionColumnCountProvider columnCountProvider = new SesionColumnCountProvider(itemView.getContext());
+        columnCountProvider = new SesionColumnCountProvider(itemView.getContext());
         autoColumnGridLayoutManager.setColumnCountProvider(columnCountProvider);
         rvSesiones.setNestedScrollingEnabled(false);
         rvSesiones.setHasFixedSize(false);
         rvSesiones.setLayoutManager(autoColumnGridLayoutManager);
         adapter = new AdapterSesiones( new ArrayList<>(), false, unidadListener);
         rvSesiones.setAdapter(adapter);
-        int spacing = 15; // 50px
-        this.columnas = SesionColumnCountProvider.columnsForWidth(rvSesiones.getContext(), rvSesiones.getWidth());
-        rvSesiones.addItemDecoration(new SesionHolder.GridSpacingItemDecoration(columnas, spacing,false));
+
     }
 
     private void setViewLess(){
@@ -149,6 +176,9 @@ public class UnidadViewHolder extends RecyclerView.ViewHolder implements View.On
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.card_view:
+                onClickVerMas();
+                break;
+            case R.id.card_view_2:
                 onClickVerMas();
                 break;
         }

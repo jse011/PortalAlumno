@@ -7,6 +7,7 @@ import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.local.TareasLocalDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.remote.RemoteMvpDataSource;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
@@ -88,9 +89,10 @@ public class TareasMvpRepository implements TareasMvpDataSource {
     }
 
     @Override
-    public void getTareasUIList(int idUsuario, int idCargaCurso, int tipoTarea, int sesionAprendizajeId, int calendarioPeriodoId, int anioAcademicoId, int planCursoId,GetTareasListCallback callback) {
-        localDataSource.getTareasUIList(idUsuario,idCargaCurso,tipoTarea,sesionAprendizajeId,calendarioPeriodoId, anioAcademicoId, planCursoId, callback);
+    public List<HeaderTareasAprendizajeUI> getTareasUIList(int idUsuario, int idCargaCurso, int tipoTarea, int sesionAprendizajeId, int calendarioPeriodoId, int anioAcademicoId, int planCursoId) {
+        return localDataSource.getTareasUIList(idUsuario, idCargaCurso, tipoTarea, sesionAprendizajeId, calendarioPeriodoId, anioAcademicoId, planCursoId);
     }
+
 
     @Override
     public void getParametroDisenio(int parametroDisenioId, CallbackTareas callbackTareas) {
@@ -108,8 +110,8 @@ public class TareasMvpRepository implements TareasMvpDataSource {
     }
 
     @Override
-    public FirebaseCancel updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, List<TareasUI> tareasUIList, CallbackTareaAlumno callbackTareaAlumno) {
-        return remoteDataSource.updateFirebaseTarea(idCargaCurso,calendarioPeriodoId, tareasUIList, callbackTareaAlumno);
+    public FirebaseCancel updateFirebaseTarea(int idCargaCurso, int calendarioPeriodoId, CallbackTareaAlumno callbackTareaAlumno) {
+        return remoteDataSource.updateFirebaseTarea(idCargaCurso,calendarioPeriodoId, callbackTareaAlumno);
     }
 
     @Override
