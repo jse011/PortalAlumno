@@ -5,6 +5,7 @@ public class DriveUi {
     private String url;
     private String msgError;
     private String thumbnail;
+    private String nombreArchivoLocal;
 
     public String getIdDrive() {
         return idDrive;
@@ -36,5 +37,13 @@ public class DriveUi {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public void setNombreArchivoLocal(String nombreArchivoLocal) {
+        this.nombreArchivoLocal = nombreArchivoLocal;
+    }
+
+    public String getNombreArchivoLocal() {
+        return nombreArchivoLocal;
     }
 }

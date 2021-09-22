@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/circle_transparent_2.xml" value="0.3828125" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/pattern_repeat.xml" value="0.25104166666666666" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/actividades_fragment.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_main_two.xml" value="0.24270833333333333" />
@@ -11,8 +12,13 @@
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tabs_sesiones_2.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tarea_descripcion.xml" value="0.10283687943262411" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/app_bar_main.xml" value="0.1" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/fragment_archivo_preview.xml" value="0.22291666666666668" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_download_tarea.xml" value="0.21145833333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_encuesta_sesion.xml" value="0.11068895643363728" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tarea.xml" value="0.2671875" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tareas_unidades.xml" value="0.2671875" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tareas_unidades_2.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tareas_unidades_simple.xml" value="0.22" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_colaborativa.xml" value="0.18432971014492755" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_header_unidades.xml" value="0.1868421052631579" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_instrumento.xml" value="0.18659420289855072" />
@@ -22,7 +28,7 @@
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_unidades.xml" value="0.24149659863945577" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_pregunta.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_unidades.xml" value="0.22" />
-        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/preview_tarea_alumno.xml" value="0.14722222222222223" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/preview_tarea_alumno.xml" value="0.14" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/tab_item_tarea_mvp.xml" value="0.22760416666666666" />
       </map>
     </option>

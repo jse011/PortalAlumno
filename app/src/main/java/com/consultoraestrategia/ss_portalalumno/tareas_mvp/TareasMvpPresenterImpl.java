@@ -1,7 +1,6 @@
 package com.consultoraestrategia.ss_portalalumno.tareas_mvp;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCase;
@@ -12,7 +11,6 @@ import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCalendarioPerioUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
-import com.consultoraestrategia.ss_portalalumno.global.entities.GbSesionAprendizajeUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbTareaUi;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.DowloadImageUseCase;
@@ -28,11 +26,12 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioE
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RubroEvalProcesoUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.ui.FragmentTareas;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by irvinmarin on 06/11/2017.
@@ -43,9 +42,7 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
     private TareasMvpView view;
     private UseCaseHandler handler;
     private GetTareasUIList getTareasUIList;
-    int tipoTarea = 0;
     int idCargaCurso = 0;
-    int mSesionAprendizajeId = 0;
     int idCurso;
     private int idCalendarioPeriodo;
     private int programaEducativoId;
@@ -88,46 +85,21 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
         Log.d(TAG, "onCreate");
     }
 
-    private void getTareasCurso(int tipoTarea,int idCargaCurso, int mSesionAprendizajeId) {
+    private void getTareasCurso(int idCargaCurso) {
         if (view!=null)view.hideMessage();
         if (view!=null)view.showProgress();
         int calendarioPeriodoId = 0;
         if(idCalendarioPeriodo != 0)calendarioPeriodoId = idCalendarioPeriodo;
-        List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList = getTareasUIList.execute(new GetTareasUIList.RequestValues(0, idCargaCurso, tipoTarea, mSesionAprendizajeId, calendarioPeriodoId, anioAcademicoId, planCursoId));
+        List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList = getTareasUIList.execute(new GetTareasUIList.RequestValues(0, idCargaCurso, 0, 0, calendarioPeriodoId, anioAcademicoId, planCursoId));
         try {
             for(HeaderTareasAprendizajeUI newheaderTareasAprendizajeUI: headerTareasAprendizajeUIList){
-
-                for(HeaderTareasAprendizajeUI headerTareasAprendizajeUI: this.headerTareasAprendizajeUIList){
-
-                    if(headerTareasAprendizajeUI.getIdUnidadAprendizaje()==newheaderTareasAprendizajeUI.getIdUnidadAprendizaje()){
-
-                        for (TareasUI newtareasUI : newheaderTareasAprendizajeUI.getTareasUIList()){
-
-                            for (TareasUI tareasUI : headerTareasAprendizajeUI.getTareasUIList()){
-
-                                if(tareasUI.getKeyTarea().equals(newtareasUI.getKeyTarea())){
-
-                                    int pocision =0;
-                                    for (RecursosUI newrepositorioFileUi : newtareasUI.getRecursosUIList()){
-
-                                        for (RecursosUI repositorioFileUi : tareasUI.getRecursosUIList()){
-                                            String recurso1 = !TextUtils.isEmpty(repositorioFileUi.getArchivoId())?repositorioFileUi.getArchivoId():"";
-                                            String recurso2 = !TextUtils.isEmpty(newrepositorioFileUi.getArchivoId())?newrepositorioFileUi.getArchivoId():"";
-                                            if(recurso1.equals(recurso2)&&!TextUtils.isEmpty(recurso1)&&!TextUtils.isEmpty(recurso2)){
-                                                newtareasUI.getRecursosUIList().set(pocision, repositorioFileUi);
-                                            }
-
-                                        }
-                                        pocision++;
-                                    }
-
-                                }
-
-                            }
-
-                        }
-
-                    }
+                newheaderTareasAprendizajeUI.setParametroDisenioUi(parametroDisenioUi);
+                newheaderTareasAprendizajeUI.setCantidadUnidades(headerTareasAprendizajeUIList.size());
+                int position = 0;
+                for (TareasUI newtareasUI : newheaderTareasAprendizajeUI.getTareasUIList()){
+                    newtareasUI.setPosition(newheaderTareasAprendizajeUI.getTareasUIList().size() - position);
+                    newtareasUI.setParametroDisenioUi(parametroDisenioUi);
+                    position++;
 
                 }
 
@@ -180,13 +152,12 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
     @Override
     public void setExtras(Bundle extras) {
-        this.tipoTarea = extras.getInt(FragmentTareas.tipoTareas,0);
         setData();
-        online.online(success -> {
+        /*online.online(success -> {
             if(!success){
                 getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
             }
-        });
+        });*/
     }
 
     private void setData() {
@@ -203,43 +174,12 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
         this.parametroDisenioUi.setColor1(gbCursoUi.getParametroDisenioColor1());
         this.parametroDisenioUi.setColor2(gbCursoUi.getParametroDisenioColor2());
         this.parametroDisenioUi.setColor3(gbCursoUi.getParametroDisenioColor3());
-
-        if(this.tipoTarea!=0){
-            GbSesionAprendizajeUi gbSesionAprendizajeUi = iCRMEdu.variblesGlobales.getGbSesionAprendizajeUi();
-            this.mSesionAprendizajeId = gbSesionAprendizajeUi.getSesionAprendizajeId();
-        }
     }
 
 
-    public void getTareas(int mIdCargaCurso, int mIdCurso, int mSesionAprendizajeId, int tipoTareas) {
-        Log.d(TAG, "mIdCargaCurso : " + mIdCargaCurso);
-        Log.d(TAG, "mIdCurso : " + mIdCurso);
-        Log.d(TAG, "mSesionAprendizajeId : " + mSesionAprendizajeId);
-        getTareasCurso(tipoTareas, mIdCargaCurso, mSesionAprendizajeId);
-    }
 
     @Override
     public void deleteTarea(TareasUI tareasUI) {
-        TareasC tareas = SQLite.select()
-                .from(TareasC.class)
-                .where(TareasC_Table.key.is(tareasUI.getKeyTarea()))
-                .querySingle();
-        if (tareas != null) {
-            tareas.setEstadoId(265);
-            tareas.setSyncFlag(TareasC.FLAG_UPDATED);
-            tareas.setEstadoExportado(0);
-            tareas.save();
-            if(view!=null)view.exportarTareasEliminadas(programaEducativoId);
-            if(view!=null)view.exportarTareasEliminadas(programaEducativoId);
-
-            Log.d(TAG, "Tarea ELiminar");
-        } else {
-            Log.d(TAG, "No hay Tarea para ELiminar");
-        }
-
-        cancelDowload(tareasUI);
-
-        getTareasCurso(tipoTarea, idCargaCurso, mSesionAprendizajeId);
 
     }
 
@@ -247,19 +187,18 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
     @Override
     public void onResumeFragment() {
-        getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
+        //getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
     }
 
     @Override
     public void onClickedCrearTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI, int idSilaboEvento, int mIdCurso) {
 
-        if(view!=null)view.showActivityCrearTareas(headerTareasAprendizajeUI,0,idSilaboEvento,mSesionAprendizajeId, idCurso, parametroDisenioUi.getColor1(), programaEducativoId);
+        if(view!=null)view.showActivityCrearTareas(headerTareasAprendizajeUI,0,idSilaboEvento,0, idCurso, parametroDisenioUi.getColor1(), programaEducativoId);
     }
 
     @Override
     public void onClickedOpTareaEdit(TareasUI tareasUI, HeaderTareasAprendizajeUI headerTareasAprendizajeUI) {
-        if(view!=null)view.showlActivityEditTareas(tareasUI,headerTareasAprendizajeUI, 0,headerTareasAprendizajeUI.getIdSilaboEvento(),mSesionAprendizajeId, idCurso, parametroDisenioUi.getColor1(), programaEducativoId);
-        cancelDowload(tareasUI);
+        if(view!=null)view.showlActivityEditTareas(tareasUI,headerTareasAprendizajeUI, 0,headerTareasAprendizajeUI.getIdSilaboEvento(),0, idCurso, parametroDisenioUi.getColor1(), programaEducativoId);
     }
     @Override
     public void onActualizarTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI) {
@@ -283,12 +222,12 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
     @Override
     public void onCrearRubro(TareasUI tareasUI, HeaderTareasAprendizajeUI headerTareasAprendizajeUI) {
-        if(view!=null)view.showActivityCrearRubro(tareasUI, headerTareasAprendizajeUI.getIdSilaboEvento(), idCalendarioPeriodo, programaEducativoId,mSesionAprendizajeId, parametroDisenioUi.getColor1(), idCurso);
+
     }
 
     @Override
     public void onCrearRubrica(TareasUI tareasUI, HeaderTareasAprendizajeUI headerTareasAprendizajeUI) {
-        if(view!=null)view.showActivityCrearRubrica(tareasUI, idCalendarioPeriodo, idCargaCurso, idCurso, programaEducativoId,mSesionAprendizajeId, parametroDisenioUi.getColor1());
+
     }
 
     @Override
@@ -310,10 +249,10 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
     private void showEvaluacionRubro(TareasUI tareasUI, RubroEvalProcesoUi rubroEvalProcesoUi) {
         switch (rubroEvalProcesoUi.getFormaRubroEvalProcesoUi()){
             case GRUPAL:
-                if(view!=null)view.showEvaluacionRubroGrupal(tareasUI,rubroEvalProcesoUi, idCargaCurso, mSesionAprendizajeId, idCurso, parametroDisenioUi.getColor1());
+
                 break;
             case INDIVIDUAL:
-                if(view!=null)view.showEvaluacionRubroIndividual(tareasUI,rubroEvalProcesoUi, idCargaCurso, mSesionAprendizajeId, idCurso, parametroDisenioUi.getColor1());
+
                 break;
         }
     }
@@ -472,7 +411,6 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
     @Override
     public void onDestroyView() {
-        cancelAllDowload();
         view = null;
         Log.d(TAG, "onDestroyView");
     }
@@ -493,98 +431,71 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
     @Override
     public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
-        cancelAllDowload();
+        Log.d(TAG,"notifyChangeFragment tarea");
         setData();
         if(view!=null)view.showProgress();
         if(firebasTarea!=null)firebasTarea.cancel();
         online.online(success -> {
             if(success&&finishUpdateUnidadFb){
 
-                if(tipoTarea==0){
+                firebasTarea = updateFireBaseTareaSilabo.execute(idCargaCurso, idCalendarioPeriodo, new UpdateFireBaseTareaSilabo.CallBack() {
+                    @Override
+                    public void onSucces() {
+                        getTareasCurso(idCargaCurso);
+                    }
 
-                   firebasTarea = updateFireBaseTareaSilabo.execute(idCargaCurso, idCalendarioPeriodo, new UpdateFireBaseTareaSilabo.CallBack() {
-                        @Override
-                        public void onSucces() {
-                            getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-                        }
+                    @Override
+                    public void onError(String error) {
+                        if(view!=null)view.hideProgress();
+                    }
 
-                        @Override
-                        public void onError(String error) {
-                            if(view!=null)view.hideProgress();
-                        }
-
-                       @Override
-                       public void onChangeTarea(String tareaId, String nota, int tipoNotaId) {
-                                //Aqui
-                          for (HeaderTareasAprendizajeUI headerTareasAprendizajeUI: headerTareasAprendizajeUIList){
-                              for (TareasUI tareasUI : headerTareasAprendizajeUI.getTareasUIList()){
-                                  if(tareasUI.getKeyTarea().equals(tareaId)){
-                                        tareasUI.setNota(nota);
-                                        tareasUI.setTipoNotaId(tipoNotaId);
-                                        if(view!=null)view.updateTarea(tareasUI);
-                                        break;
-                                  }
-                              }
-                          }
-                       }
-                   });
-                }else {
-                    updateFireBaseTareaSesion.execute(idCargaCurso, idCalendarioPeriodo, mSesionAprendizajeId, new ArrayList<>(), new UpdateFireBaseTareaSesion.CallBack() {
-                        @Override
-                        public void onSucces() {
-                            getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-                            if(view!=null)view.hideProgress();
-                            if(headerTareasAprendizajeUIList.isEmpty()){
-                                if(view!=null)view.showMessage();
-                            }else {
-                                if(view!=null)view.hideMessage();
+                    @Override
+                    public void onChangeTarea(String tareaId, String nota, int tipoNotaId) {
+                        //Aqui
+                        for (HeaderTareasAprendizajeUI headerTareasAprendizajeUI: headerTareasAprendizajeUIList){
+                            for (TareasUI tareasUI : headerTareasAprendizajeUI.getTareasUIList()){
+                                if(tareasUI.getKeyTarea().equals(tareaId)){
+                                    tareasUI.setNota(nota);
+                                    tareasUI.setTipoNotaId(tipoNotaId);
+                                    if(view!=null)view.updateTarea(headerTareasAprendizajeUI, tareasUI);
+                                    break;
+                                }
                             }
                         }
-
-                        @Override
-                        public void onError(String error) {
-                            if(view!=null)view.hideProgress();
-                        }
-                    });
-                }
-            }else {
-                if(tipoTarea==0){
-                    getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-                }else {
-                    getTareas(idCargaCurso, idCurso, mSesionAprendizajeId, tipoTarea);
-                    if(view!=null)view.hideProgress();
-                    if(headerTareasAprendizajeUIList.isEmpty()){
-                        if(view!=null)view.showMessage();
-                    }else {
-                        if(view!=null)view.hideMessage();
                     }
-                }
+
+                    @Override
+                    public void onChangeTarea(List<TareasUI> tareasUIList) {
+                        for (HeaderTareasAprendizajeUI headerTareasAprendizajeUI: headerTareasAprendizajeUIList){
+                            List<TareasUI> tareasUIModificadaList  = new ArrayList<>();
+                            for (TareasUI tareasUI : headerTareasAprendizajeUI.getTareasUIList()){
+                                for (TareasUI newtareasUI: tareasUIList){
+                                    if(tareasUI.getKeyTarea().equals(newtareasUI.getKeyTarea())){
+                                        tareasUI.setNota(newtareasUI.getNota());
+                                        tareasUI.setTipoNotaId(newtareasUI.getTipoNotaId());
+                                        tareasUIModificadaList.add(tareasUI);
+                                    }
+                                }
+                            }
+                            if(view!=null)view.updateTarea(headerTareasAprendizajeUI, tareasUIModificadaList);
+                        }
+                    }
+                });
+            }else {
+                getTareasCurso(idCargaCurso);
             }
         });
     }
 
-    private void cancelAllDowload() {
-        try {
-            for(HeaderTareasAprendizajeUI headerTareasAprendizajeUI: headerTareasAprendizajeUIList){
-                for (TareasUI tareasUI : headerTareasAprendizajeUI.getTareasUIList()){
-                    for (RepositorioFileUi repositorioFileUi : tareasUI.getRecursosUIList()){
-                        repositorioFileUi.setCancel(true);
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+    @Override
+    public void onClickUnidadAprendizaje(HeaderTareasAprendizajeUI unidadAprendizajeUi) {
+        if(unidadAprendizajeUi.isToogle()){
+            unidadAprendizajeUi.setToogle(false);
+        }else {
+            unidadAprendizajeUi.setToogle(true);
         }
+        if(view !=null) view.updateItem(unidadAprendizajeUi);
     }
 
-    private void cancelDowload(TareasUI tareasUI) {
-        try {
-            for (RepositorioFileUi repositorioFileUi : tareasUI.getRecursosUIList()){
-                repositorioFileUi.setCancel(true);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
 }

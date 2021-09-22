@@ -480,7 +480,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                         .where(TareasC_Table.unidadAprendizajeId.is(unidadAprendizaje.getUnidadAprendizajeId()))
                         .and(TareasC_Table.estadoId.notIn(265))
                         //.and(TareasC_Table.sesionAprendizajeId.eq(0))
-                        .orderBy(TareasC_Table.fechaCreacion.asc())
+                        .orderBy(TareasC_Table.numero.asc())
                         .queryList());
             }else {
                 Log.d(TAG, "sesionAprendizajeId: "+ sesionAprendizajeId);
@@ -515,7 +515,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                 tareasUI.setHoraEntrega(tareas.getHoraEntrega());
                 tareasUI.setIdUnidaddAprendizaje(tareas.getUnidadAprendizajeId());
                 tareasUI.setNombreCurso(nombreCurso);
-
+                //tareasUI.setPosition(tareas.getNumero()); en el firebase binee repetida
                 TareaAlumno tareaAlumno = SQLite.select()
                         .from(TareaAlumno.class)
                         .where(TareaAlumno_Table.tareaId.eq(tareas.getKey()))
@@ -549,131 +549,6 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                     tareasUI.setNota(nota);
                 }
 
-                List<TareasRecursosC> tareasRecursosList = SQLite.select()
-                        .from(TareasRecursosC.class)
-                        .where(TareasRecursosC_Table.tareaId.is(tareas.getKey()))
-                        .queryList();
-
-                List<RecursosUI> recursosUIList = new ArrayList<>();
-                for (TareasRecursosC tareasRecursos : tareasRecursosList) {
-
-                    RecursoDidacticoEventoC recursoDidacticoEvento = SQLite.select()
-                            .from(RecursoDidacticoEventoC.class)
-                            .where(RecursoDidacticoEventoC_Table.key.eq(tareasRecursos.getRecursoDidacticoId()))
-                            .and(RecursoDidacticoEventoC_Table.estado.eq(1))
-                            .querySingle();
-
-                    if (recursoDidacticoEvento != null) {
-                        RecursosUI recursosUI = new RecursosUI();
-                        recursosUI.setTarea(tareasUI);
-                        recursosUI.setRecursoId(tareasRecursos.getRecursoDidacticoId());
-                        recursosUI.setNombreRecurso(recursoDidacticoEvento.getTitulo());
-                        // recursosUI.setNombre(recursoDidacticoEvento.getTitulo());
-                        recursosUI.setDescripcion(recursoDidacticoEvento.getDescripcion());
-                        recursosUI.setFechaCreacionRecuros(recursoDidacticoEvento.getFechaCreacion());
-                        boolean isYoutube = false;
-                        switch (recursoDidacticoEvento.getTipoId()) {
-                            case 379://video
-                                isYoutube = !TextUtils.isEmpty(YouTubeHelper.extractVideoIdFromUrl(recursoDidacticoEvento.getUrl()));
-                                if(!isYoutube){
-                                    isYoutube = !TextUtils.isEmpty(YouTubeHelper.extractVideoIdFromUrl(recursosUI.getDescripcion()));
-                                    if(isYoutube){
-                                        recursosUI.setUrl(recursosUI.getDescripcion());
-                                    }
-                                }
-                                if(isYoutube){
-                                    recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
-                                    recursosUI.setUrl(recursoDidacticoEvento.getUrl());
-                                    recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
-                                    recursosUI.setTipoFileU(RepositorioTipoFileU.YOUTUBE);
-                                    recursosUI.setPath(recursoDidacticoEvento.getLocalUrl());
-                                }else {
-                                    recursosUI.setTipoFileU(RepositorioTipoFileU.VIDEO);
-                                }
-                                break;
-                            case 380://vinculo
-                                recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
-                                recursosUI.setUrl(TextUtils.isEmpty(recursoDidacticoEvento.getUrl())?
-                                        recursoDidacticoEvento.getDescripcion():recursoDidacticoEvento.getUrl());
-                                recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.VINCULO);
-                                break;
-                            case 397://Documento de texto
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.DOCUMENTO);
-                                break;
-                            case 398://Imagen
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.IMAGEN);
-                                break;
-                            case 399://Audio
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.AUDIO);
-                                break;
-                            case 400://Hoja de Cálculo
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.HOJA_CALCULO);
-                                break;
-                            case 401://Diapositiva
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.DIAPOSITIVA);
-                                break;
-                            case 402://PDF
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.PDF);
-                                break;
-                            case 403://Materiales
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.MATERIALES);
-                                recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
-                                break;
-                        }
-                        // Log.d(TAG,"archivo:( " + recursoDidacticoEvento.getUrl());
-                        if (recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_AUDIO||
-                                recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_DIAPOSITIVA||
-                                recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_DOCUMENTO||
-                                recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_HOJA_CALCULO||
-                                recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_IMAGEN||
-                                recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_PDF||
-                                (recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO
-                                        && !isYoutube)
-                        ){
-
-                            Archivo archivo = SQLite.select(UtilsDBFlow.f_allcolumnTable(Archivo_Table.ALL_COLUMN_PROPERTIES))
-                                    .from(Archivo.class)
-                                    .innerJoin(RecursoArchivo.class)
-                                    .on(Archivo_Table.key.withTable().eq(RecursoArchivo_Table.archivoId.withTable()))
-                                    .where(RecursoArchivo_Table.recursoDidacticoId.withTable().eq(recursoDidacticoEvento.getKey()))
-                                    .querySingle();
-
-                            Log.d(TAG,"archivo:(");
-                            if(archivo!=null){
-                                Log.d(TAG,"great");
-                                recursosUI.setArchivoId(archivo.getKey());
-                                recursosUI.setNombreArchivo(archivo.getNombre());
-                                recursosUI.setPath(archivo.getLocalpath());
-
-                                recursosUI.setFechaAccionArchivo(archivo.getFechaAccion());
-                                //recursosUI.setDescripcion(recursoDidacticoEvento.getDescripcion());
-                                if(TextUtils.isEmpty(archivo.getLocalpath())){
-                                    recursosUI.setEstadoFileU(RepositorioEstadoFileU.SIN_DESCARGAR);
-                                }else {
-                                    recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
-                                }
-                                recursosUI.setDriveId(archivo.getPath());
-                                recursosUI.setPath(archivo.getLocalpath());
-                            }else if(recursoDidacticoEvento.getTipoId() == RecursoDidacticoEventoC.TIPO_VIDEO){
-                                recursosUI.setNombreArchivo(recursoDidacticoEvento.getUrl());
-                                recursosUI.setUrl(recursoDidacticoEvento.getUrl());
-                                recursosUI.setEstadoFileU(RepositorioEstadoFileU.DESCARGA_COMPLETA);
-                                recursosUI.setTipoFileU(RepositorioTipoFileU.VINCULO);
-                                recursosUI.setFechaAccionArchivo(recursoDidacticoEvento.getFechaCreacion());
-                            }
-
-                        }else {
-                            String url = recursoDidacticoEvento.getUrl();
-                            if(TextUtils.isEmpty(url))url = recursoDidacticoEvento.getDescripcion();
-                            recursosUI.setUrl(url);
-                            recursosUI.setFechaAccionArchivo(recursoDidacticoEvento.getFechaCreacion());
-                        }
-
-                        recursosUIList.add(recursosUI);
-                    }
-                }
-                tareasUI.setRecursosUIList(recursosUIList);
                 tareasUIList.add(tareasUI);
             }
             Collections.reverse(tareasUIList);

@@ -480,11 +480,17 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+
+                        TareasC tareasC = SQLite.select()
+                                .from(TareasC.class)
+                                .where(TareasC_Table.tareaId.eq(tareaId))
+                                .querySingle();
+                        int orden = tareasC!=null?tareasC.getNumero():0;//Temporal asta que se arregle el orden del firebase
                         //TransaccionUtils.deleteTable(TareasC.class, TareasC_Table.tareaId.isNull());
                         TransaccionUtils.deleteTable(TareasC.class, TareasC_Table.tareaId.eq(tareaId));
                         TransaccionUtils.deleteTable(TareasRecursosC.class, TareasRecursosC_Table.tareaId.eq(tareaId));
 
-                        transformarTarea(dataSnapshot, unidadAprendizajeId);
+                        transformarTarea(dataSnapshot, unidadAprendizajeId, orden);
                         callback.onLoad(true);
                     }
 
@@ -584,7 +590,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
 
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
-        List<RetrofitCancel<JsonObject>> retrofitCancelList = new ArrayList<>();
+        List<RetrofitCancel> retrofitCancelList = new ArrayList<>();
         ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
         apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
         RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getTareasAlumno(silaboEventoId, tipoPeriodoId));
@@ -607,28 +613,27 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                 TransaccionUtils.deleteTable(TareasC.class, TareasC_Table.tareaId.in(tareasCWhere));
                 TransaccionUtils.deleteTable(TareasRecursosC.class, TareasRecursosC_Table.tareaId.in(tareasCWhere));
 
-              if(response == null){
+                if (response == null) {
 
-              }else {
-                  for (Map.Entry<String, JSONFirebase> entry : JSONFirebase.d(response).getChildren2().entrySet()){
-                      JSONFirebase unidadSnapshot = (entry.getValue());
-                      String key = entry.getKey();
-                      String[] keys = key!=null?key.split("unid_"):new String[]{};
-                      int unidadAprendizajeId = 0;
-                      if(keys.length>1){
-                          unidadAprendizajeId = Integer.parseInt(keys[1]);
-                      }
+                } else {
+                    for (Map.Entry<String, JSONFirebase> entry : JSONFirebase.d(response).getChildren2().entrySet()) {
+                        JSONFirebase unidadSnapshot = (entry.getValue());
+                        String key = entry.getKey();
+                        String[] keys = key != null ? key.split("unid_") : new String[]{};
+                        int unidadAprendizajeId = 0;
+                        if (keys.length > 1) {
+                            unidadAprendizajeId = Integer.parseInt(keys[1]);
+                        }
+                        int orden = 0;//para no perder el orden de la lista
+                        for (JSONFirebase tareaSnapshot : unidadSnapshot.getChildren()) {
+                            //FBTareaEvento fbTareaEvento = tareaSnapshot.getValue(FBTareaEvento.class);
+                            transformarTarea(tareaSnapshot, unidadAprendizajeId, orden);
+                            orden ++;
 
-                      for (JSONFirebase tareaSnapshot : unidadSnapshot.getChildren()){
-                          //FBTareaEvento fbTareaEvento = tareaSnapshot.getValue(FBTareaEvento.class);
-                          transformarTarea(tareaSnapshot, unidadAprendizajeId);
+                        }
 
-                      }
-
-                  }
-              }
-
-              callbackTareaAlumno.onLoad(true);
+                    }
+                }
 
                 List<UnidadAprendizaje> unidadAprendizajeList = SQLite.select()
                         .from(UnidadAprendizaje.class)
@@ -641,7 +646,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
 
 
                 SessionUser sessionUser = SessionUser.getCurrentUser();
-                int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
+                int alumnoId = sessionUser != null ? sessionUser.getPersonaId() : 0;
 
                 SQLite.delete()
                         .from(TareaAlumnoArchivos.class)
@@ -654,85 +659,12 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                         .where(Webconfig_Table.nombre.eq("wstr_UrlExpresiones"))
                         .querySingle();
 
-                String pathValores = webconfig!=null?webconfig.getContent():"";
+                String pathValores = webconfig != null ? webconfig.getContent() : "";
 
+
+                List<Integer> unidadAprendizajeIdList = new ArrayList<>();
                 for (UnidadAprendizaje unidadAprendizaje : unidadAprendizajeList){
-                    ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
-                    apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
-                    RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getTareasAlumnoEvaluacion(silaboEventoId, unidadAprendizaje.getUnidadAprendizajeId(), alumnoId));
-                    retrofitCancelList.add(retrofitCancel);
-                    retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
-                        @Override
-                        public void onResponse(JsonObject response) {
-
-                            if(response == null){
-
-                            }else {
-                                for (JSONFirebase dataSnapshot : JSONFirebase.d(response).getChildren()){
-                                    TareaAlumno tareaAlumno = new TareaAlumno();
-                                    tareaAlumno.setAlumnoId(UtilsFirebase.convert(dataSnapshot.child("AlumnoId").getValue(),0));
-                                    tareaAlumno.setTareaId(UtilsFirebase.convert(dataSnapshot.child("TareaId").getValue(),""));
-                                    tareaAlumno.setEntregado(UtilsFirebase.convert(dataSnapshot.child("Entregado").getValue(),false));
-                                    tareaAlumno.setValorTipoNotaId(UtilsFirebase.convert(dataSnapshot.child("ValorTipoNotaId").getValue(), ""));
-                                    tareaAlumno.setFechaEntrega(UtilsFirebase.convert(dataSnapshot.child("FechaEntrega").getValue(), 0L));
-                                    tareaAlumno.save();
-
-                                    TipoNotaC tipoNotaC = SQLite.select()
-                                            .from(TipoNotaC.class)
-                                            .innerJoin(ValorTipoNotaC.class)
-                                            .on(TipoNotaC_Table.tipoNotaId.withTable()
-                                                    .eq(ValorTipoNotaC_Table.tipoNotaId.withTable()))
-                                            .where(ValorTipoNotaC_Table.valorTipoNotaId.withTable()
-                                                    .eq(tareaAlumno.getValorTipoNotaId()))
-                                            .querySingle();
-
-                                    ValorTipoNotaC valorTipoNotaC= SQLite.select()
-                                            .from(ValorTipoNotaC.class)
-                                            .where(ValorTipoNotaC_Table.valorTipoNotaId.eq(tareaAlumno.getValorTipoNotaId()))
-                                            .querySingle();
-
-                                    int tipoId = tipoNotaC!=null?tipoNotaC.getTipoId():0;
-                                    String nota = "";
-                                    if(tipoId==TipoNotaC.SELECTOR_ICONOS){
-                                        nota = valorTipoNotaC!=null?pathValores + valorTipoNotaC.getIcono():"";
-                                    }else{
-                                        nota = valorTipoNotaC!=null?valorTipoNotaC.getTitulo():"";
-                                    }
-
-                                    SQLite.delete()
-                                            .from(TareaAlumnoArchivos.class)
-                                            .where(TareaAlumnoArchivos_Table.tareaId.eq(tareaAlumno.getTareaId()))
-                                            .and(TareaAlumnoArchivos_Table.alumnoId.eq(alumnoId))
-                                            .execute();
-
-                                    if(dataSnapshot.child("Archivos").exists()){
-                                        for (Map.Entry<String,JSONFirebase> entry : dataSnapshot.child("Archivos").getChildren2().entrySet()){
-                                            JSONFirebase archivosSnapshot = entry.getValue();
-                                            TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
-                                            tareaAlumnoArchivos.setTareaAlumnoArchivoId(entry.getKey());
-                                            tareaAlumnoArchivos.setTareaId(tareaAlumno.getTareaId());
-                                            tareaAlumnoArchivos.setAlumnoId(alumnoId);
-                                            tareaAlumnoArchivos.setNombre(UtilsFirebase.convert(archivosSnapshot.child("Nombre").getValue(),""));
-                                            tareaAlumnoArchivos.setPath(UtilsFirebase.convert(archivosSnapshot.child("Path").getValue(),""));
-                                            tareaAlumnoArchivos.setRepositorio(UtilsFirebase.convert(archivosSnapshot.child("Repositorio").getValue(),false));
-                                            tareaAlumnoArchivos.save();
-                                        }
-                                    }
-
-
-                                    callbackTareaAlumno.onChangeTareaAlumno(tareaAlumno.getTareaId(), nota, tipoId);
-                                }
-
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onFailure(Throwable t) {
-
-                        }
-                    });
+                    unidadAprendizajeIdList.add(unidadAprendizaje.getUnidadAprendizajeId());
 
                     firebaseCancelList.add(new FirebaseCancelImpl(mDatabase.child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizaje.getUnidadAprendizajeId())
                             .orderByChild("AlumnoId").equalTo(alumnoId), new ChildEventListener() {
@@ -864,6 +796,93 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                     }));
                 }
 
+                ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+                apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+                RetrofitCancel<List<JsonObject>> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getTareasAlumnoEvaluacion2(silaboEventoId, unidadAprendizajeIdList, alumnoId));
+                retrofitCancelList.add(retrofitCancel);
+                retrofitCancel.enqueue(new RetrofitCancel.Callback<List<JsonObject>>() {
+                    @Override
+                    public void onResponse(List<JsonObject> response) {
+
+                        if(response == null){
+
+                        }else {
+                            List<TareasUI> tareasUIList = new ArrayList<>();
+                            for (JsonObject jsonObject : response){
+                                for (JSONFirebase dataSnapshot : JSONFirebase.d(jsonObject).getChildren()){
+                                    TareaAlumno tareaAlumno = new TareaAlumno();
+                                    tareaAlumno.setAlumnoId(UtilsFirebase.convert(dataSnapshot.child("AlumnoId").getValue(),0));
+                                    tareaAlumno.setTareaId(UtilsFirebase.convert(dataSnapshot.child("TareaId").getValue(),""));
+                                    tareaAlumno.setEntregado(UtilsFirebase.convert(dataSnapshot.child("Entregado").getValue(),false));
+                                    tareaAlumno.setValorTipoNotaId(UtilsFirebase.convert(dataSnapshot.child("ValorTipoNotaId").getValue(), ""));
+                                    tareaAlumno.setFechaEntrega(UtilsFirebase.convert(dataSnapshot.child("FechaEntrega").getValue(), 0L));
+                                    tareaAlumno.save();
+
+                                    TipoNotaC tipoNotaC = SQLite.select()
+                                            .from(TipoNotaC.class)
+                                            .innerJoin(ValorTipoNotaC.class)
+                                            .on(TipoNotaC_Table.tipoNotaId.withTable()
+                                                    .eq(ValorTipoNotaC_Table.tipoNotaId.withTable()))
+                                            .where(ValorTipoNotaC_Table.valorTipoNotaId.withTable()
+                                                    .eq(tareaAlumno.getValorTipoNotaId()))
+                                            .querySingle();
+
+                                    ValorTipoNotaC valorTipoNotaC= SQLite.select()
+                                            .from(ValorTipoNotaC.class)
+                                            .where(ValorTipoNotaC_Table.valorTipoNotaId.eq(tareaAlumno.getValorTipoNotaId()))
+                                            .querySingle();
+
+                                    int tipoId = tipoNotaC!=null?tipoNotaC.getTipoId():0;
+                                    String nota = "";
+                                    if(tipoId==TipoNotaC.SELECTOR_ICONOS){
+                                        nota = valorTipoNotaC!=null?pathValores + valorTipoNotaC.getIcono():"";
+                                    }else{
+                                        nota = valorTipoNotaC!=null?valorTipoNotaC.getTitulo():"";
+                                    }
+
+                                    SQLite.delete()
+                                            .from(TareaAlumnoArchivos.class)
+                                            .where(TareaAlumnoArchivos_Table.tareaId.eq(tareaAlumno.getTareaId()))
+                                            .and(TareaAlumnoArchivos_Table.alumnoId.eq(alumnoId))
+                                            .execute();
+
+                                    if(dataSnapshot.child("Archivos").exists()){
+                                        for (Map.Entry<String,JSONFirebase> entry : dataSnapshot.child("Archivos").getChildren2().entrySet()){
+                                            JSONFirebase archivosSnapshot = entry.getValue();
+                                            TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                                            tareaAlumnoArchivos.setTareaAlumnoArchivoId(entry.getKey());
+                                            tareaAlumnoArchivos.setTareaId(tareaAlumno.getTareaId());
+                                            tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                                            tareaAlumnoArchivos.setNombre(UtilsFirebase.convert(archivosSnapshot.child("Nombre").getValue(),""));
+                                            tareaAlumnoArchivos.setPath(UtilsFirebase.convert(archivosSnapshot.child("Path").getValue(),""));
+                                            tareaAlumnoArchivos.setRepositorio(UtilsFirebase.convert(archivosSnapshot.child("Repositorio").getValue(),false));
+                                            tareaAlumnoArchivos.save();
+                                        }
+                                    }
+
+                                    TareasUI tareasUI = new TareasUI();
+                                    tareasUI.setKeyTarea(tareaAlumno.getTareaId());
+                                    tareasUI.setNota(nota);
+                                    tareasUI.setTipoNotaId(tipoId);
+                                    tareasUIList.add(tareasUI);
+                                }
+                            }
+                            callbackTareaAlumno.onChangeTareaAlumno(tareasUIList);
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+
+                    }
+                });
+
+
+
+
+                callbackTareaAlumno.onLoad(true);
+
             }
 
             @Override
@@ -873,19 +892,20 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         });
 
         return () -> {
-            for(RetrofitCancel<JsonObject> cancel : retrofitCancelList)cancel.cancel();
+            for(RetrofitCancel cancel : retrofitCancelList)cancel.cancel();
             for (FirebaseCancel firebaseCancel : firebaseCancelList)firebaseCancel.cancel();
         };
 
     }
 
-    private void transformarTarea(DataSnapshot tareaSnapshot, int unidadAprendizajeId) {
+    private void transformarTarea(DataSnapshot tareaSnapshot, int unidadAprendizajeId, int orden) {
         TareasC tareasC = new TareasC();
         tareasC.setKey(UtilsFirebase.convert(tareaSnapshot.child("TareaId").getValue(),""));
         tareasC.setTareaId(UtilsFirebase.convert(tareaSnapshot.child("TareaId").getValue(),""));
         tareasC.setEstadoId(TareasC.ESTADO_PUBLICADO);
         tareasC.setHoraEntrega(UtilsFirebase.convert(tareaSnapshot.child("HoraEntrega").getValue(),""));
-
+        //tareasC.setNumero(UtilsFirebase.convert(tareaSnapshot.child("Numero").getValue(),0));
+        tareasC.setNumero(orden);
         try {
             SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
             Date todayCalendar = simpleDateFormat1.parse(UtilsFirebase.convert(tareaSnapshot.child("FechaEntrega").getValue(),""));
@@ -906,13 +926,14 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         }
     }
 
-    private void transformarTarea(JSONFirebase tareaSnapshot, int unidadAprendizajeId) {
+    private void transformarTarea(JSONFirebase tareaSnapshot, int unidadAprendizajeId, int orden) {
         TareasC tareasC = new TareasC();
         tareasC.setKey(UtilsFirebase.convert(tareaSnapshot.child("TareaId").getValue(),""));
         tareasC.setTareaId(UtilsFirebase.convert(tareaSnapshot.child("TareaId").getValue(),""));
         tareasC.setEstadoId(TareasC.ESTADO_PUBLICADO);
         tareasC.setHoraEntrega(UtilsFirebase.convert(tareaSnapshot.child("HoraEntrega").getValue(),""));
-
+        //tareasC.setNumero(UtilsFirebase.convert(tareaSnapshot.child("Numero").getValue(),0));
+        tareasC.setNumero(orden);
         try {
             SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
             Date todayCalendar = simpleDateFormat1.parse(UtilsFirebase.convert(tareaSnapshot.child("FechaEntrega").getValue(),""));

@@ -387,6 +387,19 @@ public class ApiRetrofit {
         return service.getUnidadAprendizajeAlumno(apiRequestBody);
     }
 
+    public  Call<RestApiResponse<List<JsonObject>>> getTareasAlumnoEvaluacion2(int silaboEventoId, List<Integer> unidadAprendizajeIdList, int alumnoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeIdList(unidadAprendizajeIdList);
+        parametro.setAlumnoId(alumnoId);
+        Log.d(TAG,"url: " + url);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getTareasAlumnoEvaluacion2",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getTareasAlumnoEvaluacion2(apiRequestBody);
+    }
+
 
     public class ApiRequestBody<T extends Parameters>{
         @SerializedName("interface")

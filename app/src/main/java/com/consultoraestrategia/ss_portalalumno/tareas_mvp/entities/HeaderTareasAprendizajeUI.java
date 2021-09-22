@@ -17,6 +17,9 @@ public class HeaderTareasAprendizajeUI {
     public List<TareasUI> tareasUIList;
     public boolean calendarioEditar;
     private int nroUnidad;
+    private ParametroDisenioUi parametroDisenioUi;
+    private int cantidadUnidades;
+    private boolean toogle;
 
     public HeaderTareasAprendizajeUI() {
     }
@@ -105,4 +108,31 @@ public class HeaderTareasAprendizajeUI {
     public void setNroUnidad(int nroUnidad) {
         this.nroUnidad = nroUnidad;
     }
+
+    public ParametroDisenioUi getParametroDisenioUi() {
+        return parametroDisenioUi;
+    }
+
+    public void setParametroDisenioUi(ParametroDisenioUi parametroDisenioUi) {
+        this.parametroDisenioUi = parametroDisenioUi;
+    }
+
+    public int getCantidadUnidades() {
+        return cantidadUnidades;
+    }
+
+    public void setCantidadUnidades(int cantidadUnidades) {
+        this.cantidadUnidades = cantidadUnidades;
+    }
+
+    public boolean isToogle() {
+        return toogle;
+    }
+
+    public void setToogle(boolean toogle) {
+        this.toogle = toogle;
+    }
+
+
+
 }

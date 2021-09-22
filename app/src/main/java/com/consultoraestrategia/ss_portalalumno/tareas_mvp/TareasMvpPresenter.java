@@ -48,4 +48,5 @@ public interface TareasMvpPresenter extends BasePresenter<TareasMvpView> {
 
     void notifyChangeFragment(boolean finishUpdateUnidadFb);
 
+    void onClickUnidadAprendizaje(HeaderTareasAprendizajeUI unidadAprendizajeUi);
 }

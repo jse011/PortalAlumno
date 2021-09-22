@@ -36,7 +36,7 @@ import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnClickListener, LinkUtils.OnClickListener {
 
     @BindView(R.id.img_fondo_progres)
     ImageView imgFondoProgres;
@@ -83,7 +83,7 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
 
         setupEstado(repositorioFileUi.getEstadoFileU());
         setupIcono(repositorioFileUi.getTipoFileU());
-        LinkUtils.autoLink(txtdescripcion, null);
+        LinkUtils.autoLink(txtdescripcion, this);
         try {
             cardView.setCardBackgroundColor(Color.parseColor(((RecursosUI)repositorioFileUi).getColor1()));
         }catch (Exception e){
@@ -243,4 +243,13 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         return repositorioFileUi;
     }
 
+    @Override
+    public void onLinkClicked(View v, String link) {
+
+    }
+
+    @Override
+    public void onClicked(View v) {
+        onClickArchivo();
+    }
 }

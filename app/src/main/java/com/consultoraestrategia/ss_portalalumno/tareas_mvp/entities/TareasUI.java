@@ -14,6 +14,8 @@ public class TareasUI  {
     private boolean retrasoEntrega;
     private String nota;
     private int tipoNotaId;
+    private ParametroDisenioUi parametroDisenioUi;
+    private int position;
 
     public boolean isCalendarioVigente() {
         return calendarioVigente;
@@ -69,6 +71,14 @@ public class TareasUI  {
 
     public int getTipoNotaId() {
         return tipoNotaId;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     //IU
@@ -245,6 +255,14 @@ public class TareasUI  {
 
     public void setRubroEvalProcesoUi(RubroEvalProcesoUi rubroEvalProcesoUi) {
         this.rubroEvalProcesoUi = rubroEvalProcesoUi;
+    }
+
+    public ParametroDisenioUi getParametroDisenioUi() {
+        return parametroDisenioUi;
+    }
+
+    public void setParametroDisenioUi(ParametroDisenioUi parametroDisenioUi) {
+        this.parametroDisenioUi = parametroDisenioUi;
     }
 
     @Override

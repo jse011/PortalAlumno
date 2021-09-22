@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,11 +45,15 @@ import com.consultoraestrategia.ss_portalalumno.previewDrive.multimedia.Multimed
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetDriveTareaTemporal;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveEvidencia;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveTarea;
+import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.SaveDriveTareaTemporal;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.util.IdGenerator;
+import com.consultoraestrategia.ss_portalalumno.util.RoundedView;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsStorage;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
 import com.consultoraestrategia.ss_portalalumno.youtube.YoutubeConfig;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -86,6 +91,7 @@ public class PreviewArchivoActivity extends BasePrevArchivoActivity implements P
                 new GetIdDriveTarea(previewDriveRepository),
                 new GetIdDriveEvidencia(previewDriveRepository),
                 new GetDriveTareaTemporal(previewDriveRepository),
+                new SaveDriveTareaTemporal(previewDriveRepository),
                 new AndroidOnlineSimpleImpl(this));
     }
 
@@ -159,20 +165,15 @@ public class PreviewArchivoActivity extends BasePrevArchivoActivity implements P
 
     @Override
     public void dowloadArchivo(String idDrive, String archivoPreview) {
-        //archivoPreview = archivoPreview.replaceAll(" ", "%20");
-        //archivoPreview = archivoPreview.replaceAll("/", "");
+        archivoPreview = archivoPreview.replaceAll(" ", "%20");
+        archivoPreview = archivoPreview.replaceAll("/", "");
         String download = "https://drive.google.com/uc?export=download&id=" + idDrive;
         try {
-            presenter.onStarDownload(downloadManager(download, archivoPreview));
-        } catch (IllegalArgumentException e){
-            e.printStackTrace();
-            try {
-                presenter.onStarDownload(downloadManager(download, IdGenerator.generateId()+"."+ UtilsStorage.getExtencion(archivoPreview)));
-            } catch (Exception e1){
-                e1.printStackTrace();
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(download)));
-            }
 
+            archivoPreview = IdGenerator.generateId()+"."+ UtilsStorage.getExtencion(archivoPreview);
+            presenter.onStarDownload(downloadManager(download, archivoPreview), archivoPreview);
+
+            //presenter.onStarDownload(downloadManager(download, archivoPreview), archivoPreview);
         }catch (Exception e) {
             e.printStackTrace();
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(download)));
@@ -250,7 +251,7 @@ public class PreviewArchivoActivity extends BasePrevArchivoActivity implements P
             String downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
             String downloadMimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
             if ((downloadStatus == DownloadManager.STATUS_SUCCESSFUL) && downloadLocalUri != null) {
-                openDownloadedAttachment(context, Uri.parse(downloadLocalUri), downloadMimeType);
+                openDownloadedAttachment(context, downloadLocalUri, downloadMimeType);
             }
         }
         cursor.close();
@@ -268,19 +269,13 @@ public class PreviewArchivoActivity extends BasePrevArchivoActivity implements P
      * 2.c. Refer - https://developer.android.com/reference/android/support/v4/content/FileProvider.html
      *
      * @param context            Context.
-     * @param attachmentUri      Uri of the downloaded attachment to be opened.
+     * @param path      Uri of the downloaded attachment to be opened.
      * @param attachmentMimeType MimeType of the downloaded attachment.
      */
-    private void openDownloadedAttachment(final Context context, Uri attachmentUri, final String attachmentMimeType) {
-        if(attachmentUri!=null) {
+    private void openDownloadedAttachment(final Context context, String path, final String attachmentMimeType) {
+        if(!TextUtils.isEmpty(path)) {
             // Get Content Uri.
-            if (ContentResolver.SCHEME_FILE.equals(attachmentUri.getScheme())) {
-                // FileUri - Convert it to contentUri.
-                //File file = new File(attachmentUri.getPath());
-                //attachmentUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);;
-                attachmentUri = getUriFromPath(attachmentUri.getPath());
-
-            }
+            Uri attachmentUri = getUriFromPath(path);
 
             Intent openAttachmentIntent = new Intent(Intent.ACTION_VIEW);
             openAttachmentIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -294,7 +289,21 @@ public class PreviewArchivoActivity extends BasePrevArchivoActivity implements P
                 context.startActivity(openAttachmentIntent);
             } catch (ActivityNotFoundException e) {
                 //Toast.makeText(context, context.getString(R.string.unable_to_open_file), Toast.LENGTH_LONG).show();
-                Toast.makeText(this, getString(R.string.cannot_open_file), Toast.LENGTH_SHORT).show();
+                try {
+
+                    /*Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                            .setText(UtilsStorage.getNombre(attachmentUri.getPath()))
+                            .setType(UtilsStorage.getMimeType(attachmentUri.getPath()))
+                            .setStream(newUri)
+                            .getIntent()
+                            .setPackage("com.google.android.apps.docs");
+
+                    startActivity(shareIntent);*/
+                    startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
+                }catch (Exception e1){
+                    e1.printStackTrace();
+                    Toast.makeText(this, getString(R.string.cannot_open_file), Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -357,13 +366,35 @@ public class PreviewArchivoActivity extends BasePrevArchivoActivity implements P
                     .setPackage("com.google.android.apps.docs");
             startActivity(shareIntent);*/
 
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/" + driveId + "/preview"));
+            /*Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://drive.google.com/file/d/" + driveId + "/preview"));
             intent.setPackage("com.google.android.apps.docs");
-            startActivity(intent);
+            startActivity(intent);*/
+
+            // location = "/sdcard/my_folder";
+            //startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
+
+            dowloadArchivo(driveId, archivoPreview);
+
+
 
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void openDownloadFile(String nombreArchivoLocal) {
+
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + nombreArchivoLocal;
+        openDownloadedAttachment(this, path, UtilsStorage.getMimeType(nombreArchivoLocal));
+        Log.d(getTag(), "openDownloadFile: " + path);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     @Override

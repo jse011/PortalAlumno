@@ -4,6 +4,7 @@ package com.consultoraestrategia.ss_portalalumno.lib;
 import androidx.annotation.NonNull;
 
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion;
+import com.consultoraestrategia.ss_portalalumno.entities.TareasC;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Variable;
@@ -29,7 +30,8 @@ public class AppDatabase {
     //public static final int VERSION = 10;//Agrego registro Instrumentos y asus varaibles
     //public static final int VERSION = 11;//Se agrego la table EventoTipos Evento2 Calendario2 EventoAdjunto
     //public static final int VERSION = 12;//Se agrego la table GrabacionSalaVirtual InstrumentoEncuestaEval ReunionVirtualServidor
-    public static final int VERSION = 13;//Se agrego la table DriveTareaArchivo
+    //public static final int VERSION = 13;//Se agrego la table DriveTareaArchivo
+    public static final int VERSION = 14;//Se agrego la table DriveTareaArchivo
     @Migration(version = 8, database = AppDatabase.class)
     public static class AlterUsuario extends AlterTableMigration<Usuario> {
 
@@ -103,5 +105,24 @@ public class AppDatabase {
             super.onPostMigrate();
         }
     }
+
+    @Migration(version = 14, database = AppDatabase.class)
+    public static class AlterTarea extends AlterTableMigration {
+
+        public AlterTarea(Class<TareasC> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.INTEGER, "numero");
+        }
+
+        @Override
+        public void onPostMigrate() {
+            super.onPostMigrate();
+        }
+    }
+
 
 }

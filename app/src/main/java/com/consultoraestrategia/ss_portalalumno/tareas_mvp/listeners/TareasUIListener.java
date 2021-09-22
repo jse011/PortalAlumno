@@ -8,7 +8,7 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
  * Created by irvinmarin on 24/11/2017.
  */
 
-public interface TareasUIListener extends DownloadItemListener {
+public interface TareasUIListener  {
     void onOpTareaEditClicked(TareasUI tareasUI, HeaderTareasAprendizajeUI headerTareasAprendizajeUI);
 
     void onOpTareaDelteClicked(TareasUI tareasUI);
@@ -24,4 +24,6 @@ public interface TareasUIListener extends DownloadItemListener {
     void onClikRubroTarea(TareasUI tareasUI);
 
     void onClicTarea(TareasUI tareasUI);
+
+    void onClickUnidadAprendizaje(HeaderTareasAprendizajeUI unidadAprendizaje);
 }

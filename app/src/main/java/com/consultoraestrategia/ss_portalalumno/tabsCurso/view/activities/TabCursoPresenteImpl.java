@@ -43,8 +43,6 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     private String fotoCurso;
     private TabCursoTareaView tabCursoTareaView;
     private TabCursoUnidadView tabCursoUnidadView;
-    private boolean finishUpdateUnidadFb;
-    private boolean iniciandoApp = true;
     private int silaboEventoId;
 
 
@@ -70,7 +68,6 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     @Override
     public void onCreate() {
         super.onCreate();
-        iniciandoApp = true;
         setupVaribleGlobal();
         setupCalendarioPerio();
         if(view!=null)view.showTitle(nombreCurso);
@@ -82,7 +79,6 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     }
 
     private void updateFireBaseUnidadAprendizaje() {
-        finishUpdateUnidadFb = false;
         updateFireBasePersona.execute(cargaCursoId, new UpdateFireBasePersona.CallBack() {
             @Override
             public void onSucces() {
@@ -98,16 +94,14 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         updateFireBaseUnidadAprendizaje.execute(cargaCursoId, idCalendarioPeriodo, new UpdateFireBaseUnidadAprendizaje.CallBack() {
             @Override
             public void onSucces() {
-                finishUpdateUnidadFb = true;
-               if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
-               if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+               if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(true);
+               if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(true);
             }
 
             @Override
             public void onError(String error) {
-                finishUpdateUnidadFb = true;
-                if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
-                if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+                if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(false);
+                if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(false);
             }
         });
 
@@ -234,8 +228,8 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
                 if(view!=null)view.modoOnline();
             }else {
                 if(view!=null)view.modoOffline();
-                if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
-                if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
+                if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(false);
+                if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(false);
             }
         });
 
@@ -254,16 +248,32 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
         });
     }
 
+
     @Override
     public void attachView(TabCursoTareaView tabCursoTareaView) {
        this.tabCursoTareaView = tabCursoTareaView;
-       tabCursoTareaView.notifyChangeFragment(finishUpdateUnidadFb);
+       succesCreateTab();
+    }
+
+    private void succesCreateTab() {
+        if(tabCursoTareaView!=null && tabCursoUnidadView!=null){
+            online.online(success -> {
+                if(success){
+                    updateFireBaseUnidadAprendizaje();
+                    if(view!=null)view.modoOnline();
+                }else {
+                    if(view!=null)view.modoOffline();
+                    if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(false);
+                    if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(false);
+                }
+            });
+        }
     }
 
     @Override
     public void attachView(TabCursoUnidadView tabCursoUnidadView) {
         this.tabCursoUnidadView = tabCursoUnidadView;
-         tabCursoUnidadView.notifyChangeFragment(finishUpdateUnidadFb);
+        succesCreateTab();
     }
 
     @Override
@@ -280,25 +290,11 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     public void onDestroy() {
         if(view!=null)view.desconetarAsistenica(silaboEventoId);
         super.onDestroy();
-        finishUpdateUnidadFb = false;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(iniciandoApp){
-            online.online(success -> {
-                if(success){
-                    if(!finishUpdateUnidadFb){
-                        updateFireBaseUnidadAprendizaje();
-                    }
-                    if(view!=null)view.modoOnline();
-                }else {
-                    if(view!=null)view.modoOffline();
-                }
-            });
-        }
-        iniciandoApp = false;
 
     }
 }

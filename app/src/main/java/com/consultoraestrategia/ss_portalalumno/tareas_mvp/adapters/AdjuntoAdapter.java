@@ -84,7 +84,7 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, LinkUtils.OnClickListener {
         @BindView(R.id.imgRecurso)
         ImageView imgRecurso;
         @BindView(R.id.conten_recurso)
@@ -119,7 +119,7 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
             btnRecurso.setOnClickListener(this);
             txtNombreRecurso.setText(tareaArchivoUi.getNombre());
             txtdescripcion.setText(tareaArchivoUi.getDescripcion());
-            LinkUtils.autoLink(txtdescripcion, null);
+            LinkUtils.autoLink(txtdescripcion, this);
             float progress = (float) tareaArchivoUi.getProgress()/(float) 100;
             customProgress.setMaximumPercentage(progress);
             customProgress.setDisabledMovementProgress(true);
@@ -219,6 +219,21 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
             }
         }
 
+        @Override
+        public void onLinkClicked(View v, String link) {
+
+        }
+
+        @Override
+        public void onClicked(View v) {
+            if(tareaArchivoUi.getTipo() != TareaArchivoUi.Tipo.LINK){
+                listener.onClickOpenTareaArchivo(tareaArchivoUi);
+            }else {
+                LinkUtils.SensibleLinkMovementMethod sensibleLinkMovementMethod = (LinkUtils.SensibleLinkMovementMethod)txtdescripcion.getMovementMethod();
+                listener.oClickOpenLink(tareaArchivoUi, sensibleLinkMovementMethod.getClickedLink());
+
+            }
+        }
     }
 
 

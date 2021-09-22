@@ -5,8 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.consultoraestrategia.ss_portalalumno.entities.DriveTareaArchivo;
-import com.consultoraestrategia.ss_portalalumno.entities.DriveTareaArchivo_Table;
+import com.consultoraestrategia.ss_portalalumno.entities.DriveArchivoLocal;
+import com.consultoraestrategia.ss_portalalumno.entities.DriveArchivoLocal_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
@@ -91,12 +91,6 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
                             driveUi.setThumbnail(response.getThumbnail());
                             driveUi.setMsgError(response.getMsgError());
                             driveUi.setUrl(response.getUrl());
-
-                            DriveTareaArchivo driveTareaArchivo = new DriveTareaArchivo();
-                            driveTareaArchivo.setDriveId(response.getIdDrive());
-                            driveTareaArchivo.setTareaId(tareaId);
-                            driveTareaArchivo.setNombreArchivo(nombreArchivo);
-                            driveTareaArchivo.save();
 
                             driveUiCallback.onLoad(true, driveUi);
                         }
@@ -195,6 +189,7 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
                             driveUi.setThumbnail(response.getThumbnail());
                             driveUi.setMsgError(response.getMsgError());
                             driveUi.setUrl(response.getUrl());
+
                             driveUiCallback.onLoad(true, driveUi);
                         }
                     }
@@ -243,12 +238,32 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
     }
 
     @Override
-    public String getIdDriveTemporal(String tareaId, String nombreArchivo) {
-        DriveTareaArchivo driveTareaArchivo = SQLite.select()
-                .from(DriveTareaArchivo.class)
-                .where(DriveTareaArchivo_Table.nombreArchivo.eq(nombreArchivo))
-                .and(DriveTareaArchivo_Table.tareaId.eq(tareaId))
+    public DriveUi getIdDriveTemporal(String id, String nombreArchivo) {
+        DriveArchivoLocal driveTareaArchivo = SQLite.select()
+                .from(DriveArchivoLocal.class)
+                .where(DriveArchivoLocal_Table.nombreArchivo.eq(nombreArchivo))
+                .and(DriveArchivoLocal_Table.driveArchivoLocalId.eq(id))
                 .querySingle();
-        return driveTareaArchivo != null?driveTareaArchivo.getDriveId(): null;
+
+        DriveUi driveUi = new DriveUi();
+
+        if (driveTareaArchivo!=null){
+            driveUi.setIdDrive(driveTareaArchivo.getDriveId());
+            driveUi.setNombreArchivoLocal(driveTareaArchivo.getNombreLocal());
+        }
+
+        return driveUi;
+    }
+
+    @Override
+    public void saveIdDriveTemporal(String id, String nombreArchivo, String nombreAchivoLocal, long idDownload, String driveId) {
+        DriveArchivoLocal driveTareaArchivo = new DriveArchivoLocal();
+        driveTareaArchivo.setNombreArchivo(nombreArchivo);
+        driveTareaArchivo.setDriveArchivoLocalId(id);
+        driveTareaArchivo.setDriveId(driveId);
+        driveTareaArchivo.setNombreLocal(nombreAchivoLocal);
+        driveTareaArchivo.setIdDownload(idDownload);
+        driveTareaArchivo.save();
+
     }
 }

@@ -11,7 +11,7 @@ public interface PreviewArchivoPresenter extends BasePresenter<PreviewArchivoVie
 
     void onClickBtnOpen();
 
-    void onStarDownload(long downloadID);
+    void onStarDownload(long downloadID, String archivoPreview);
 
     void finishedDownload(long id);
 

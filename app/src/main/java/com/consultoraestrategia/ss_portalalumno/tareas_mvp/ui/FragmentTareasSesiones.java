@@ -151,7 +151,7 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
         AutoColumnGridLayoutManager autoColumnGridLayoutManager = new AutoColumnGridLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
         TareaColumnCountProvider columnCountProvider = new TareaColumnCountProvider(getContext());
         autoColumnGridLayoutManager.setColumnCountProvider(columnCountProvider);
-        tareasAdapter = new TareasAdapter(new HeaderTareasAprendizajeUI(), this,new ParametroDisenioUi(),rvUnidades);
+        //tareasAdapter = new TareasAdapter(new HeaderTareasAprendizajeUI(), this,new ParametroDisenioUi(),rvUnidades);
         rvUnidades.setLayoutManager(autoColumnGridLayoutManager);
         rvUnidades.setAdapter(tareasAdapter);
         //presenter.getTareas(mIdCargaCurso, mIdCurso, mSesionAprendizajeId,tipoTareas);
@@ -170,8 +170,8 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
 
     @Override
     public void showTareasUIList(List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList, int idCurso, ParametroDisenioUi parametroDisenioUi) {
-        tareasAdapter.setParametroDisenioUi(parametroDisenioUi);
-        if(!headerTareasAprendizajeUIList.isEmpty())tareasAdapter.setTareasUIList(headerTareasAprendizajeUIList.get(0));
+        //tareasAdapter.setParametroDisenioUi(parametroDisenioUi);
+        //if(!headerTareasAprendizajeUIList.isEmpty())tareasAdapter.setTareasUIList(headerTareasAprendizajeUIList.get(0));
     }
 
     @Override
@@ -253,12 +253,12 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
 
     @Override
     public void setUpdateProgress(RepositorioFileUi repositorioFileUi, int count) {
-        tareasAdapter.updateProgress(repositorioFileUi, count);
+        //tareasAdapter.updateProgress(repositorioFileUi, count);
     }
 
     @Override
     public void setUpdate(RepositorioFileUi repositorioFileUi) {
-        tareasAdapter.update(repositorioFileUi);
+        //tareasAdapter.update(repositorioFileUi);
     }
 
     @Override
@@ -304,7 +304,17 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
     }
 
     @Override
-    public void updateTarea(TareasUI tareasUI) {
+    public void updateTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI, TareasUI tareasUI) {
+
+    }
+
+    @Override
+    public void updateTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI, List<TareasUI> tareasUIModificadaList) {
+
+    }
+
+    @Override
+    public void updateItem(HeaderTareasAprendizajeUI unidadAprendizajeUi) {
 
     }
 
@@ -399,30 +409,17 @@ public class FragmentTareasSesiones extends Fragment implements TareasMvpView, U
         presenter.onClickTarea(tareasUI);
     }
 
+    @Override
+    public void onClickUnidadAprendizaje(HeaderTareasAprendizajeUI unidadAprendizaje) {
+
+    }
+
 
     public void onReloadFragmentTareas() {
         Log.d(TAG, "onReloadFragmentTareas");
         setupRvUnidad();
     }
 
-    @Override
-    public void onClickDownload(RepositorioFileUi repositorioFileUi) {
-        presenter.onClickDownload(repositorioFileUi);
-    }
 
-    @Override
-    public void onClickClose(RepositorioFileUi repositorioFileUi) {
-        presenter.onClickClose(repositorioFileUi);
-    }
-
-    @Override
-    public void onClickArchivo(RepositorioFileUi repositorioFileUi) {
-        presenter.onClickArchivo(repositorioFileUi);
-    }
-
-    @Override
-    public void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink) {
-
-    }
 
 }

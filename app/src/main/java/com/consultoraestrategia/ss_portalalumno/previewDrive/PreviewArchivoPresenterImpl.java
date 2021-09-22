@@ -6,22 +6,26 @@ import android.text.TextUtils;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BasePresenterImpl;
+import com.consultoraestrategia.ss_portalalumno.entities.TareaAlumnoArchivos;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbPreview;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetDriveTareaTemporal;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveEvidencia;
+import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.SaveDriveTareaTemporal;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.useCase.GetIdDriveTarea;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.entities.DriveUi;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.archivo.ArchivoPreviewView;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.multimedia.MultimediaPreviewView;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsStorage;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchivoView> implements PreviewArchivoPresenter {
 
 
     private final GetDriveTareaTemporal getDriveTareaTemporal;
+    private final SaveDriveTareaTemporal saveDriveTareaTemporal;
     private String tareaId;
     private String archivoPreview;
     private GetIdDriveTarea getIdDrive;
@@ -37,14 +41,16 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
     private int sesionAprendizajeId;
     private String youtube;
     private int tipo;
+    private String nombreArchivoLocal;
 
     public PreviewArchivoPresenterImpl(UseCaseHandler handler, Resources res, GetIdDriveTarea getIdDrive,
-                                       GetIdDriveEvidencia getIdDriveEvidencia, GetDriveTareaTemporal getDriveTareaTemporal, Online online) {
+                                       GetIdDriveEvidencia getIdDriveEvidencia, GetDriveTareaTemporal getDriveTareaTemporal, SaveDriveTareaTemporal saveDriveTareaTemporal, Online online) {
         super(handler, res);
         this.getIdDrive = getIdDrive;
         this.getIdDriveEvidencia = getIdDriveEvidencia;
         this.online = online;
         this.getDriveTareaTemporal = getDriveTareaTemporal;
+        this.saveDriveTareaTemporal = saveDriveTareaTemporal;
     }
 
     @Override
@@ -86,15 +92,17 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             if(tipo == GbPreview.MULTIMEDIA){
                 if(view!=null)view.showMultimendia();
             }else {
-                if(!TextUtils.isEmpty(driveId)&&!TextUtils.isEmpty(archivoPreview)){
-                    if(view!=null)view.openForceDrive(driveId, archivoPreview);
-                }else if(!TextUtils.isEmpty(tareaId)&&!TextUtils.isEmpty(archivoPreview)){
-                    driveId = getDriveTareaTemporal.execute(tareaId, archivoPreview);
-                    if(!TextUtils.isEmpty(driveId)){
-                        if(view!=null)view.openForceDrive(driveId, archivoPreview);
+                if((!TextUtils.isEmpty(tareaId)|| sesionAprendizajeId > 0)&&!TextUtils.isEmpty(archivoPreview)){
+                    DriveUi driveUi = getDriveTareaTemporal.execute(tareaId,sesionAprendizajeId ,archivoPreview);
+                    driveId = driveUi.getIdDrive();
+                    nombreArchivoLocal = driveUi.getNombreArchivoLocal();
+                    if(!TextUtils.isEmpty(nombreArchivoLocal)){
+                        if(view!=null)view.openDownloadFile(nombreArchivoLocal);
+                    }else if(TextUtils.isEmpty(driveId)&&!TextUtils.isEmpty(archivoPreview)){
+                        if(view!=null)view.dowloadArchivo(driveId, archivoPreview);
                     }
-
                 }
+
                 if(view!=null)view.showDocument();
             }
         }
@@ -132,9 +140,10 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
     }
 
     @Override
-    public void onStarDownload(long downloadID) {
+    public void onStarDownload(long downloadID, String archivoPreview) {
         dowloadProgress = true;
         this.downloadID = downloadID;
+        saveDriveTareaTemporal.execute(tareaId, sesionAprendizajeId, this.archivoPreview, archivoPreview, driveUiSelected.getIdDrive(), downloadID);
         if(view!=null)view.showDowloadProgress();
         if(view!=null)view.hideDownloadComplete();
     }
@@ -145,6 +154,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             dowloadProgress = false;
             if(view!=null)view.hideDowloadProgress();
             if(view!=null)view.showDownloadComplete();
+            if(view!=null)view.openDownloadFile(id);
         }
     }
 
@@ -192,7 +202,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
                     public void onLoad(boolean success, DriveUi driveUi) {
                         if(success){
                             driveUiSelected = driveUi;
-                            if(view!=null)view.openForceDrive(driveUiSelected.getIdDrive(), archivoPreview);
+                            if(view!=null)view.dowloadArchivo(driveUi.getIdDrive(), archivoPreview);
                             if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
                                 PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
                             if(view!=null)view.showButons();
@@ -211,6 +221,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
                     public void onLoad(boolean success, DriveUi driveUi) {
                         if(success){
                             driveUiSelected = driveUi;
+                            if(view!=null)view.dowloadArchivo(driveUi.getIdDrive(), archivoPreview);
                             if(PreviewArchivoPresenterImpl.this.archivoPreviewView!=null)
                                 PreviewArchivoPresenterImpl.this.archivoPreviewView.uploadArchivo(driveUi.getIdDrive());
                             if(view!=null)view.showButons();
@@ -354,6 +365,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             uploadPreview();
         }
     }
+
 
     @Override
     public void onDestroy() {

@@ -55,6 +55,8 @@ public interface TareasMvpDataSource {
     interface CallbackTareaAlumno{
         void onLoad(boolean success);
         void onChangeTareaAlumno(String tareaId, String nota, int tipoNotaId);
+
+        void onChangeTareaAlumno(List<TareasUI> tareasUIList);
     }
 
     interface CallbackProgress<T>  {

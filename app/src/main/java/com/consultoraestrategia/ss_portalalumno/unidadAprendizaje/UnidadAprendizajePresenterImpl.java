@@ -54,9 +54,9 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
     @Override
     public void onViewCreated() {
         super.onViewCreated();
-        online.online(success -> {
+        /*online.online(success -> {
             if(!success) getListUnidades();
-        });
+        });*/
     }
 
     private void getListUnidades(){
@@ -72,8 +72,8 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
                 return Integer.compare(o2.getNroUnidad(),o1.getNroUnidad());
             }
         });
-        if(view!=null)view.hideProgress();
         if(view!=null)view.showListUnidadAprendizaje(unidadAprendizajeUiList, color1);
+        if(view!=null)view.hideProgress();
     }
 
     @Override
@@ -134,6 +134,7 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
 
     @Override
     public void notifyChangeFragment(boolean finishUpdateUnidadFb) {
+        Log.d(getTag(),"notifyChangeFragment unidad");
         setupData();
         showProgress();
         online.online(success -> {
@@ -141,7 +142,6 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
                 updateFireBaseUnidadAprendizaje.execute(cargaCursoId, calendarioPeriodoId, anioAcademicoId, planCursoId, unidadAprendizajeUiList,new UpdateFireBaseUnidadAprendizaje.CallBack() {
                     @Override
                     public void onSucces() {
-                        hideProgress();
                         getListUnidades();
                         if(unidadAprendizajeUiList.size()==0){
                             if (view!=null)view.showMensajeListaVacia();
@@ -156,7 +156,6 @@ public class UnidadAprendizajePresenterImpl extends BaseFragmentPresenterImpl<Un
                     }
                 });
             }else {
-                hideProgress();
                 getListUnidades();
                 if(unidadAprendizajeUiList.size()==0){
                     if (view!=null)view.showMensajeListaVacia();

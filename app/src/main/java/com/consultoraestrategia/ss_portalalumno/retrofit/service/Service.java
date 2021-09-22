@@ -70,4 +70,6 @@ public interface Service {
     Call<RestApiResponse<List<InstrumentoEncuestaEval>>> getInstrumentoEncuestaEval(@Body ApiRetrofit.ApiRequestBody<ParametroInstrumentoEncustaAlumno> apiRequestBody);
     @POST(" ")
     Call<RestApiResponse<JsonObject>> getUnidadAprendizajeAlumno(@Body ApiRetrofit.ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody);
+    @POST(" ")
+    Call<RestApiResponse<List<JsonObject>>> getTareasAlumnoEvaluacion2(@Body ApiRetrofit.ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody);
 }

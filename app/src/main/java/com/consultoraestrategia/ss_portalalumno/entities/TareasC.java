@@ -33,6 +33,8 @@ public class TareasC extends BaseEntity {
     private int estadoExportado;
 
     private List<RecursoDidacticoEventoC> tareasRecursosList;
+    @Column
+    private int numero;
 
     public TareasC() {
     }
@@ -115,5 +117,13 @@ public class TareasC extends BaseEntity {
 
     public void setTareasRecursosList(List<RecursoDidacticoEventoC> tareasRecursosList) {
         this.tareasRecursosList = tareasRecursosList;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
+    }
+
+    public int getNumero() {
+        return numero;
     }
 }

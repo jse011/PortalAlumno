@@ -29,6 +29,11 @@ public class UpdateFireBaseTareaSilabo {
             public void onChangeTareaAlumno(String tareaId, String nota, int tipoNotaId) {
                 callBack.onChangeTarea(tareaId, nota, tipoNotaId);
             }
+
+            @Override
+            public void onChangeTareaAlumno(List<TareasUI> tareasUIList) {
+                callBack.onChangeTarea(tareasUIList);
+            }
         });
     }
 
@@ -36,5 +41,6 @@ public class UpdateFireBaseTareaSilabo {
         void onSucces();
         void onError(String error);
         void onChangeTarea(String tareaId, String nota, int tipoNotaId);
+        void onChangeTarea(List<TareasUI> tareasUIList);
     }
 }

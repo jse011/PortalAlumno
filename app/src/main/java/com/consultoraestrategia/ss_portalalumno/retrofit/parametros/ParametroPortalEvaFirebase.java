@@ -3,6 +3,8 @@ package com.consultoraestrategia.ss_portalalumno.retrofit.parametros;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
     @SerializedName("vint_SilaboEventoId")
     private int silaboEventoId;
@@ -18,6 +20,8 @@ public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
     private int programaEducativoId;
     @SerializedName("vint_TareaId")
     private String tareaId;
+    @SerializedName("vint_UnidadAprendizajeIdList")
+    private List<Integer> unidadAprendizajeIdList;
 
     public int getSilaboEventoId() {
         return silaboEventoId;
@@ -73,5 +77,13 @@ public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
 
     public String getTareaId() {
         return tareaId;
+    }
+
+    public void setUnidadAprendizajeIdList(List<Integer> unidadAprendizajeIdList) {
+        this.unidadAprendizajeIdList = unidadAprendizajeIdList;
+    }
+
+    public List<Integer> getUnidadAprendizajeIdList() {
+        return unidadAprendizajeIdList;
     }
 }

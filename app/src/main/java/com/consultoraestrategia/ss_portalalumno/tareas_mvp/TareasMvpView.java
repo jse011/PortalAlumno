@@ -8,6 +8,7 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RubroEvalPro
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by irvinmarin on 06/11/2017.
@@ -66,5 +67,10 @@ public interface TareasMvpView extends BaseView<TareasMvpPresenter> {
 
     void showTareaDescripcionActivity();
 
-    void updateTarea(TareasUI tareasUI);
+    void updateTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI, TareasUI tareasUI);
+
+    void updateTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI,  List<TareasUI> tareasUIModificadaList);
+
+    void updateItem(HeaderTareasAprendizajeUI unidadAprendizajeUi);
+
 }

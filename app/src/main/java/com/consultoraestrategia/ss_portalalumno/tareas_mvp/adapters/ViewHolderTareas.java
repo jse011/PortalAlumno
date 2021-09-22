@@ -119,12 +119,12 @@ class ViewHolderTareas extends SectioningAdapter.ItemViewHolder implements  View
 
 
             rvRecurso.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
-            recursosTareaAdapter = new DownloadAdapter(listener, rvRecurso);
-            rvRecurso.setAdapter(recursosTareaAdapter);
+            //recursosTareaAdapter = new DownloadAdapter(listener, rvRecurso);
+            //rvRecurso.setAdapter(recursosTareaAdapter);
             rvRecurso.setHasFixedSize(false);
             rvRecurso.setNestedScrollingEnabled(false);
             this.recursosUIList = tareasUI.getRecursosUIList();
-            if (tareasUI.getRecursosUIList() != null)recursosTareaAdapter.setList(new ArrayList<RepositorioFileUi>(tareasUI.getRecursosUIList()));
+            //if (tareasUI.getRecursosUIList() != null)recursosTareaAdapter.setList(new ArrayList<RepositorioFileUi>(tareasUI.getRecursosUIList()));
             txtTituloTarea.setText(tareasUI.getTituloTarea());
             txtTituloTarea.setTextColor(Color.parseColor("#000000"));
 

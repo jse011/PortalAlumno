@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +15,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
@@ -25,13 +25,13 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.tabsCurso.tabs.TabCursoTareaView;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.adapters.UnidadAdapter2;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSesion;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.domain_usecase.UpdateFireBaseTareaSilabo;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpPresenter;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpPresenterImpl;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.TareasMvpView;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.adapters.UnidadesAdapter;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.TareasMvpRepository;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.local.TareasLocalDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.remote.RemoteMvpDataSource;
@@ -48,10 +48,7 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.listeners.TareasUILis
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.listeners.UnidadAprendizajeListener;
 import com.consultoraestrategia.ss_portalalumno.util.OpenIntents;
 
-import org.zakariya.stickyheaders.StickyHeaderLayoutManager;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -161,23 +158,16 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
     }
 
 
-    UnidadesAdapter unidadesAdapter;
+    UnidadAdapter2 unidadAdapter2;
 
 
     private void setupRvUnidad() {
-//        adapter = new HeaderTareasAdapter(new ArrayList<HeaderTareasAprendizajeUI>(), this, this, null, rvUnidades, 1, status);
-//        rvUnidades.setLayoutManager(new LinearLayoutManager(getContext()));
-//        rvUnidades.setAdapter(adapter);
-        //rvUnidades.setAdapter(unidadesAdapter);
-
-        unidadesAdapter = new UnidadesAdapter(rvUnidades,new ArrayList<HeaderTareasAprendizajeUI>(), this, this, null, 1);
-        unidadesAdapter.setRecyclerView(rvUnidades);
-        rvUnidades.setAdapter(unidadesAdapter);
-        StickyHeaderLayoutManager layoutManager = new StickyHeaderLayoutManager();
+        unidadAdapter2 = new UnidadAdapter2(this, rvUnidades);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvUnidades.setLayoutManager(layoutManager);
-        int resId = R.anim.layout_animation_from_bottom;
-        LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(getContext(), resId);
-        rvUnidades.setLayoutAnimation(animation);
+        rvUnidades.setHasFixedSize(true);
+        ((SimpleItemAnimator) rvUnidades.getItemAnimator()).setSupportsChangeAnimations(false);
+        rvUnidades.setAdapter(unidadAdapter2);
     }
 
 
@@ -192,8 +182,7 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
 
     @Override
     public void showTareasUIList(List<HeaderTareasAprendizajeUI> headerTareasAprendizajeUIList, int idCurso, ParametroDisenioUi parametroDisenioUi) {
-        unidadesAdapter.setmIdCurso(idCurso);
-        unidadesAdapter.setTareasUIList(headerTareasAprendizajeUIList, parametroDisenioUi);
+        unidadAdapter2.setList(headerTareasAprendizajeUIList);
     }
 
     @Override
@@ -285,12 +274,12 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
 
     @Override
     public void setUpdateProgress(RepositorioFileUi repositorioFileUi, int count) {
-        unidadesAdapter.updateProgress(repositorioFileUi, count);
+
     }
 
     @Override
     public void setUpdate(RepositorioFileUi repositorioFileUi) {
-        unidadesAdapter.update(repositorioFileUi);
+
     }
 
     @Override
@@ -336,8 +325,18 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
     }
 
     @Override
-    public void updateTarea(TareasUI tareasUI) {
-        unidadesAdapter.notifyAllSectionsDataSetChanged();
+    public void updateTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI, TareasUI tareasUI) {
+        unidadAdapter2.update(headerTareasAprendizajeUI, tareasUI);
+    }
+
+    @Override
+    public void updateTarea(HeaderTareasAprendizajeUI headerTareasAprendizajeUI, List<TareasUI> tareasUIModificadaList) {
+        unidadAdapter2.update(headerTareasAprendizajeUI, tareasUIModificadaList);
+    }
+
+    @Override
+    public void updateItem(HeaderTareasAprendizajeUI unidadAprendizajeUi) {
+        unidadAdapter2.update(unidadAprendizajeUi);
     }
 
 
@@ -423,6 +422,11 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
         presenter.onClickTarea(tareasUI);
     }
 
+    @Override
+    public void onClickUnidadAprendizaje(HeaderTareasAprendizajeUI unidadAprendizajeUi) {
+        presenter.onClickUnidadAprendizaje(unidadAprendizajeUi);
+    }
+
 
     public void onReloadFragmentTareas() {
         Log.d(TAG, "onReloadFragmentTareas");
@@ -430,7 +434,7 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
     }
 
 
-    @Override
+    /*@Override
     public void onClickDownload(RepositorioFileUi repositorioFileUi) {
         presenter.onClickDownload(repositorioFileUi);
     }
@@ -448,7 +452,7 @@ public class FragmentTareas extends Fragment implements TareasMvpView, UnidadApr
     @Override
     public void onClickOpenLinkArchivo(RepositorioFileUi repositorioFileUi, String clickedLink) {
 
-    }
+    }*/
 
     @Override
     public void notifyChangeFragment(boolean finishUpdateUnidadFb) {

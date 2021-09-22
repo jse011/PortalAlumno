@@ -208,10 +208,10 @@ public class TabsCursoActivity extends BaseActivity<TabCursoView, TabCursoPresen
         ViewpagerAdapter fragmentAdapter = new ViewpagerAdapter(getSupportFragmentManager(), 0, this);
         fragmentAdapter.addFragment(new UnidadAprendizajeFragment(), "UNIDADES");
         fragmentAdapter.addFragment(FragmentTareas.newInstance(), "TAREAS");
-        vpCurso.setOffscreenPageLimit(2);
+        vpCurso.setOffscreenPageLimit(3);
         tabCurso.setupWithViewPager(vpCurso);
         toolsTitleToolbar = new ToolsTitleToolbar(vpCurso, ctlTabcursos);
-        vpCurso.setSaveFromParentEnabled(false);
+        //vpCurso.setSaveFromParentEnabled(false);
         vpCurso.setAdapter(fragmentAdapter);
     }
 
