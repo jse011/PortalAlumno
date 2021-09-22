@@ -98,7 +98,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
                     nombreArchivoLocal = driveUi.getNombreArchivoLocal();
                     if(!TextUtils.isEmpty(nombreArchivoLocal)){
                         if(view!=null)view.openDownloadFile(nombreArchivoLocal);
-                    }else if(TextUtils.isEmpty(driveId)&&!TextUtils.isEmpty(archivoPreview)){
+                    }else if(!TextUtils.isEmpty(driveId)&&!TextUtils.isEmpty(archivoPreview)){
                         if(view!=null)view.dowloadArchivo(driveId, archivoPreview);
                     }
                 }
