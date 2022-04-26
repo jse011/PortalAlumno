@@ -1,12 +1,12 @@
 package com.consultoraestrategia.ss_portalalumno.main;
 
-import androidx.fragment.app.Fragment;
-
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseView;
 import com.consultoraestrategia.ss_portalalumno.main.entities.AlumnoUi;
+import com.consultoraestrategia.ss_portalalumno.main.entities.AnioAcademicoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.CursosUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.EventoUi;
 import com.consultoraestrategia.ss_portalalumno.main.entities.NuevaVersionUi;
+import com.consultoraestrategia.ss_portalalumno.main.entities.ProgramaEduactivoUI;
 import com.consultoraestrategia.ss_portalalumno.main.entities.TipoEventoUi;
 
 import java.util.ArrayList;
@@ -61,6 +61,8 @@ public interface MainView extends BaseView<MainPresenter> {
 
     void accederGoogle();
 
+    void mostrarDialogoForzarConexion();
+
     interface TabEvento {
 
         void setTiposList(List<TipoEventoUi> tipoEventoUiList);
@@ -106,11 +108,28 @@ public interface MainView extends BaseView<MainPresenter> {
 
          void showListCurso(List<CursosUi> cursosUiList);
          void setPresenter(MainPresenter presenter);
-    }
+
+         void showProgress();
+
+         void hideProgress();
+     }
 
     interface TabFamilia {
         void setPresenter(MainPresenter presenter);
         void showFamilia(AlumnoUi usuario, List<Object> familia);
         void updateFamiliar(Object personUi);
+    }
+
+    interface TabQR {
+        void setPresenter(MainPresenter presenter);
+        void showQR(String data);
+        void tarjetaUsuario(AlumnoUi alumnoUi, ProgramaEduactivoUI programaEducativo);
+        void logoEntidad(AnioAcademicoUi anioAcademicoUi);
+
+        void fotoAlumno(AlumnoUi alumnoUi);
+
+        void programaEval(ProgramaEduactivoUI alumnoUi);
+
+        void colorTarjetaQr(String colorTarjetaQr);
     }
 }

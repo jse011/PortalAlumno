@@ -32,6 +32,8 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
     public static final String ACTION_START_ALERT_BLOQUEO ="com.consultoraestrategia.ss_portalalumno.global.intent.action.ACTION_START_ALERT_BLOQUEO";
 
     public static VariblesGlobales variblesGlobales = new VariblesGlobales();
+    public static VariblesConfiguracion variblesConfiguracion = new VariblesConfiguracion();
+
     private static final String TAG = "iCRMEduTAG";
     private ProgressReceiver progressReceiver;
     private List<ICRMEduListener> icrmEduListenerList = new ArrayList<>();
@@ -42,6 +44,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
         FlowManager.init(new FlowConfig.Builder(this).build());
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler(this));
         variblesGlobales = new VariblesGlobales().getData(getApplicationContext());
+        variblesConfiguracion = new VariblesConfiguracion().getData(getApplicationContext());
        getAsistencia();
        registerProgressReceiver();
     }
@@ -64,6 +67,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
     @Override
     public void onApplicationPaused() {
         if(variblesGlobales!=null)variblesGlobales.saveData(getApplicationContext());
+        if(variblesConfiguracion!=null)variblesConfiguracion.saveData(getApplicationContext());
     }
 
     @Override
@@ -74,6 +78,7 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
         if(variblesGlobales==null)variblesGlobales = new VariblesGlobales().getData(getApplicationContext());
+        if(variblesConfiguracion!=null)variblesConfiguracion = new VariblesConfiguracion().getData(getApplicationContext());
     }
 
 
@@ -312,6 +317,48 @@ public class iCRMEdu extends Application implements ActivityLifecycleHandler.Lif
 
         public void setPersonaId(int personaId) {
             this.personaId = personaId;
+        }
+    }
+
+    public static class VariblesConfiguracion{
+
+        private boolean forzarConexion;
+
+        public boolean isForzarConexion() {
+            return forzarConexion;
+        }
+
+        public void setForzarConexion(boolean forzarConexion) {
+            this.forzarConexion = forzarConexion;
+        }
+
+        public void saveData(Context context) {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("shared preferences VariblesConfiguracion", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(this);
+            editor.putString("VariblesConfiguracion", json);
+            editor.apply();
+
+        }
+
+        public VariblesConfiguracion getData(Context context) {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("shared preferences VariblesConfiguracion", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("VariblesConfiguracion", null);
+            VariblesConfiguracion variblesConfiguracion = gson.fromJson(json, this.getClass());
+            if (variblesConfiguracion == null) {
+                variblesConfiguracion = new VariblesConfiguracion();
+            }
+            return variblesConfiguracion;
+
+        }
+    }
+
+    public void forzarConexion(){
+        if(variblesConfiguracion!=null){
+            variblesConfiguracion.forzarConexion = true;
+            variblesConfiguracion.saveData(this);
         }
     }
 

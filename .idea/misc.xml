@@ -3,33 +3,81 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/bg_gradient.xml" value="0.22708333333333333" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/bg_gradient_educar.xml" value="0.378125" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/button_login.xml" value="0.33958333333333335" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/button_login_educar.xml" value="0.22708333333333333" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/button_state_login_animator.xml" value="0.3828125" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/circle_borde_menu.xml" value="0.1655" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/circle_borde_qr.xml" value="0.1655" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/circle_transparent_2.xml" value="0.3828125" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/corner_adjuntar_tarea.xml" value="0.186" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/corner_circle_pregunta.xml" value="0.186" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/corner_circle_qr.xml" value="0.186" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/corner_user_login.xml" value="0.378125" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/ic_account_circle.xml" value="0.1655" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/ic_camera_adjuntar_2.xml" value="0.24322916666666666" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/ic_camera_adjuntar_3.xml" value="0.24322916666666666" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/ic_videocam_adjuntar.xml" value="0.24322916666666666" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/pattern_repeat.xml" value="0.25104166666666666" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/splash_background.xml" value="0.22708333333333333" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/splash_background_educar.xml" value="0.378125" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/tab_4_selector.xml" value="0.225" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/drawable/tab_qr_selector.xml" value="0.225" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/font/quicksand.xml" value="0.19375" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout-v28/login_mvp_user.xml" value="0.28489583333333335" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/actividades_fragment.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_login_2.xml" value="0.21197916666666666" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_main_final.xml" value="0.1" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_main_two.xml" value="0.24270833333333333" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_splash_screen.xml" value="0.14" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tabs_curso.xml" value="0.25" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tabs_sesiones.xml" value="0.23489583333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tabs_sesiones_2.xml" value="0.23020833333333332" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/activity_tarea_descripcion.xml" value="0.10283687943262411" />
-        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/app_bar_main.xml" value="0.1" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/app_bar_main.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/content_main_cursos.xml" value="0.271875" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/dialog_seleccionar_archivo.xml" value="0.22708333333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/fragment_archivo_preview.xml" value="0.22291666666666668" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/fragment_player2.xml" value="0.271875" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/gpvch_layout_dialog_app.xml" value="0.22" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_download_tarea.xml" value="0.21145833333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_encuesta_sesion.xml" value="0.11068895643363728" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_login_usuario.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tarea.xml" value="0.2671875" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tareas_unidades.xml" value="0.2671875" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tareas_unidades_2.xml" value="0.22" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/item_tareas_unidades_simple.xml" value="0.22" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_colaborativa.xml" value="0.18432971014492755" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_forzar_conexion.xml" value="0.2" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_header_unidades.xml" value="0.1868421052631579" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_instrumento.xml" value="0.18659420289855072" />
-        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_archivo_adjunto.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_archivo_adjunto.xml" value="0.33" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_ses_evi_archivo.xml" value="0.22708333333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_sesiones.xml" value="0.5" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_sesiones_land_scape.xml" value="0.25" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_item_unidades.xml" value="0.24149659863945577" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_pregunta.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/layout_unidades.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_bloqueo.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_correo.xml" value="0.2109375" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_dni.xml" value="0.2109375" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_lista_usuario.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_mvp_correo.xml" value="0.2109375" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_mvp_dni.xml" value="0.25" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_mvp_lista_usuario.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_mvp_password.xml" value="0.25" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_mvp_user.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_password.xml" value="0.25" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_progress.xml" value="0.22760416666666666" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/login_usuario.xml" value="0.25" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/my_wb_tst.xml" value="0.2765625" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/preview_tarea_alumno.xml" value="0.14" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/tab_cursos.xml" value="0.2390625" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/tab_familia.xml" value="0.1" />
         <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/tab_item_tarea_mvp.xml" value="0.22760416666666666" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/layout/tab_qr.xml" value="0.22" />
+        <entry key="..\:/Users/Usuario/AndroidStudioProjects/PortalAlumno/app/src/main/res/menu/bottombar_menu.xml" value="0.1765625" />
       </map>
     </option>
   </component>

@@ -19,14 +19,13 @@
 
     <item
         android:id="@+id/tab4"
-        android:icon="@drawable/tab_4_selector"
+        android:icon="@drawable/tab_qr_selector"
         android:title="@null" />
 
     <item
         android:id="@+id/tab5"
-        android:icon="@null"
-        android:title="@null"
-        android:enabled="false"/>
+        android:icon="@drawable/tab_4_selector"
+        android:title="@null" />
 
 
 </menu>

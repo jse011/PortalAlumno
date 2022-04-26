@@ -56,7 +56,8 @@ public class JSONFirebase  {
         }else if(jsonElement.isJsonObject()){
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             for(Map.Entry<String,JsonElement> entry : jsonObject.entrySet()){
-                attributes.add(d(jsonObject.get(entry.getKey()).getAsJsonObject()));
+                JsonElement j =entry.getValue();
+                attributes.add(d(j));
             }
         }else if(jsonElement.isJsonArray()){
             JsonArray jsonArray = jsonElement.getAsJsonArray();

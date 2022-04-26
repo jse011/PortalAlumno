@@ -14,10 +14,13 @@ import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UtilsPortalAlumno {
     public static String tiempoCreacion(long fecha){
@@ -68,7 +71,7 @@ public class UtilsPortalAlumno {
         }else {
             format_min =  String.valueOf(min);
         }
-        return  hr%12 + ":" + format_min + " " + ((hr>=12) ? "PM" : "AM");
+        return  hr==12?"12" : hr%12 + ":" + format_min + " " + ((hr>=12) ? "PM" : "AM");
     }
 
     public static String changeTime12Hour(String _24HourTime){
@@ -398,5 +401,24 @@ public class UtilsPortalAlumno {
         }
 
         return mstr_fecha;
+    }
+
+    /**
+     * Returns a list with all links contained in the input
+     */
+    public static List<String> extractUrls(String text)
+    {
+        List<String> containedUrls = new ArrayList<String>();
+        String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+        Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+        Matcher urlMatcher = pattern.matcher(text);
+
+        while (urlMatcher.find())
+        {
+            containedUrls.add(text.substring(urlMatcher.start(0),
+                    urlMatcher.end(0)));
+        }
+
+        return containedUrls;
     }
 }

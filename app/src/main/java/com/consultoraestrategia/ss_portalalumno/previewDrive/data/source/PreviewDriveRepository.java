@@ -12,6 +12,8 @@ public interface PreviewDriveRepository {
 
     void saveIdDriveTemporal(String id, String nombreArchivo, String nombreAchivoLocal, long idDownload, String driveId);
 
+    DriveUi getIdDriveTemporal(String driveId);
+
     interface Callback <T>{
         void onLoad(boolean success, T item);
     }

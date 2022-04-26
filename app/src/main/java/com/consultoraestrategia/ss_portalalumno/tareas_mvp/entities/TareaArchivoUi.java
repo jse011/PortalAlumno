@@ -8,6 +8,7 @@ public class TareaArchivoUi {
     private int state = 0;//pause 0 ,  progresso 1
     private boolean disabled;
     private boolean entregado;
+    private boolean forceUpload;
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
@@ -39,6 +40,14 @@ public class TareaArchivoUi {
 
     public boolean getEntregado() {
         return entregado;
+    }
+
+    public void setForceUpload(boolean forceUpload) {
+        this.forceUpload = forceUpload;
+    }
+
+    public boolean getForceUpload() {
+        return forceUpload;
     }
 
     public enum Tipo{DOCUMENTO("Documento"), IMAGEN("Imagen"), PDF("Documento Portátil"), PRESENTACION("Presentación"), HOJACALCULO("Hoja de cálculo"), VIDEO("Video"), AUDIO("Múscia"), YOUTUBE(""), DRIVE(""), LINK(""), OTROS("Desconocido");

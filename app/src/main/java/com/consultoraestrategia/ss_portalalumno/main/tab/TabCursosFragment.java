@@ -7,6 +7,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,6 +45,8 @@ public class TabCursosFragment extends Fragment implements MainView.TabCursos, C
     TextView textoExpanded;
     @BindView(R.id.rvListaClases)
     RecyclerView rvListaClases;
+    @BindView(R.id.progressBar18)
+    ProgressBar progressBar;
 
     private Unbinder unbinder;
     private MainPresenter presenter;
@@ -118,6 +121,16 @@ public class TabCursosFragment extends Fragment implements MainView.TabCursos, C
     @Override
     public void setPresenter(MainPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    @Override
+    public void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

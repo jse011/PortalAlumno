@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -98,6 +99,8 @@ public class EvidenciaSesAdapter extends RecyclerView.Adapter<EvidenciaSesAdapte
         CardView cardView;
         @BindView(R.id.progress)
         FrameLayout progress;
+        @BindView(R.id.progressBar17)
+        ProgressBar progressBarForceUpload;
 
         private Listener listener;
         private ArchivoSesEvidenciaUi archivoSesEvidenciaUi;
@@ -132,22 +135,36 @@ public class EvidenciaSesAdapter extends RecyclerView.Adapter<EvidenciaSesAdapte
                 btnRecurso.setVisibility(View.GONE);
                 btnAction.setVisibility(View.GONE);
                 customProgress.setVisibility(View.GONE);
+                progressBarForceUpload.setVisibility(View.GONE);
             }else {
                 this.progress.setVisibility(View.GONE);
                 if(archivoSesEvidenciaUi.getFile()!=null){
-                    if(archivoSesEvidenciaUi.getState()==1){
-                        btnAction.setImageResource(R.drawable.ic_pause_youtube);
+
+                    if(archivoSesEvidenciaUi.getForzarConexion()){
+                        btnRecurso.setVisibility(View.GONE);
+                        btnAction.setVisibility(View.GONE);
+                        customProgress.setVisibility(View.GONE);
+                        progressBarForceUpload.setVisibility(View.VISIBLE);
+                        customProgress.updateView();
                     }else {
-                        btnAction.setImageResource(R.drawable.ic_play_recurso);
+                        if(archivoSesEvidenciaUi.getState()==1){
+                            btnAction.setImageResource(R.drawable.ic_pause_youtube);
+                        }else {
+                            btnAction.setImageResource(R.drawable.ic_play_recurso);
+                        }
+                        btnRecurso.setVisibility(View.VISIBLE);
+                        btnAction.setVisibility(View.VISIBLE);
+                        customProgress.setVisibility(View.VISIBLE);
+                        customProgress.updateView();
+                        progressBarForceUpload.setVisibility(View.GONE);
                     }
-                    btnRecurso.setVisibility(View.VISIBLE);
-                    btnAction.setVisibility(View.VISIBLE);
-                    customProgress.setVisibility(View.VISIBLE);
-                    customProgress.updateView();
+
+
                 }else {
                     btnRecurso.setVisibility(View.VISIBLE);
                     btnAction.setVisibility(View.GONE);
                     customProgress.setVisibility(View.GONE);
+                    progressBarForceUpload.setVisibility(View.GONE);
                 }
             }
 

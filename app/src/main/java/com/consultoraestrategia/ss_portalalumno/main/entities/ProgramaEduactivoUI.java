@@ -8,6 +8,7 @@ public class ProgramaEduactivoUI {
     private int idPrograma;
     private String nombrePrograma;
     private boolean seleccionado;
+    private String periodoyseccion;
 
     public ProgramaEduactivoUI(int idPrograma, String nombrePrograma) {
         this.idPrograma = idPrograma;
@@ -62,5 +63,15 @@ public class ProgramaEduactivoUI {
     @Override
     public int hashCode() {
         return idPrograma;
+    }
+
+
+
+    public String getPeriodoyseccion() {
+        return periodoyseccion;
+    }
+
+    public void setPeriodoyseccion(String periodoyseccion) {
+        this.periodoyseccion = periodoyseccion;
     }
 }

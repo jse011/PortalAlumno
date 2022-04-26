@@ -9,16 +9,15 @@ import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.consultoraestrategia.ss_portalalumno.R
+import com.consultoraestrategia.ss_portalalumno.lib.bottomnavigationviewex.BottomNavigationViewEx
 import com.google.android.material.bottomappbar.BottomAppBarTopEdgeTreatment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
 
 @SuppressLint("RestrictedApi")
 class FabBottomNavigationView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : BottomNavigationViewEx(context, attrs, defStyleAttr) {
 
     private var topCurvedEdgeTreatment: BottomAppBarTopEdgeTreatment

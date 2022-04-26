@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.previewDrive;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
@@ -65,7 +66,7 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
 
     @Override
     public void setExtras(Bundle extras) {
-        super.setExtras(extras);
+
         GbPreview gbPreview = iCRMEdu.variblesGlobales.getGbPreview();
         if(gbPreview!=null){
             this.tareaId = gbPreview.getTareaId();
@@ -75,6 +76,8 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             this.youtube = gbPreview.getYoutube();
             this.tipo = gbPreview.getTipo();
         }
+
+        super.setExtras(extras);
     }
 
     @Override
@@ -92,9 +95,9 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             if(tipo == GbPreview.MULTIMEDIA){
                 if(view!=null)view.showMultimendia();
             }else {
-                if((!TextUtils.isEmpty(tareaId)|| sesionAprendizajeId > 0)&&!TextUtils.isEmpty(archivoPreview)){
-                    DriveUi driveUi = getDriveTareaTemporal.execute(tareaId,sesionAprendizajeId ,archivoPreview);
-                    driveId = driveUi.getIdDrive();
+                if((!TextUtils.isEmpty(tareaId)|| sesionAprendizajeId > 0 || !TextUtils.isEmpty(driveId))&&!TextUtils.isEmpty(archivoPreview)){
+                    DriveUi driveUi = getDriveTareaTemporal.execute(tareaId,sesionAprendizajeId , driveId, archivoPreview);
+                    String driveId = driveUi.getIdDrive();
                     nombreArchivoLocal = driveUi.getNombreArchivoLocal();
                     if(!TextUtils.isEmpty(nombreArchivoLocal)){
                         if(view!=null)view.openDownloadFile(nombreArchivoLocal);
@@ -154,7 +157,13 @@ public class PreviewArchivoPresenterImpl extends BasePresenterImpl<PreviewArchiv
             dowloadProgress = false;
             if(view!=null)view.hideDowloadProgress();
             if(view!=null)view.showDownloadComplete();
-            if(view!=null)view.openDownloadFile(id);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(view!=null)view.openDownloadFile(id);
+                }
+            }, 1500);
+
         }
     }
 

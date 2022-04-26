@@ -1,6 +1,8 @@
 package com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.remote;
 
+import android.content.ContentResolver;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,6 +16,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.entities.CalendarioPeriodo_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.RecursoArchivo;
 import com.consultoraestrategia.ss_portalalumno.entities.RecursoDidacticoEventoC;
+import com.consultoraestrategia.ss_portalalumno.entities.SesionAlumnoArchivos;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje;
 import com.consultoraestrategia.ss_portalalumno.entities.SesionAprendizaje_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.SessionUser;
@@ -38,28 +41,27 @@ import com.consultoraestrategia.ss_portalalumno.entities.ValorTipoNotaC_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.firebase.FBTareaEvento;
-import com.consultoraestrategia.ss_portalalumno.entities.servidor.BEDrive;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancel;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
-import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.TareasMvpDataSource;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
+import com.consultoraestrategia.ss_portalalumno.util.DriveUrlParser;
 import com.consultoraestrategia.ss_portalalumno.util.JSONFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.TransaccionUtils;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsFirebase;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsStorage;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
+import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
@@ -84,7 +86,9 @@ import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -96,8 +100,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import retrofit2.Call;
-
 /**
  * Created by irvinmarin on 03/10/2017.
  */
@@ -108,7 +110,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
 
     ApiRetrofit apiRetrofit;
 
-    public RemoteMvpDataSource(ApiRetrofit apiRetrofit) {
+    public RemoteMvpDataSource(ApiRetrofit apiRetrofit ) {
         this.apiRetrofit = apiRetrofit;
     }
 
@@ -128,8 +130,8 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
     }
 
     @Override
-    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, StorageCallback<TareaArchivoUi> callbackStorage) {
-        StorageCancelImpl storageCancel = null;
+    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, StorageCallback<TareaArchivoUi> callbackStorage) {
+        StorageCancel storageCancel = null;
 
         Uri uri = null;
         File file = null;
@@ -163,12 +165,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
             }else if(validate==-1){
                 callbackStorage.onFinish(false, tareaArchivoUi);
             }else {
-                Webconfig webconfig = SQLite.select()
-                        .from(Webconfig.class)
-                        .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
-                        .querySingle();
 
-                String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
 
                 TareasC tareasC = SQLite.select()
                         .from(TareasC.class)
@@ -186,59 +183,12 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                 SessionUser sessionUser = SessionUser.getCurrentUser();
                 int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
 
+              if(forzarConexion){
+                  storageCancel = subirArchivosAlServidor(tareaArchivoUi, silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, uri, callbackStorage);
+              }else {
+                  storageCancel = subirArchivosAlFirebase(tareaArchivoUi, silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, uri, callbackStorage);
+              }
 
-                // Create the file metadata
-                StorageMetadata metadata = new StorageMetadata.Builder()
-                        .setContentType(UtilsStorage.getMimeType(tareaArchivoUi.getNombre()))
-                        .setContentDisposition("attachment")
-                        .build();
-
-                StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
-                        .child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/tarid_" + tareaId + "/pers_" + alumnoId + "/" + tareaArchivoUi.getNombre());
-
-                // Upload file and metadata to the path 'images/mountains.jpg'
-                storageCancel = new StorageCancelImpl(storageReference.putFile(uri, metadata));
-
-                // Listen for state changes, errors, and completion of the upload.
-                storageCancel.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                        //Para no recargar a la vista
-                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                        progress = Math.max(progress,2);
-                        //if ((progress == Math.floor(progress)) && !Double.isInfinite(progress)) {
-                        // integer type
-
-                        //}
-                        tareaArchivoUi.setProgress(progress);
-                        tareaArchivoUi.setState(1);
-                        callbackStorage.onChange(tareaArchivoUi);
-                    }
-                }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onPaused(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                        tareaArchivoUi.setState(0);
-                        callbackStorage.onChange(tareaArchivoUi);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        exception.printStackTrace();
-                        // Handle unsuccessful uploads
-                        tareaArchivoUi.setState(0);
-                        callbackStorage.onChange(tareaArchivoUi);
-                        callbackStorage.onFinish(false,tareaArchivoUi);
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        tareaArchivoUi.setState(0);
-                        tareaArchivoUi.setFile(null);
-                        tareaArchivoUi.setProgress(0);
-                        tareaArchivoUi.setPath(storageReference.getPath());
-                        saveTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, tareaArchivoUi, callbackStorage);
-                    }
-                });
             }
         }else {
             callbackStorage.onFinish(false, tareaArchivoUi);
@@ -247,8 +197,233 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         return storageCancel;
     }
 
+    StorageCancel subirArchivosAlServidor(TareaArchivoUi tareaArchivoUi, int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, Uri uri, StorageCallback<TareaArchivoUi> callbackStorage){
+      
+     
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+        List<RetrofitCancel<String>> retrofitCancelList = new ArrayList<>();
+        long size = -1;
+        try {
+            ContentResolver resolver =
+                    FirebaseStorage.getInstance().getApp().getApplicationContext().getContentResolver();
+            try {
+                ParcelFileDescriptor fd = resolver.openFileDescriptor(uri, "r");
+                if (fd != null) {
+                    size = fd.getStatSize();
+                    fd.close();
+                }
+            } catch (NullPointerException npe) {
+                // happens under test.
+                Log.w(TAG, "NullPointerException during file size calculation.", npe);
+                size = -1;
+            } catch (IOException checkSizeError) {
+                Log.w(TAG, "could not retrieve file size for upload " + uri.toString(), checkSizeError);
+            }
+
+            InputStream inputStream = resolver.openInputStream(uri);
+            if (inputStream != null) {
+                if (size == -1) {
+                    // If we had issues calculating the size, try stream.available -- it may still work
+                    try {
+                        int streamSize = inputStream.available();
+                        if (streamSize >= 0) {
+                            size = streamSize;
+                        }
+                    } catch (IOException e) {
+                        // Ignore the error and continue without a size.  We document it may not be there.
+                    }
+                }
+                inputStream = new BufferedInputStream(inputStream);
+                ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+                apiRetrofit.setTime(30,30,30, TimeUnit.MINUTES);
+                RetrofitCancelImpl<String> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.uploadFileTareaAlumno(silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, inputStream, tareaArchivoUi.getNombre()));
+                retrofitCancel.enqueue(new RetrofitCancel.Callback<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                       if(response==null){
+                           tareaArchivoUi.setState(0);
+                           callbackStorage.onChange(tareaArchivoUi);
+                           callbackStorage.onFinish(false,tareaArchivoUi);
+                       }else {
+                           tareaArchivoUi.setState(0);
+                           tareaArchivoUi.setFile(null);
+                           tareaArchivoUi.setProgress(0);
+                           tareaArchivoUi.setPath(response);
+
+
+                           TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                           tareaAlumnoArchivos.setTareaAlumnoArchivoId(response);
+                           tareaAlumnoArchivos.setTareaId(tareaId);
+                           tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                           tareaAlumnoArchivos.setPath(tareaArchivoUi.getPath());
+                           tareaAlumnoArchivos.setNombre(tareaArchivoUi.getNombre());
+                           tareaAlumnoArchivos.setRepositorio(true);
+                           tareaAlumnoArchivos.save();
+
+                           tareaArchivoUi.setId(response);
+
+                           callbackStorage.onFinish(true, tareaArchivoUi);
+                       }
+                      
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        tareaArchivoUi.setState(0);
+                        callbackStorage.onChange(tareaArchivoUi);
+                        callbackStorage.onFinish(false,tareaArchivoUi);
+                       
+                    }
+                });
+                retrofitCancelList.add(retrofitCancel);
+
+            }else{
+                tareaArchivoUi.setState(0);
+                callbackStorage.onChange(tareaArchivoUi);
+              
+                callbackStorage.onFinish(false,tareaArchivoUi);
+            }
+
+
+
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "could not locate file for uploading:" + uri.toString());
+            callbackStorage.onFinish(false,tareaArchivoUi);
+        }
+
+
+        return new StorageCancel() {
+            @Override
+            public void onPause() {
+
+            }
+
+            @Override
+            public void onResume() {
+
+            }
+
+            @Override
+            public void onCancel() {
+             for (RetrofitCancel retrofitCancel : retrofitCancelList){
+                 retrofitCancel.cancel();
+             }
+            }
+
+            @Override
+            public boolean isComplete() {
+                boolean isComplete = true;
+                for (RetrofitCancel retrofitCancel : retrofitCancelList){
+                    isComplete = !retrofitCancel.isExecuted();
+                }
+                return  isComplete;
+            }
+
+            @Override
+            public boolean isSuccessful() {
+                boolean isSuccessful = true;
+                for (RetrofitCancel retrofitCancel : retrofitCancelList){
+                    isSuccessful = !retrofitCancel.isExecuted();
+                }
+                return  isSuccessful;
+            }
+
+            @Override
+            public boolean isCanceled() {
+                boolean isCanceled = false;
+                for (RetrofitCancel retrofitCancel : retrofitCancelList){
+                    isCanceled = retrofitCancel.isCanceled();
+                }
+                return  isCanceled;
+            }
+
+            @Override
+            public boolean isInProgress() {
+                boolean isInProgress = false;
+                for (RetrofitCancel retrofitCancel : retrofitCancelList){
+                    isInProgress = retrofitCancel.isExecuted();
+                }
+                return  isInProgress;
+            }
+
+            @Override
+            public boolean isPaused() {
+                return false;
+            }
+        };
+    }
+
+    StorageCancel subirArchivosAlFirebase(TareaArchivoUi tareaArchivoUi, int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, Uri uri,StorageCallback<TareaArchivoUi> callbackStorage){
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+
+        // Create the file metadata
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType(UtilsStorage.getMimeType(tareaArchivoUi.getNombre()))
+                .setContentDisposition("attachment")
+                .build();
+
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
+                .child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/tarid_" + tareaId + "/pers_" + alumnoId + "/" + tareaArchivoUi.getNombre());
+
+        // Upload file and metadata to the path 'images/mountains.jpg'
+        StorageCancelImpl storageCancel = new StorageCancelImpl(storageReference.putFile(uri, metadata));
+
+        // Listen for state changes, errors, and completion of the upload.
+        storageCancel.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                //Para no recargar a la vista
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                progress = Math.max(progress,2);
+                //if ((progress == Math.floor(progress)) && !Double.isInfinite(progress)) {
+                // integer type
+
+                //}
+                tareaArchivoUi.setProgress(progress);
+                tareaArchivoUi.setState(1);
+                callbackStorage.onChange(tareaArchivoUi);
+            }
+        }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onPaused(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                tareaArchivoUi.setState(0);
+                callbackStorage.onChange(tareaArchivoUi);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                exception.printStackTrace();
+                // Handle unsuccessful uploads
+                tareaArchivoUi.setState(0);
+                callbackStorage.onChange(tareaArchivoUi);
+                callbackStorage.onFinish(false,tareaArchivoUi);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                tareaArchivoUi.setState(0);
+                tareaArchivoUi.setFile(null);
+                tareaArchivoUi.setProgress(0);
+                tareaArchivoUi.setPath(storageReference.getPath());
+                saveTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, tareaArchivoUi, callbackStorage);
+            }
+        });
+
+        return storageCancel;
+    }
+
     @Override
-    public void deleteStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, CallbackSimple callbackSimple) {
+    public void deleteStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple callbackSimple) {
         Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
                 .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
@@ -272,39 +447,55 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
 
-        if(tareaArchivoUi.getTipo()!= TareaArchivoUi.Tipo.LINK&&tareaArchivoUi.getTipo()!= TareaArchivoUi.Tipo.YOUTUBE&tareaArchivoUi.getTipo()!= TareaArchivoUi.Tipo.DRIVE){
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
-                    .child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/tarid_" + tareaId + "/pers_" + alumnoId + "/" + tareaArchivoUi.getNombre());
+        if(!forzarConexion){
+            if(tareaArchivoUi.getTipo()!= TareaArchivoUi.Tipo.LINK&&tareaArchivoUi.getTipo()!= TareaArchivoUi.Tipo.YOUTUBE&tareaArchivoUi.getTipo()!= TareaArchivoUi.Tipo.DRIVE){
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
+                        .child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/tarid_" + tareaId + "/pers_" + alumnoId + "/" + tareaArchivoUi.getNombre());
 
-            // Delete the file
-            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                // Delete the file
+                storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        deleteTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId,alumnoId, tareaArchivoUi, callbackSimple);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        exception.printStackTrace();
+                        deleteTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId,alumnoId, tareaArchivoUi, callbackSimple);
+                    }
+                });
+            }else {
+                deleteTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId,alumnoId, tareaArchivoUi, callbackSimple);
+            }
+        }else {
+
+            RetrofitCancelImpl<Boolean> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.deleteFileTareaAlumno(silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, tareaArchivoUi.getId()));
+            retrofitCancel.enqueue(new RetrofitCancel.Callback<Boolean>() {
                 @Override
-                public void onSuccess(Void aVoid) {
-                    deleteTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId,alumnoId, tareaArchivoUi, callbackSimple);
+                public void onResponse(Boolean response) {
+                    if(response==null){
+                        callbackSimple.onLoad(false);
+                    }else {
+                        callbackSimple.onLoad(true);
+                    }
                 }
-            }).addOnFailureListener(new OnFailureListener() {
+
                 @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Uh-oh, an error occurred!
-                    exception.printStackTrace();
-                    deleteTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId,alumnoId, tareaArchivoUi, callbackSimple);
+                public void onFailure(Throwable t) {
+                    callbackSimple.onLoad(false);
                 }
             });
-        }else {
-            deleteTareaEvaluacion(nodeFirebase, silaboEventoId, unidadAprendizajeId, tareaId,alumnoId, tareaArchivoUi, callbackSimple);
         }
+
 
     }
 
     @Override
-    public void publicarTareaAlumno(String tareaId, CallbackSimple callbackSimple) {
+    public void publicarTareaAlumno(String tareaId, boolean forzarConexion, CallbackSimple callbackSimple) {
 
-        Webconfig webconfig = SQLite.select()
-                .from(Webconfig.class)
-                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
-                .querySingle();
 
-        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
 
         TareasC tareasC = SQLite.select()
                 .from(TareasC.class)
@@ -322,8 +513,6 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
 
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase)
-                .child("/AV_Tarea_Evaluacion/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/tarid_"+tareaId+"_pers_"+alumnoId);
 
         TareaAlumno tareaAlumno = SQLite.select()
                 .from(TareaAlumno.class)
@@ -332,6 +521,66 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                 .querySingle();
 
         boolean entregado = !(tareaAlumno != null && tareaAlumno.isEntregado());
+
+        if(forzarConexion){
+            entregarTareaServidor(silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, entregado, tareaAlumno, callbackSimple);
+        }else {
+            entregarTareaFirebase(silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, entregado, tareaAlumno, callbackSimple);
+        }
+
+
+
+
+    }
+
+    public void entregarTareaServidor (int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, boolean entregado,TareaAlumno tareaAlumno, CallbackSimple callbackSimple){
+        ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+        apiRetrofit.changeSetTime(10,15,15,TimeUnit.SECONDS);
+        RetrofitCancelImpl<Object> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.entregarTareaAlumno(silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, entregado));
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<Object>() {
+            @Override
+            public void onResponse(Object response) {
+                if(response==null){
+                    callbackSimple.onLoad(false);;
+                }else {
+                    try {
+                        long fechaEntrega = UtilsFirebase.convert(response,0L);
+                        if(tareaAlumno!=null){
+                            tareaAlumno.setEntregado(entregado);
+                            tareaAlumno.setFechaEntrega(fechaEntrega);
+                            tareaAlumno.save();
+                        }else {
+                            TareaAlumno newTareaAlumno = new TareaAlumno();
+                            newTareaAlumno.setAlumnoId(alumnoId);
+                            newTareaAlumno.setTareaId(tareaId);
+                            newTareaAlumno.setEntregado(entregado);
+                            newTareaAlumno.setFechaEntrega(fechaEntrega);
+                            newTareaAlumno.save();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    callbackSimple.onLoad(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                callbackSimple.onLoad(false);
+            }
+        });
+
+    }
+    public void entregarTareaFirebase (int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, boolean entregado,TareaAlumno tareaAlumno, CallbackSimple callbackSimple){
+        Webconfig webconfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase)
+                .child("/AV_Tarea_Evaluacion/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/tarid_"+tareaId+"_pers_"+alumnoId);
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/FechaEntrega", ServerValue.TIMESTAMP);
         childUpdates.put("/Entregado", entregado);
@@ -372,7 +621,6 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                 callbackSimple.onLoad(false);
             }
         });
-
     }
 
     @Override
@@ -386,13 +634,8 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
     }
 
     @Override
-    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, CallbackSimple simple) {
-        Webconfig webconfig = SQLite.select()
-                .from(Webconfig.class)
-                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
-                .querySingle();
+    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple simple) {
 
-        String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
 
         TareasC tareasC = SQLite.select()
                 .from(TareasC.class)
@@ -410,34 +653,84 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
 
-        HashMap<String, Object> hashMap =  new HashMap<>();
-        hashMap.put("Nombre", tareaArchivoUi.getNombre());
-        hashMap.put("Path", tareaArchivoUi.getDescripcion());
-        hashMap.put("Repositorio", false);
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase)
-                .child("/AV_Tarea_Evaluacion/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/tarid_"+tareaId+"_pers_"+alumnoId+"/Archivos")
-                .push();
+        if(forzarConexion){
+            ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
+            apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+            RetrofitCancelImpl<String> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.uploadLinkTareaAlumno(silaboEventoId, unidadAprendizajeId, tareaId, alumnoId, tareaArchivoUi.getNombre(), tareaArchivoUi.getPath()));
+            retrofitCancel.enqueue(new RetrofitCancel.Callback<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if(response!=null){
+                        TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                        tareaAlumnoArchivos.setTareaAlumnoArchivoId(response);
+                        tareaAlumnoArchivos.setTareaId(tareaId);
+                        tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                        tareaAlumnoArchivos.setPath(tareaArchivoUi.getPath());
+                        tareaAlumnoArchivos.setNombre(tareaArchivoUi.getNombre());
+                        tareaAlumnoArchivos.setRepositorio(false);
+                        tareaAlumnoArchivos.save();
 
-        mDatabase.setValue(hashMap,new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
-                tareaAlumnoArchivos.setTareaAlumnoArchivoId(mDatabase.getKey());
-                tareaAlumnoArchivos.setTareaId(tareaId);
-                tareaAlumnoArchivos.setAlumnoId(alumnoId);
-                tareaAlumnoArchivos.setPath(tareaArchivoUi.getPath());
-                tareaAlumnoArchivos.setNombre(tareaArchivoUi.getNombre());
-                tareaAlumnoArchivos.setRepositorio(false);
-                tareaAlumnoArchivos.save();
-
-                tareaArchivoUi.setId(mDatabase.getKey());
-                if(databaseError!=null){
-                   simple.onLoad(false);
-                }else {
-                    simple.onLoad(true);
+                        tareaArchivoUi.setId(response);
+                        simple.onLoad(true);
+                    }else {
+                        simple.onLoad(false);
+                    }
                 }
-            }
-        });
+
+                @Override
+                public void onFailure(Throwable t) {
+                    simple.onLoad(false);
+                }
+            });
+        }else {
+
+            Webconfig webconfig = SQLite.select()
+                    .from(Webconfig.class)
+                    .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                    .querySingle();
+
+            String nodeFirebase = webconfig!=null?webconfig.getContent():"sinServer";
+            HashMap<String, Object> hashMap =  new HashMap<>();
+            hashMap.put("Nombre", tareaArchivoUi.getNombre());
+            hashMap.put("Path", tareaArchivoUi.getDescripcion());
+            hashMap.put("Repositorio", false);
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase)
+                    .child("/AV_Tarea_Evaluacion/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/tarid_"+tareaId+"_pers_"+alumnoId+"/Archivos")
+                    .push();
+
+            mDatabase.setValue(hashMap,new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    TareaAlumnoArchivos tareaAlumnoArchivos = new TareaAlumnoArchivos();
+                    tareaAlumnoArchivos.setTareaAlumnoArchivoId(mDatabase.getKey());
+                    tareaAlumnoArchivos.setTareaId(tareaId);
+                    tareaAlumnoArchivos.setAlumnoId(alumnoId);
+                    tareaAlumnoArchivos.setPath(tareaArchivoUi.getPath());
+                    tareaAlumnoArchivos.setNombre(tareaArchivoUi.getNombre());
+                    tareaAlumnoArchivos.setRepositorio(false);
+                    tareaAlumnoArchivos.save();
+
+                    String idYoutube = YouTubeUrlParser.getVideoId(tareaArchivoUi.getPath());
+                    String idDrive = DriveUrlParser.getDocumentId(tareaArchivoUi.getPath());
+                    if(!TextUtils.isEmpty(idYoutube)){
+                        tareaArchivoUi.setTipo(TareaArchivoUi.Tipo.YOUTUBE);
+                    }else if(!TextUtils.isEmpty(idDrive)){
+                        tareaArchivoUi.setTipo(TareaArchivoUi.Tipo.DRIVE);
+                    }else {
+                        tareaArchivoUi.setTipo(TareaArchivoUi.Tipo.LINK);
+                    }
+
+                    tareaArchivoUi.setId(mDatabase.getKey());
+                    if(databaseError!=null){
+                        simple.onLoad(false);
+                    }else {
+                        simple.onLoad(true);
+                    }
+                }
+            });
+        }
+
+
     }
 
     @Override
@@ -534,6 +827,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                 });
     }
 
+
     private void deleteTareaEvaluacion(String nodeFirebase , int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, TareaArchivoUi tareaArchivoUi, CallbackSimple callbackSimple){
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase)
                 .child("/AV_Tarea_Evaluacion/silid_"+silaboEventoId+"/unid_"+unidadAprendizajeId+"/tarid_"+tareaId+"_pers_"+alumnoId+"/Archivos/"+tareaArchivoUi.getId());
@@ -548,6 +842,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                         }
                     }
                 });
+
     }
 
 
@@ -956,7 +1251,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
 
     @Override
     public void updateFirebaseTareaSesion(int idCargaCurso, int calendarioPeriodoId, int SesionAprendizajeId, List<TareasUI> tareasUIList, CallbackSimple callbackSimple) {
-       /* Webconfig webconfig = SQLite.select()
+       Webconfig webconfig = SQLite.select()
                 .from(Webconfig.class)
                 .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
                 .querySingle();
@@ -1043,7 +1338,7 @@ public class RemoteMvpDataSource implements TareasMvpDataSource {
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         callbackSimple.onLoad(false);
                     }
-                });*/
+                });
 
 
     }

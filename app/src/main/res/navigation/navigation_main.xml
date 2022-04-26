@@ -25,14 +25,14 @@
 
     <fragment
         android:id="@+id/tab4"
-        android:name="com.consultoraestrategia.ss_portalalumno.main.tab.TabFamiliaFragment"
-        android:label="Familia"
-        tools:layout="@layout/tab_familia"/>
+        android:name="com.consultoraestrategia.ss_portalalumno.main.tab.TabQRFragment"
+        android:label="QR"
+        tools:layout="@layout/tab_qr"/>
 
     <fragment
         android:id="@+id/tab5"
-        android:name="com.consultoraestrategia.ss_portalalumno.main.tab.TabBlancoFragment"
-        android:label="Empty"
-        tools:layout="@layout/tab_empty_clean"/>
+        android:name="com.consultoraestrategia.ss_portalalumno.main.tab.TabFamiliaFragment"
+        android:label="Familia"
+        tools:layout="@layout/tab_familia"/>
 
 </navigation>

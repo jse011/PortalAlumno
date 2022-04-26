@@ -8,6 +8,7 @@ public class ArchivoSesEvidenciaUi {
     private int state = 0;//pause 0 ,  progresso 1
     private boolean disabled;
     private boolean entregado;
+    private boolean forzarConexion;
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
@@ -39,6 +40,14 @@ public class ArchivoSesEvidenciaUi {
 
     public boolean getEntregado() {
         return entregado;
+    }
+
+    public void setForzarConexion(boolean forzarConexion) {
+        this.forzarConexion = forzarConexion;
+    }
+
+    public boolean getForzarConexion() {
+        return forzarConexion;
     }
 
     public enum Tipo{DOCUMENTO("Documento"), IMAGEN("Imagen"), PDF("Documento Portátil"), PRESENTACION("Presentación"), HOJACALCULO("Hoja de cálculo"), VIDEO("Video"), AUDIO("Múscia"), YOUTUBE(""), DRIVE(""), LINK(""), OTROS("Desconocido");

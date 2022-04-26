@@ -208,7 +208,7 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
         int tipoPeriodoId = calendarioPeriodo!=null?calendarioPeriodo.getTipoId():0;
 
         ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
-        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        apiRetrofit.changeSetTime(30,30,30, TimeUnit.SECONDS);
         RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getSesionAprendizajedAlumno(silaboEventoId, tipoPeriodoId));
         retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
             @Override
@@ -238,7 +238,7 @@ public class UnidadAprendizajeRepositorioImpl implements UnidadAprendizajeReposi
                 );
 
                 if(object==null){
-
+                    callback.onLoad(true);
                 }else {
 
                     List<SesionAprendizaje> sesionAprendizajeList = new ArrayList<>();

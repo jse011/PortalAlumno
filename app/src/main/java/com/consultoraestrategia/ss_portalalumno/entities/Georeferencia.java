@@ -24,6 +24,8 @@ public class Georeferencia extends BaseModel {
     private String alias;
     @Column
     private int estadoId;
+    @Column
+    private String fotoEntidad;
 
 
     public Georeferencia() {
@@ -76,6 +78,14 @@ public class Georeferencia extends BaseModel {
 
     public void setEstadoId(int estadoId) {
         this.estadoId = estadoId;
+    }
+
+    public String getFotoEntidad() {
+        return fotoEntidad;
+    }
+
+    public void setFotoEntidad(String fotoEntidad) {
+        this.fotoEntidad = fotoEntidad;
     }
 
     @Override

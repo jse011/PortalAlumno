@@ -55,6 +55,7 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
     private HashMap<ArchivoSesEvidenciaUi,StorageCancel> storageCancelList = new HashMap<>();
     private boolean disabledEntregado;
     private boolean entragadoAlumno;
+    private boolean forzarConexion;
 
     public EvidenciaPresenterImpl(UseCaseHandler handler, Resources res, GetEvidenciaSesArchivosUi getEvidenciaSesArchivosUi,
                                   UpdateEvidenciaSesion updateEvidenciaSesion, IsEntregado isEntregado, EntregarSesEvidenciaFB entregarSesEvidenciaFB,UploadArchivoStorageFB uploadArchivoStorageFB,
@@ -82,11 +83,12 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
         showProgress();
         if(view!=null)view.setTema(color1, color2, color3);
         isEntregado();
+        updateEvidenciaSesion();
         online.online(new Online.Callback() {
             @Override
             public void onLoad(boolean success) {
                 if(success){
-                    updateEvidenciaSesion();
+
                 }else {
                     hideProgress();
                     getEvidenciaSesArchivosUi();
@@ -120,6 +122,7 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
         archivoSesEvidenciaUiList.clear();
         archivoSesEvidenciaUiList.addAll(getEvidenciaSesArchivosUi.execute(sesionAprendizajeId));
         for (ArchivoSesEvidenciaUi archivoSesEvidenciaUi : archivoSesEvidenciaUiList){
+            archivoSesEvidenciaUi.setForzarConexion(forzarConexion);
             archivoSesEvidenciaUi.setColor(color1);
         }
         if(view!=null)view.setListEvidencia(archivoSesEvidenciaUiList);
@@ -139,6 +142,7 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
             this.color2 = gbCursoUi.getParametroDisenioColor2();
             this.color3 = gbCursoUi.getParametroDisenioColor3();
         }
+        this.forzarConexion = iCRMEdu.variblesConfiguracion.isForzarConexion();;
     }
 
     @Override
@@ -189,32 +193,21 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
                 return;
             }
             showProgress();
-            online.online(new Online.Callback() {
-                @Override
-                public void onLoad(boolean online) {
-                    if(online){
-                        if(!disabledEntregado){
-                            if(view!=null)view.diabledButtons();
+            if(!disabledEntregado){
+                if(view!=null)view.diabledButtons();
 
-                            for (ArchivoSesEvidenciaUi archivoSesEvidenciaUi : archivoSesEvidenciaUiList){
-                                archivoSesEvidenciaUi.setEntregado(true);
-                                if(view!=null)view.update(archivoSesEvidenciaUi);
-                            }
-
-                            entregarSesEvidenciaFB.execute(cargaCusoId, sesionAprendizajeId, success -> {
-                                disabledEntregado =false;
-                                isEntregado();
-                                hideProgress();
-                            });
-                        }
-                        disabledEntregado = true;
-                    }else {
-                        hideProgress();
-                        if(view!=null)view.showMessage("sin conexión");
-                    }
-
+                for (ArchivoSesEvidenciaUi archivoSesEvidenciaUi : archivoSesEvidenciaUiList){
+                    archivoSesEvidenciaUi.setEntregado(true);
+                    if(view!=null)view.update(archivoSesEvidenciaUi);
                 }
-            });
+
+                entregarSesEvidenciaFB.execute(cargaCusoId, sesionAprendizajeId, forzarConexion, success -> {
+                    disabledEntregado =false;
+                    isEntregado();
+                    hideProgress();
+                });
+            }
+            disabledEntregado = true;
 
         }
     }
@@ -278,37 +271,25 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
     private void deleteArchivoStorageFB(ArchivoSesEvidenciaUi evidenciaUi) {
         evidenciaUi.setDisabled(true);
         if(view!=null)view.update(evidenciaUi);
-        online.online(new Online.Callback() {
-            @Override
-            public void onLoad(boolean online) {
-                if(online){
-                    if(!TextUtils.isEmpty(evidenciaUi.getId())){
-                        deleteArchivoStorageFB.execute(cargaCusoId, sesionAprendizajeId, evidenciaUi, new DeleteArchivoStorageFB.Callback() {
-                            @Override
-                            public void onLoad(boolean success) {
-                                evidenciaUi.setDisabled(false);
-                                if(success){
-                                    archivoSesEvidenciaUiList.remove(evidenciaUi);
-                                    if(view!=null)view.remove(evidenciaUi);
-                                }else {
-                                    if(view!=null)view.update(evidenciaUi);
-                                    if(view!=null)view.showMessage("Acción cancelada");
-                                }
-                            }
-                        });
-                    }else {
-                        archivoSesEvidenciaUiList.remove(evidenciaUi);
-                        evidenciaUi.setDisabled(false);
-                        if(view!=null)view.remove(evidenciaUi);
-                    }
-                }else {
+        if(!TextUtils.isEmpty(evidenciaUi.getId())){
+            deleteArchivoStorageFB.execute(cargaCusoId, sesionAprendizajeId, evidenciaUi, forzarConexion, new DeleteArchivoStorageFB.Callback() {
+                @Override
+                public void onLoad(boolean success) {
                     evidenciaUi.setDisabled(false);
-                    if(view!=null)view.update(evidenciaUi);
-                    if(view!=null)view.showMessage("sin conexión");
+                    if(success){
+                        archivoSesEvidenciaUiList.remove(evidenciaUi);
+                        if(view!=null)view.remove(evidenciaUi);
+                    }else {
+                        if(view!=null)view.update(evidenciaUi);
+                        if(view!=null)view.showMessage("Acción cancelada");
+                    }
                 }
-
-            }
-        });
+            });
+        }else {
+            archivoSesEvidenciaUiList.remove(evidenciaUi);
+            evidenciaUi.setDisabled(false);
+            if(view!=null)view.remove(evidenciaUi);
+        }
     }
 
     @Override
@@ -352,6 +333,7 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
                         ArchivoSesEvidenciaUi archivoSesEvidenciaUi = new ArchivoSesEvidenciaUi();
                         archivoSesEvidenciaUi.setNombre(file.getName());
                         archivoSesEvidenciaUi.setColor(color1);
+                        archivoSesEvidenciaUi.setForzarConexion(forzarConexion);
                         archivoSesEvidenciaUi.setTipo(TareaArchivoUi.getType(file.getPath()));
                         archivoSesEvidenciaUi.setDescripcion(archivoSesEvidenciaUi.getTipo().getNombre());
                         boolean existe = false;
@@ -383,7 +365,7 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
     }
 
     private void uploadArchivoStorageFB(ArchivoSesEvidenciaUi archivoSesEvidenciaUi) {
-        StorageCancel storageCancel = this.uploadArchivoStorageFB.execute(cargaCusoId, sesionAprendizajeId, archivoSesEvidenciaUi, new UploadArchivoStorageFB.Callback() {
+        StorageCancel storageCancel = this.uploadArchivoStorageFB.execute(cargaCusoId, sesionAprendizajeId, archivoSesEvidenciaUi, forzarConexion, new UploadArchivoStorageFB.Callback() {
             @Override
             public void onChange(ArchivoSesEvidenciaUi tareaArchivoUi) {
                 if(view!=null)view.update(tareaArchivoUi);
@@ -423,6 +405,7 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
             ArchivoSesEvidenciaUi archivoSesEvidenciaUi = new ArchivoSesEvidenciaUi();
             archivoSesEvidenciaUi.setNombre(nombre);
             archivoSesEvidenciaUi.setColor(color1);
+            archivoSesEvidenciaUi.setForzarConexion(forzarConexion);
             archivoSesEvidenciaUi.setTipo(TareaArchivoUi.getType(nombre));
             archivoSesEvidenciaUi.setDescripcion(archivoSesEvidenciaUi.getTipo().getNombre());
             boolean existe = false;
@@ -485,27 +468,28 @@ public class EvidenciaPresenterImpl extends BaseFragmentPresenterImpl<EvidenciaV
         uploadLinkFB(archivoSesEvidenciaUi);
     }
 
+    @Override
+    public void onClickGaleria() {
+        if(view!=null)view.openGalery();
+    }
+
+    @Override
+    public void onClickRecordVideo() {
+        if(view!=null)view.openRecordVideo();
+    }
+
     private void uploadLinkFB(ArchivoSesEvidenciaUi archivoSesEvidenciaUi) {
-        online.online(new Online.Callback() {
+        uploadLinkFB.execute(cargaCusoId, sesionAprendizajeId, archivoSesEvidenciaUi, forzarConexion, new UploadLinkFB.Callback() {
             @Override
-            public void onLoad(boolean success) {
+            public void onFinish(boolean success) {
                 if(success){
-                    uploadLinkFB.execute(cargaCusoId, sesionAprendizajeId, archivoSesEvidenciaUi, new UploadLinkFB.Callback() {
-                        @Override
-                        public void onFinish(boolean success) {
-                            if(success){
-                                archivoSesEvidenciaUi.setDisabled(false);
-                                if(view!=null)view.update(archivoSesEvidenciaUi);
-                            }else {
-                                archivoSesEvidenciaUi.setDisabled(true);
-                                archivoSesEvidenciaUiList.remove(archivoSesEvidenciaUi);
-                                if(view!=null)view.remove(archivoSesEvidenciaUi);
-                                if(view!=null)view.showMessage("Error al guardar el vínculo");
-                            }
-                        }
-                    });
+                    archivoSesEvidenciaUi.setDisabled(false);
+                    if(view!=null)view.update(archivoSesEvidenciaUi);
                 }else {
-                    if(view!=null)view.showMessage("Sin conexión");
+                    archivoSesEvidenciaUi.setDisabled(true);
+                    archivoSesEvidenciaUiList.remove(archivoSesEvidenciaUi);
+                    if(view!=null)view.remove(archivoSesEvidenciaUi);
+                    if(view!=null)view.showMessage("Error al guardar el vínculo");
                 }
             }
         });

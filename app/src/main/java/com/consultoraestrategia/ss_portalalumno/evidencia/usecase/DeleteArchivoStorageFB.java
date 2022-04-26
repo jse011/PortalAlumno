@@ -11,8 +11,8 @@ public class DeleteArchivoStorageFB {
         this.repository = repository;
     }
 
-    public void execute(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, Callback callback){
-        repository.deleteStorageFB(cargaCursoId, sesionAprendizajeId,archivoSesEvidenciaUi, new EvidenciaRepository.Callback() {
+    public void execute(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, boolean forzarConexion, Callback callback){
+        repository.deleteStorageFB(cargaCursoId, sesionAprendizajeId,archivoSesEvidenciaUi, forzarConexion, new EvidenciaRepository.Callback() {
             @Override
             public void onLoad(boolean success) {
                 callback.onLoad(success);

@@ -1,15 +1,19 @@
 package com.consultoraestrategia.ss_portalalumno.login2.principal;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -19,6 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
@@ -60,7 +65,10 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
     @BindView(R.id.contenedor)
     FrameLayout contenedor;
     @BindView(R.id.contendoPrincipal)
-    ConstraintLayout contendoPrincipal;
+    FrameLayout contendoPrincipal;
+    @BindView(R.id.animation_view)
+    LottieAnimationView animationView;
+
     private CorreoFragment correoFragment;
     private DniFragment dniFragment;
     private ListaUsuarioFragment listaUsuarioFragment;
@@ -77,6 +85,12 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
     @Override
     protected AppCompatActivity getActivity() {
         return this;
+    }
+
+    private void disableAutoFill() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getWindow().getDecorView().setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
+        }
     }
 
     @Override
@@ -107,9 +121,33 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
     @Override
     protected void setContentView() {
         setContentView(R.layout.activity_login_2);
+        String lottie_animation;
+        if(getResources().getString(R.string.app_name).equals("Educar Student")){
+           getTheme().applyStyle(R.style.LoginEducarStudent, true);
+            lottie_animation = "lf30_editor_mhbkpgup.json";
+        }else{
+           getTheme().applyStyle(R.style.LoginEvaStudent, true);
+            lottie_animation = "lf30_editor_fhwg7xxq.json";
+        }
         ButterKnife.bind(this);
         setupToolbar();
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(new LifeCycleFragment(this),true);
+        animationView.setAnimation(lottie_animation);
+        animationView.setRepeatCount(ValueAnimator.INFINITE);
+        animationView.playAnimation();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        float height = (float)displayMetrics.heightPixels/0.52f;
+        float width = (float) displayMetrics.widthPixels/0.5f;
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams((int)width, (int)height);
+        animationView.setLayoutParams(layoutParams);
+
+        //float heightA = ((float)displayMetrics.heightPixels - ((float)displayMetrics.heightPixels * (0.92f * 100f)));
+        //float widthA = 0;//(float) displayMetrics.widthPixels/2.5f;
+
+        //animationView.animate().translationYBy(heightA)/*.translationXBy(widthA)*/.setDuration(0);
+        animationView.animate().rotation(-55);
     }
 
     private void setupToolbar() {
@@ -234,6 +272,7 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        disableAutoFill();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         ButterKnife.bind(this);
 
@@ -333,4 +372,8 @@ public class Login2Activity extends BaseActivity<Login2View, Login2Presenter> im
         EstadoCuenta2Activity.start(this, personaId, numDoc);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

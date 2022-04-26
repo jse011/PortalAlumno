@@ -24,7 +24,7 @@ public interface LoginDataRepository {
 
     RetrofitCancel getUsuarioLocalPorDni(String urlAdminServicio, String usuario, String password, String correo, String dni, Callback<UsuarioExternoUi> callback);
 
-    RetrofitCancel getDatosInicioSesion(int usuarioId, CallBackSucces<DatosProgressUi> callback);
+    RetrofitCancel getDatosInicioSesion(int usuarioId, boolean remover, CallBackSucces<DatosProgressUi> callback);
 
     RetrofitCancel getPersonaLocal(String usuario, Callback<PersonaUi> callback);
 
@@ -38,9 +38,16 @@ public interface LoginDataRepository {
 
     FirebaseCancel ishabilitadoAcceso(Callback<HabilitarAccesoUi> booleanCallback);
 
+    void removerDatosIncioSession(CallbackSimple callbackSimple);
+
     interface Callback<S>{
         void onResponse(boolean success, S value);
     }
+
+    interface CallbackSimple{
+        void onResponse(boolean success);
+    }
+
 
     interface CallBackSucces<T>{
         void onLoad(boolean success, T item);

@@ -21,7 +21,7 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 public class YoutubeConfig implements YouTubePlayer.OnInitializedListener, YouTubePlayer.OnFullscreenListener {
-    public static final String API_KEY = "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA";
+
     private Fragment fragment;
     @SuppressLint("InlinedApi")
     private static final int PORTRAIT_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
@@ -42,6 +42,7 @@ public class YoutubeConfig implements YouTubePlayer.OnInitializedListener, YouTu
 
     public void initialize(String idVideo, FragmentManager fragmentManager, @IdRes int id, PlaybackEventListener playbackEventListener){
         this.idVideo = idVideo;
+        String ui = "AIzaSyBg3blO9e6Q02C9V-58xh3eQhGy9TxirXA";
         this.playbackEventListener = playbackEventListener;
         Log.d("YoutubeConfig ", idVideo);
 
@@ -49,7 +50,7 @@ public class YoutubeConfig implements YouTubePlayer.OnInitializedListener, YouTu
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(id, fragment).commit();
         fragment.setRetainInstance(true);
-        ((YouTubePlayerSupportFragment)(Object)fragment).initialize(YoutubeConfig.API_KEY, this);
+        ((YouTubePlayerSupportFragment)(Object)fragment).initialize(ui, this);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {

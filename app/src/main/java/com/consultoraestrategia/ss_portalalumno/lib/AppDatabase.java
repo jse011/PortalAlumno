@@ -3,6 +3,7 @@ package com.consultoraestrategia.ss_portalalumno.lib;
 
 import androidx.annotation.NonNull;
 
+import com.consultoraestrategia.ss_portalalumno.entities.Georeferencia;
 import com.consultoraestrategia.ss_portalalumno.entities.InstrumentoEvaluacion;
 import com.consultoraestrategia.ss_portalalumno.entities.TareasC;
 import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
@@ -31,7 +32,9 @@ public class AppDatabase {
     //public static final int VERSION = 11;//Se agrego la table EventoTipos Evento2 Calendario2 EventoAdjunto
     //public static final int VERSION = 12;//Se agrego la table GrabacionSalaVirtual InstrumentoEncuestaEval ReunionVirtualServidor
     //public static final int VERSION = 13;//Se agrego la table DriveTareaArchivo
-    public static final int VERSION = 14;//Se agrego la table DriveTareaArchivo
+    //public static final int VERSION = 14;//Se agrego la table DriveTareaArchivo
+    public static final int VERSION = 15; //Se modifico la table Georeferencia
+
     @Migration(version = 8, database = AppDatabase.class)
     public static class AlterUsuario extends AlterTableMigration<Usuario> {
 
@@ -50,6 +53,24 @@ public class AppDatabase {
         }
 
 
+    }
+
+    @Migration(version = 15, database = AppDatabase.class)
+    public static class AlterGeoreferencia extends AlterTableMigration {
+
+        public AlterGeoreferencia(Class<Georeferencia> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.TEXT, "fotoEntidad");
+        }
+
+        @Override
+        public void onPostMigrate() {
+            super.onPostMigrate();
+        }
     }
 
     @Migration(version = 8, database = AppDatabase.class)

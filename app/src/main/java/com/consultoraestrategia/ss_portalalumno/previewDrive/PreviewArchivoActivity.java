@@ -36,6 +36,7 @@ import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.viewpager.LifecycleImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineSimpleImpl;
+import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.archivo.ArchivoPreviewFragment;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.archivo.ArchivoPreviewView;
 import com.consultoraestrategia.ss_portalalumno.previewDrive.data.source.PreviewDriveRepository;

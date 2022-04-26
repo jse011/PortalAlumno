@@ -32,7 +32,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bnve"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_actualizar_evento_2"
-        tools:ignore="VectorDrawableCompat" />
+        tools:ignore="ContentDescription,VectorDrawableCompat" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="39dp"
@@ -80,6 +80,7 @@
         <com.consultoraestrategia.ss_portalalumno.util.FabBottomNavigationView
             android:id="@+id/bnve"
             style="@style/bnve_white_bg"
+            app:itemIconSize="45dp"
             android:layout_width="match_parent"
             android:layout_marginTop="16dp"
             android:layout_height="62dp"

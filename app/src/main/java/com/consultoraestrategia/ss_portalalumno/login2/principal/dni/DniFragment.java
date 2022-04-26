@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -41,7 +42,8 @@ public class DniFragment extends Fragment implements DniView, TextView.OnEditorA
     ImageView btnAtrasDni;
     @BindView(R.id.imageView8)
     ImageView imageView8;
-
+    @BindView(R.id.textView109)
+    TextView textView109;
     private Unbinder unbinder;
     private Login2Presenter presenter;
 
@@ -62,19 +64,22 @@ public class DniFragment extends Fragment implements DniView, TextView.OnEditorA
         if(getResources().getString(R.string.app_name).equals("Educar Student")){
 
             Glide.with(imageView17)
-                    .load(R.drawable.logo_educar)
+                    .load(R.drawable.educar_d_login)
                     .into(imageView17);
             imageView8.setVisibility(View.VISIBLE);
             Glide.with(this)
                     .load(R.drawable.docente_mentor)
                     .into(imageView8);
-
+            textView109.setText("Centro de Aprendizaje Virtual");
+            textView109.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEducarStudent));
 
         }else{
             Glide.with(imageView17)
-                    .load(R.drawable.docente_mentor)
+                    .load(R.drawable.icrm_d_login)
                     .into(imageView17);
             imageView8.setVisibility(View.INVISIBLE);
+            textView109.setText("Social iCRM Educativo Móvil");
+            textView109.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEvaStudent));
         }
     }
 

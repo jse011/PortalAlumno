@@ -1,6 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.previewDrive.data.source;
 
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -68,52 +69,39 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
 
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
-                .child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/tarid_" + tareaId + "/pers_" + alumnoId + "/" + nombreArchivo);
 
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        retrofitCancels.add(getUrlDrive(tareaId, alumnoId, nombreArchivo, "", new Callback<DriveUi>() {
             @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
-                Call<RestApiResponse<BEDrive>> responseCall = apiRetrofit.f_SynckTareaAlumDrive(tareaId, alumnoId, nombreArchivo, uri.toString());
+            public void onLoad(boolean success, DriveUi item) {
 
-                RetrofitCancel<BEDrive> retrofitCancel = new RetrofitCancelImpl<>(responseCall);
+                if(!success || item==null || TextUtils.isEmpty(item.getIdDrive())){
+                    StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
+                            .child("/AV_Tarea_Evaluacion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/tarid_" + tareaId + "/pers_" + alumnoId + "/" + nombreArchivo);
 
-                retrofitCancel.enqueue(new RetrofitCancel.Callback<BEDrive>() {
-                    @Override
-                    public void onResponse(final BEDrive response) {
-                        if(response == null){
-                            Log.d(TAG,"response calendarioPeriodo null");
-                        }else {
-                            Log.d(TAG,"response calendarioPeriodo true");
-                            DriveUi driveUi = new DriveUi();
-                            driveUi.setIdDrive(response.getIdDrive());
-                            driveUi.setThumbnail(response.getThumbnail());
-                            driveUi.setMsgError(response.getMsgError());
-                            driveUi.setUrl(response.getUrl());
+                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png'
 
-                            driveUiCallback.onLoad(true, driveUi);
+                            retrofitCancels.add(getUrlDrive(tareaId, alumnoId, nombreArchivo, uri.toString(), driveUiCallback));
+
                         }
-                    }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                            driveUiCallback.onLoad(false, null);
+                        }
+                    });
+                }else {
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        t.printStackTrace();
-                        Log.d(TAG,"response calendarioPeriodo Transaction Failure");
-                        driveUiCallback.onLoad(false, null);
-                    }
-                });
-
-                retrofitCancels.add(retrofitCancel);
+                    driveUiCallback.onLoad(true, item);
+                }
 
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                driveUiCallback.onLoad(false, null);
-            }
-        });
+        }));
+
+
 
         return new RetrofitCancel() {
             @Override
@@ -137,6 +125,39 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
                 return false;
             }
         };
+    }
+
+    RetrofitCancel getUrlDrive(String tareaId, int alumnoId, String nombreArchivo, String path,  Callback<DriveUi> driveUiCallback){
+        Call<RestApiResponse<BEDrive>> responseCall = apiRetrofit.f_SynckTareaAlumDrive(tareaId, alumnoId, nombreArchivo, path);
+
+        RetrofitCancel<BEDrive> retrofitCancel = new RetrofitCancelImpl<>(responseCall);
+
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<BEDrive>() {
+            @Override
+            public void onResponse(final BEDrive response) {
+                if(response == null){
+                    Log.d(TAG,"response calendarioPeriodo null");
+                }else {
+                    Log.d(TAG,"response calendarioPeriodo true");
+                    DriveUi driveUi = new DriveUi();
+                    driveUi.setIdDrive(response.getIdDrive());
+                    driveUi.setThumbnail(response.getThumbnail());
+                    driveUi.setMsgError(response.getMsgError());
+                    driveUi.setUrl(response.getUrl());
+
+                    driveUiCallback.onLoad(true, driveUi);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+                Log.d(TAG,"response calendarioPeriodo Transaction Failure");
+                driveUiCallback.onLoad(false, null);
+            }
+        });
+
+        return  retrofitCancel;
     }
 
     @Override
@@ -165,53 +186,36 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
 
         SessionUser sessionUser = SessionUser.getCurrentUser();
         int alumnoId = sessionUser!=null?sessionUser.getPersonaId():0;
-        // //gs://messenger-academico.appspot.com/ups/AV_Evidencias_Sesion/silid_2830/unid_16633/sesid_258063/pers_1949
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
-                .child("/AV_Evidencias_Sesion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/sesid_" + sesionAprendizajeId + "/pers_" + alumnoId + "/" + nombreArchivo);
 
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
+
+        getUrlDriveEvidencias(silaboEventoId, unidadAprendizajeId, sesionAprendizajeId, alumnoId, nombreArchivo, "", new Callback<DriveUi>() {
             @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
-                Call<RestApiResponse<BEDrive>> responseCall = apiRetrofit.f_SynckEviSesDrive(silaboEventoId, unidadAprendizajeId, sesionAprendizajeId, alumnoId, nombreArchivo, uri.toString());
+            public void onLoad(boolean success, DriveUi item) {
+                if(!success || item==null || TextUtils.isEmpty(item.getIdDrive())){
+                    // //gs://messenger-academico.appspot.com/ups/AV_Evidencias_Sesion/silid_2830/unid_16633/sesid_258063/pers_1949
+                    StorageReference storageReference = FirebaseStorage.getInstance().getReference("/"+nodeFirebase)
+                            .child("/AV_Evidencias_Sesion/silid_" + silaboEventoId + "/unid_" + unidadAprendizajeId + "/sesid_" + sesionAprendizajeId + "/pers_" + alumnoId + "/" + nombreArchivo);
 
-                RetrofitCancel<BEDrive> retrofitCancel = new RetrofitCancelImpl<>(responseCall);
-
-                retrofitCancel.enqueue(new RetrofitCancel.Callback<BEDrive>() {
-                    @Override
-                    public void onResponse(final BEDrive response) {
-                        if(response == null){
-                            Log.d(TAG,"response calendarioPeriodo null");
-                        }else {
-                            Log.d(TAG,"response calendarioPeriodo true");
-                            DriveUi driveUi = new DriveUi();
-                            driveUi.setIdDrive(response.getIdDrive());
-                            driveUi.setThumbnail(response.getThumbnail());
-                            driveUi.setMsgError(response.getMsgError());
-                            driveUi.setUrl(response.getUrl());
-
-                            driveUiCallback.onLoad(true, driveUi);
+                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png'
+                            retrofitCancels.add(  getUrlDriveEvidencias(silaboEventoId, unidadAprendizajeId, sesionAprendizajeId, alumnoId, nombreArchivo,uri.toString(), driveUiCallback));
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-                        t.printStackTrace();
-                        Log.d(TAG,"response calendarioPeriodo Transaction Failure");
-                        driveUiCallback.onLoad(false, null);
-                    }
-                });
-
-                retrofitCancels.add(retrofitCancel);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                driveUiCallback.onLoad(false, null);
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                            driveUiCallback.onLoad(false, null);
+                        }
+                    });
+                }else {
+                    driveUiCallback.onLoad(true, item);
+                }
             }
         });
+
 
         return new RetrofitCancel() {
             @Override
@@ -235,6 +239,40 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
                 return false;
             }
         };
+    }
+
+
+    RetrofitCancel getUrlDriveEvidencias(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId, String nombre, String path,  Callback<DriveUi> driveUiCallback){
+        Call<RestApiResponse<BEDrive>> responseCall = apiRetrofit.f_SynckEviSesDrive(silaboEventoId, unidadAprendizajeId, sesionAprendizajeId, alumnoId, nombre, path);
+
+        RetrofitCancel<BEDrive> retrofitCancel = new RetrofitCancelImpl<>(responseCall);
+
+        retrofitCancel.enqueue(new RetrofitCancel.Callback<BEDrive>() {
+            @Override
+            public void onResponse(final BEDrive response) {
+                if(response == null){
+                    Log.d(TAG,"response calendarioPeriodo null");
+                }else {
+                    Log.d(TAG,"response calendarioPeriodo true");
+                    DriveUi driveUi = new DriveUi();
+                    driveUi.setIdDrive(response.getIdDrive());
+                    driveUi.setThumbnail(response.getThumbnail());
+                    driveUi.setMsgError(response.getMsgError());
+                    driveUi.setUrl(response.getUrl());
+
+                    driveUiCallback.onLoad(true, driveUi);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+                Log.d(TAG,"response calendarioPeriodo Transaction Failure");
+                driveUiCallback.onLoad(false, null);
+            }
+        });
+
+        return  retrofitCancel;
     }
 
     @Override
@@ -265,5 +303,22 @@ public class PreviewDriveRepositoyImpl implements PreviewDriveRepository {
         driveTareaArchivo.setIdDownload(idDownload);
         driveTareaArchivo.save();
 
+    }
+
+    @Override
+    public DriveUi getIdDriveTemporal(String driveId) {
+        DriveArchivoLocal driveTareaArchivo = SQLite.select()
+                .from(DriveArchivoLocal.class)
+                .where(DriveArchivoLocal_Table.driveId.eq(driveId))
+                .querySingle();
+
+        DriveUi driveUi = new DriveUi();
+
+        if (driveTareaArchivo!=null){
+            driveUi.setIdDrive(driveTareaArchivo.getDriveId());
+            driveUi.setNombreArchivoLocal(driveTareaArchivo.getNombreLocal());
+        }
+
+        return driveUi;
     }
 }

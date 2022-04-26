@@ -135,7 +135,7 @@ public class ActividadesRemoteDataSource implements ActividadesDataSource {
                 List<RecursoArchivo> recursoArchivoList = new ArrayList<>();
 
                 if(response==null){
-
+                    callbackSimple.onLoad(true);
                 }else {
                     for (JSONFirebase actividadSnapshot : JSONFirebase.d(response).getChildren()){
 

@@ -82,6 +82,10 @@ public interface MainPresenter extends BasePresenter<MainView> {
 
     void onErrorCuentaFirebase();
 
+    void attachView(MainView.TabQR tabQR);
+
+    void onTabQRDestroy();
+
 
     interface Callback<T> {
         void onSuccess(T item);

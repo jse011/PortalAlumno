@@ -3,6 +3,7 @@ package com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,11 +45,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import com.consultoraestrategia.ss_portalalumno.BuildConfig;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
 import com.consultoraestrategia.ss_portalalumno.base.activity.BaseActivity;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
+import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.lib.cardviewGesture.MovableCardView;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.adapterDownload.adapter.DownloadAdapter;
@@ -79,6 +84,7 @@ import com.consultoraestrategia.ss_portalalumno.util.OpenIntents;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
 import com.consultoraestrategia.ss_portalalumno.youtube.YoutubeConfig;
+import com.fxn.interfaces.WorkFinish;
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
 import com.fxn.utility.PermUtil;
@@ -91,7 +97,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -100,7 +109,7 @@ import butterknife.OnClick;
 
 public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView, TareaDescripcionPresenter> implements TareasDecripcionView, DownloadItemListener, CallbackFilterChooserBottomDialog, AdjuntoAdapter.Listener {
     private final static int REQUEST_CODE_DOC_Q = 2312;
-    private static final int REQUEST_CODE_IMAGE_Q = 2314;
+    private static final int REQUEST_CODE_IMAGE_Q = 2314, REQUEST_TAKE_PHOTO = 2316, REQUEST_VIDEO_CAPTURE = 2317, REQUEST_GALLERY_IMAGE = 2315;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -525,9 +534,19 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
     }
 
     @Override
+    public void onClickGaleria() {
+        presenter.onClickGaleria();
+    }
+
+    @Override
+    public void onClickRecordVideo() {
+        presenter.onClickRecordVideo();
+    }
+
+    @Override
     public void openCamera(ArrayList<String> photoSelected) {
 
-        Options options = Options.init()
+        /*Options options = Options.init()
                 .setCount(6)                                                   //Number of images to restict selection count
                 .setFrontfacing(false);                                      //Front Facing camera on start
         if (photoSelected != null && !photoSelected.isEmpty()) {
@@ -541,7 +560,53 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
                 .setPath(getResources().getString(R.string.app_name) + "/images")//Custom Path For media Storage
                 .setRequestCode(REQUEST_CODE_IMAGE_Q);                            //Request code for activity results
 
-        Pix.start(this, options);
+        Pix.start(this, options);*/
+
+        PermUtil.checkForCamaraWritePermissions(this, new WorkFinish() {
+            @Override
+            public void onWorkFinish(Boolean check) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(TareaDescripcionActivity.this,
+                                BuildConfig.APPLICATION_ID+".provider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                }
+            }
+        });
+
+    }
+
+    String currentPhotoPath;
+    String currentPhotoFileName;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        currentPhotoFileName = image.getName();
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     @Override
@@ -595,6 +660,8 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
 
     @Override
     public void showPreviewArchivo() {
+        iCRMEdu.VariblesGlobales variblesGlobales = iCRMEdu.variblesGlobales;
+        variblesGlobales.saveData(this);
        startActivity(new Intent(this, PreviewArchivoActivity.class));
     }
 
@@ -640,6 +707,13 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
     }
 
     @Override
+    public void openGalery() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, REQUEST_GALLERY_IMAGE);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case PermUtil.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
@@ -662,9 +736,53 @@ public class TareaDescripcionActivity extends BaseActivity<TareasDecripcionView,
         }else if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_DOC_Q){
             Uri uri = data.getData();
             presenter.onResultDoc(uri, getNombre(uri, this));
+        }else if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            Uri uri = galleryAddPic();
+            presenter.onResultDoc(uri, currentPhotoFileName);
+        }else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+            Uri videoUri = data.getData();
+            presenter.onResultDoc(videoUri,  queryName(getContentResolver(), videoUri));
+        }else if (resultCode == RESULT_OK && requestCode == REQUEST_GALLERY_IMAGE){
+            Uri imageUri = data.getData();
+            presenter.onResultGarlery(imageUri, queryName(getContentResolver(), imageUri));
         }
     }
 
+    private static String queryName(ContentResolver resolver, Uri uri) {
+        Cursor returnCursor =
+                resolver.query(uri, null, null, null, null);
+        assert returnCursor != null;
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        returnCursor.moveToFirst();
+        String name = returnCursor.getString(nameIndex);
+        returnCursor.close();
+        return name;
+    }
+
+    @Override
+    public void openRecordVideo() {
+        PermUtil.checkForCamaraWritePermissions(this, new WorkFinish() {
+            @Override
+            public void onWorkFinish(Boolean check) {
+                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                }
+            }
+        });
+
+
+
+    }
+
+    private Uri galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+        return  contentUri;
+    }
 
     @Override
     public void onClickActionTareaArchivo(TareaArchivoUi tareaArchivoUi) {

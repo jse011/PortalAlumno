@@ -17,38 +17,38 @@ public class Usuario extends BaseModel {
 
     @Column
     @PrimaryKey
-    int usuarioId;
+    public int usuarioId;
     @Column
-    private int personaId;
+    public int personaId;
     @Column
-    private String usuario;
+    public String usuario;
     @Column
-    private String password;
+    public String password;
     @Column
-    boolean estado;
+    public boolean estado;
 
-    private String nombres;
-    private String apellidoPaterno;
-    private String apellidoMaterno;
+    public String nombres;
+    public String apellidoPaterno;
+    public String apellidoMaterno;
     public String numDoc;
     @Column
-    private boolean habilitarAcceso;
+    public boolean habilitarAcceso;
 
-    private List<Entidad> entidades;
+    public List<Entidad> entidades;
 
-    private List<Georeferencia> georeferencias;
+    public List<Georeferencia> georeferencias;
 
-    private List<Rol> roles;
+    public List<Rol> roles;
 
-    private List<UsuarioRolGeoreferencia> usuarioRolGeoreferencias;
+    public List<UsuarioRolGeoreferencia> usuarioRolGeoreferencias;
 
-    private List<PersonaGeoreferencia> personaGeoreferencias;
+    public List<PersonaGeoreferencia> personaGeoreferencias;
 
-    private List<UsuarioAcceso> accesos;
+    public List<UsuarioAcceso> accesos;
 
-    private String fotoPersona;
+    public String fotoPersona;
 
-    private String fotoEntidad;
+    public String fotoEntidad;
 
 
     public Usuario() {

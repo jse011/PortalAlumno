@@ -51,6 +51,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.ParametrosDisenio;
 import com.consultoraestrategia.ss_portalalumno.entities.Periodo;
 import com.consultoraestrategia.ss_portalalumno.entities.Persona;
 import com.consultoraestrategia.ss_portalalumno.entities.PersonaGeoreferencia;
+import com.consultoraestrategia.ss_portalalumno.entities.Persona_Table;
 import com.consultoraestrategia.ss_portalalumno.entities.PlanCursos;
 import com.consultoraestrategia.ss_portalalumno.entities.PlanEstudios;
 import com.consultoraestrategia.ss_portalalumno.entities.ProgramasEducativo;
@@ -93,6 +94,7 @@ import com.consultoraestrategia.ss_portalalumno.entities.Usuario;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.UsuarioExternoUi;
 import com.consultoraestrategia.ss_portalalumno.login2.entities.UsuarioUi;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
+import com.consultoraestrategia.ss_portalalumno.retrofit.UnsafeOkHttpClient;
 import com.consultoraestrategia.ss_portalalumno.retrofit.response.RestApiResponse;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancelImpl;
@@ -202,8 +204,8 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
         settings.save();
 
         ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
-        apiRetrofit.updateServerUrl();
-        OkHttpClient.Builder builder = ProgressManager.getInstance().with(new OkHttpClient.Builder());
+        apiRetrofit.initialize();
+        OkHttpClient.Builder builder = ProgressManager.getInstance().with(UnsafeOkHttpClient.getUnsafeOkHttpClient());
         builder.connectTimeout(10, TimeUnit.SECONDS) // connect timeout
                 .writeTimeout(15, TimeUnit.SECONDS) // write timeout
                 .readTimeout(15, TimeUnit.SECONDS);
@@ -302,10 +304,10 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
     }
 
     @Override
-    public RetrofitCancel getDatosInicioSesion(int usuarioId, CallBackSucces<DatosProgressUi> callback) {
+    public RetrofitCancel getDatosInicioSesion(int usuarioId, boolean remover, CallBackSucces<DatosProgressUi> callback) {
         ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
 
-        OkHttpClient.Builder builder = ProgressManager.getInstance().with(new OkHttpClient.Builder());
+        OkHttpClient.Builder builder = ProgressManager.getInstance().with(UnsafeOkHttpClient.getUnsafeOkHttpClient());
         builder.connectTimeout(10, TimeUnit.SECONDS) // connect timeout
                 .writeTimeout(30, TimeUnit.SECONDS) // write timeout
                 .readTimeout(30, TimeUnit.SECONDS);
@@ -412,7 +414,16 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                         }
                     }).build();
 
-                    transaction.execute();
+                    if(remover){
+                        removerDatosIncioSession(new CallbackSimple() {
+                            @Override
+                            public void onResponse(boolean success) {
+                                transaction.execute();
+                            }
+                        });
+                    }else{
+                        transaction.execute();
+                    }
 
                 }
             }
@@ -596,6 +607,7 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
                     }
                 }else {
                     Log.d(TAG,"isSuccessful false");
+                    callback.onResponse(false, null);
                 }
             }
 
@@ -750,6 +762,135 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
 
                     }
                 });
+    }
+
+    @Override
+    public void removerDatosIncioSession(CallbackSimple callback) {
+        DatabaseDefinition database = FlowManager.getDatabase(AppDatabase.class);
+        Transaction transaction = database.beginTransactionAsync(new ITransaction() {
+            @Override
+            public void execute(DatabaseWrapper databaseWrapper) {
+                SessionUser sessionUser = SessionUser.getCurrentUser();
+                int usuarioId = sessionUser!=null?sessionUser.getUserId():0;
+                int personaId = sessionUser!=null?sessionUser.getPersonaId():0;
+                SQLite.delete()
+                        .from(Webconfig.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(CargaCursos.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Contrato.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(DetalleContratoAcad.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Persona.class)
+                        .where(Persona_Table.personaId.notEq(personaId))
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Relaciones.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Usuario.class)
+                        .where(Usuario_Table.usuarioId.notEq(usuarioId))
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Cursos.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(PlanCursos.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(PlanEstudios.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(ProgramasEducativo.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(CargaAcademica.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Seccion.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Periodo.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Georeferencia.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(AnioAcademicoAlumno.class)
+                        .execute(databaseWrapper);
+                SQLite.delete()
+                        .from(AnioAcademico.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(CalendarioAcademico.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(CalendarioPeriodo.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(NivelAcademico.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(SilaboEvento.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(CalendarioPeriodoDetalle.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(ParametrosDisenio.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(Aula.class)
+                        .execute(databaseWrapper);
+
+                SQLite.delete()
+                        .from(CargaCursoDocente.class)
+                        .execute(databaseWrapper);
+
+            }
+        }).success(new Transaction.Success() {
+            @Override
+            public void onSuccess(@NonNull Transaction transaction) {
+
+                callback.onResponse(true);
+            }
+        }).error(new Transaction.Error() {
+            @Override
+            public void onError(@NonNull Transaction transaction, @NonNull Throwable error) {
+                error.printStackTrace();
+
+                callback.onResponse(false);
+            }
+        }).build();
+
+        transaction.execute();
     }
 
 

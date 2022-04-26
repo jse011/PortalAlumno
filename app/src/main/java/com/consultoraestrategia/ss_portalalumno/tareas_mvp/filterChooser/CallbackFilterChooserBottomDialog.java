@@ -12,4 +12,7 @@ public interface CallbackFilterChooserBottomDialog {
 
     void onClickCamera();
 
+    void onClickGaleria();
+
+    void onClickRecordVideo();
 }

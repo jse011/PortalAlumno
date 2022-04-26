@@ -158,6 +158,7 @@ public class MainRepositorioImpl implements MainRepositorio {
             alumnoUi.setFoto(urlFoto+personaId+"/"+fileName);
         }
         alumnoUi.setNombre(persona==null?"":UtilsPortalAlumno.capitalize(UtilsPortalAlumno.getFirstWord(persona.getFirstName()))+" "+UtilsPortalAlumno.capitalize(persona.getApellidoPaterno())+" "+UtilsPortalAlumno.capitalize(persona.getApellidoMaterno()));
+        alumnoUi.setNombre2(persona==null?"":UtilsPortalAlumno.capitalize(persona.getApellidoPaterno())+" "+UtilsPortalAlumno.capitalize(persona.getApellidoMaterno())+ " " + UtilsPortalAlumno.capitalize(UtilsPortalAlumno.getFirstWord(persona.getFirstName())));
         String fechaNacimientoPadre = "";
         if(persona!=null&&persona.getFechaNac()!=null&&!persona.getFechaNac().isEmpty()){
             fechaNacimientoPadre = UtilsPortalAlumno.calcularEdad(persona.getFechaNac()) + " años " +  UtilsPortalAlumno.f_fecha_letrasSinHora(persona.getFechaNac());
@@ -256,12 +257,17 @@ public class MainRepositorioImpl implements MainRepositorio {
                 .querySingle();
         if(georeferencia!=null){
             anioAcademicoUi.setEntidadId(georeferencia.getEntidadId());
+            anioAcademicoUi.setFotoEntidad(georeferencia.getFotoEntidad());
+            anioAcademicoUi.setNombreGeoref(georeferencia.getAlias());
         }
+
         return anioAcademicoUi;
     }
 
     @Override
     public List<CursosUi> getCursos(int personaId, int anioAcademicoId) {
+
+
         List<CursoCustom> cursoCustoms = SQLite.select(
                 Cursos_Table.cursoId.withTable(),
                 Cursos_Table.alias.withTable(),
@@ -334,7 +340,6 @@ public class MainRepositorioImpl implements MainRepositorio {
                 //#endregion Detalle
                 .where(PlanEstudios_Table.planEstudiosId.withTable()
                         .eq(CargaAcademica_Table.idPlanEstudio.withTable()))
-
                 .and(DetalleContratoAcad_Table.cargaAcademicaId.withTable()
                         .eq(CargaAcademica_Table.cargaAcademicaId.withTable()))
                 .and(Contrato_Table.personaId.withTable().eq(personaId))
@@ -350,6 +355,7 @@ public class MainRepositorioImpl implements MainRepositorio {
             cursosUi.setCursoId(cursoCustom.getCursoId());
             ProgramaEduactivoUI programasEducativoUI = new ProgramaEduactivoUI();
             programasEducativoUI.setIdPrograma(cursoCustom.getProgramaEduId());
+            programasEducativoUI.setPeriodoyseccion(cursoCustom.getNivelAcademico() + " - " + cursoCustom.getPeriodo()+" "+cursoCustom.getSeccion());
             programasEducativoUI.setNombrePrograma(cursoCustom.getNombrePrograma());
             programasEducativoUI.setSeleccionado(cursoCustom.isTooglePrograma());
             cursosUi.setProgramaEduactivoUI(programasEducativoUI);
@@ -536,6 +542,11 @@ public class MainRepositorioImpl implements MainRepositorio {
                     SQLite.delete()
                             .from(Evento2.class)
                             .where(Evento2_Table.eventoId.eq(calendarioEventoQuery.eventoId))
+                            .execute(databaseWrapper);
+
+                    SQLite.delete()
+                            .from(EventoAdjunto.class)
+                            .where(EventoAdjunto_Table.eventoId.eq(calendarioEventoQuery.eventoId))
                             .execute(databaseWrapper);
 
                     int position = calendarioDataList.indexOf(calendarioEventoQuery.getCalendarioId());
@@ -994,6 +1005,26 @@ public class MainRepositorioImpl implements MainRepositorio {
                 .querySingle();
 
         return webConfig!=null?webConfig.getContent():"";
+    }
+
+    @Override
+    public String getColorTarjetaId() {
+        Webconfig webConfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Color_Tarjeta_QR"))
+                .querySingle();
+
+        return (webConfig!=null?webConfig.getContent():"");
+    }
+
+    @Override
+    public String getNombreServidor() {
+        Webconfig webConfig = SQLite.select()
+                .from(Webconfig.class)
+                .where(Webconfig_Table.nombre.eq("wstr_Servidor"))
+                .querySingle();
+
+        return (webConfig!=null?webConfig.getContent():"");
     }
 
     @Override

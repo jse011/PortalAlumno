@@ -14,6 +14,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="LoginEvaStudent" parent="AppTheme.NoActionBar">
+        <item name="colorAccent">@color/colorEvaStudent</item>
+    </style>
+    <style name="LoginEducarStudent" parent="AppTheme.NoActionBar">
+        <item name="colorAccent">@color/colorEducarStudent</item>
+    </style>
+
     <style name="FullScrenMode"  parent="AppTheme.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>

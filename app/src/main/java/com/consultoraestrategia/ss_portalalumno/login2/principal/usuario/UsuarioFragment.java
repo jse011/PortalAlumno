@@ -1,5 +1,7 @@
 package com.consultoraestrategia.ss_portalalumno.login2.principal.usuario;
 
+import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -14,13 +16,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.Login2Presenter;
+import com.consultoraestrategia.ss_portalalumno.util.CustomHint;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +50,12 @@ public class UsuarioFragment extends Fragment implements UsuarioView, TextView.O
     ImageView imageView7;
     @BindView(R.id.textView89)
     TextView textView89;
+    @BindView(R.id.textView90)
+    TextView textView90;
+    @BindView(R.id.til_passname)
+    TextInputLayout tilPassname;
+    @BindView(R.id.til_username)
+    TextInputLayout tilUsername;
     @BindView(R.id.btn_atras_lst_usu)
     ImageView btnAtrasLstUsu;
     private Unbinder unbinder;
@@ -59,23 +72,41 @@ public class UsuarioFragment extends Fragment implements UsuarioView, TextView.O
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        ColorStateList colorStateList;
         if(getResources().getString(R.string.app_name).equals("Educar Student")){
-
+            colorStateList = ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.colorEducarStudent));
             Glide.with(imageView17)
-                    .load(R.drawable.logo_educar)
+                    .load(R.drawable.educar_d_login)
                     .into(imageView17);
             edittextPasswordUser.setOnEditorActionListener(this);
             textView89.setVisibility(View.GONE);
             imageView7.setVisibility(View.VISIBLE);
+            textView90.setText("Centro de Aprendizaje Virtual");
+            textView90.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEducarStudent));
+            //edittextUsername.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEvaStudent));
+            btnSiguienteUser.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.button_login_educar));
         }else{
+            colorStateList = ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.colorEvaStudent));
             Glide.with(imageView17)
-                    .load(R.drawable.docente_mentor)
+                    .load(R.drawable.icrm_d_login)
                     .into(imageView17);
             textView89.setVisibility(View.GONE);
             edittextPasswordUser.setOnEditorActionListener(this);
             imageView7.setVisibility(View.INVISIBLE);
+            textView90.setText("Social iCRM Educativo Móvil");
+            textView90.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEvaStudent));
+            btnSiguienteUser.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.button_login));
+            //edittextUsername.setTextColor(ContextCompat.getColor(getContext(), R.color.colorDocenteMentor));
         }
+        //ViewCompat.setBackgroundTintList(tilPassname, colorStateList);
+        //ViewCompat.setBackgroundTintList(tilUsername, colorStateList);
+        /* Here you get int representation of an HTML color resources */
+
+        Glide.with(imageView17)
+                .load(R.drawable.docente_mentor)
+                .into(imageView7);
+        textView89.setVisibility(View.GONE);
+        imageView7.setVisibility(View.VISIBLE);
 
         //   initAdapter();
     }

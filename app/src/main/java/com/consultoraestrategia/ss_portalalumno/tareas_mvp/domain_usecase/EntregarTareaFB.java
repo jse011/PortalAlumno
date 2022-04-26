@@ -10,8 +10,8 @@ public class EntregarTareaFB {
         this.tareasMvpRepository = tareasMvpRepository;
     }
 
-    public void execute(String tareaId, Callback callback){
-        tareasMvpRepository.publicarTareaAlumno(tareaId, new TareasMvpDataSource.CallbackSimple() {
+    public void execute(String tareaId, boolean forzarConexion, Callback callback){
+        tareasMvpRepository.publicarTareaAlumno(tareaId, forzarConexion, new TareasMvpDataSource.CallbackSimple() {
             @Override
             public void onLoad(boolean success) {
                 callback.onLoad(success);

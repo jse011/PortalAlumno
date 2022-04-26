@@ -14,13 +14,13 @@ public interface EvidenciaRepository {
 
     EvidenciaSesionUi isEntregado(int sesionAprendizajeId);
 
-    void entregarSesEvidencia(int cargaCursoId, int sesionAprendizajeId, Callback callback);
+    void entregarSesEvidencia(int cargaCursoId, int sesionAprendizajeId, boolean forzarConexion, Callback callback);
 
-    StorageCancel uploadStorageFB(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, StorageCallback<ArchivoSesEvidenciaUi> tareaArchivoUiStorageCallback);
+    StorageCancel uploadStorageFB(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, boolean forzarConexion, StorageCallback<ArchivoSesEvidenciaUi> tareaArchivoUiStorageCallback);
 
-    void uploadLinkFB(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, Callback callback);
+    void uploadLinkFB(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, boolean forzarConexion, Callback callback);
 
-    void deleteStorageFB(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, Callback callback);
+    void deleteStorageFB(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, boolean forzarConexion, Callback callback);
 
     interface Callback{
         void onLoad(boolean success);

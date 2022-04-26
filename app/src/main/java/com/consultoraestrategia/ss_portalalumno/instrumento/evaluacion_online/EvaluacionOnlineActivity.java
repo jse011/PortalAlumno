@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -131,6 +132,9 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
                     "&Sesi=" + URLEncoder.encode(String.valueOf(sesionId), "UTF-8")+
                     "&alum=" + URLEncoder.encode(String.valueOf(alumnoId), "UTF-8");
             webView.postUrl(getUrlServidor(), postData.getBytes());
+            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -151,6 +155,10 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
         } else {
             // older android version, disable hardware acceleration
             //webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
 
         webView.setWebChromeClient(new WebChromeClient() {
@@ -260,6 +268,8 @@ public class EvaluacionOnlineActivity extends AppCompatActivity implements Lifec
 
     @Override
     public void onBackPressed() {
+
+        super.onBackPressed();
         if(background.getVisibility() == View.VISIBLE){
             super.onBackPressed();
         }else if( contentPlayer.getVisibility()!=View.GONE){

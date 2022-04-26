@@ -30,6 +30,10 @@ public interface MainRepositorio {
 
     String getIconoPortalAlumno();
 
+    String getColorTarjetaId();
+
+    String getNombreServidor();
+
     interface SuccessCallback{
         void onLoad(boolean success);
     }

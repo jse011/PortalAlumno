@@ -28,6 +28,8 @@ public interface TareasDecripcionView extends BaseView<TareaDescripcionPresenter
 
     void showYoutube(String url);
 
+    void openRecordVideo();
+
     void changeTema(String color1, String color2, String color3);
 
     void showListaTareaAlumno(List<TareaArchivoUi> tareasUIList);
@@ -59,4 +61,6 @@ public interface TareasDecripcionView extends BaseView<TareaDescripcionPresenter
     void hideProgress2();
 
     void onShowPickDoc();
+
+    void openGalery();
 }

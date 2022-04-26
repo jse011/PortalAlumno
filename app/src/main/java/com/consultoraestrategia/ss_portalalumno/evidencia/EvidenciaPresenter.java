@@ -27,4 +27,8 @@ interface EvidenciaPresenter extends BaseFragmentPresenter<EvidenciaView> {
     void onClickCamera();
 
     void onClickAddLink(String desripcion, String vinculo);
+
+    void onClickGaleria();
+
+    void onClickRecordVideo();
 }

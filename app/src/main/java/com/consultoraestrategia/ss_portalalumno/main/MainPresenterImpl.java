@@ -3,7 +3,6 @@ package com.consultoraestrategia.ss_portalalumno.main;
 import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
@@ -15,10 +14,12 @@ import com.consultoraestrategia.ss_portalalumno.firebase.online.Online;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbCursoUi;
 import com.consultoraestrategia.ss_portalalumno.global.entities.GbPreview;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetColorTarjetaQR;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetEventoAgenda;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetIconoPortalAlumno;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetLikeSaveCountLike;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetNombreServidor;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.SaveLike;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
@@ -43,6 +44,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     private ProgramaEduactivoUI programaEducativo;
     private List<ProgramaEduactivoUI> programaEduactivosUIList=new ArrayList<>();
     private List<CursosUi> cursosUiList = new ArrayList<>();
+    private boolean showProgresCurso = true;
     private GetCursos getCursos;
     private AnioAcademicoUi anioAcademicoUi;
     private String usuario;
@@ -75,9 +77,14 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     private GetIconoPortalAlumno getIconoPortalAlumno;
     private MainView.TabFamilia tabFamiliaView;
     private Object personToogleUi;
+    private RetrofitCancel retrofitCancel;
+    private MainView.TabQR tabQR;
+    private GetColorTarjetaQR getColorTarjetaQR;
+    private GetNombreServidor getNombreServidor;
 
     public MainPresenterImpl(UseCaseHandler handler, Resources res, GetCursos getCursos, UpdateCalendarioPeriodo calendarioPeriodo, UpdateFirebaseTipoNota updateFirebaseTipoNota,
-                             Online online, GetEventoAgenda getEventoAgenda, GetLikeSaveCountLike getLikeSaveCountLike, SaveLike saveLike, GetIconoPortalAlumno getIconoPortalAlumno) {
+                             Online online, GetEventoAgenda getEventoAgenda, GetLikeSaveCountLike getLikeSaveCountLike, SaveLike saveLike, GetIconoPortalAlumno getIconoPortalAlumno,
+                             GetColorTarjetaQR getColorTarjetaQR, GetNombreServidor getNombreServidor) {
         super(handler, res);
         this.getCursos = getCursos;
         this.calendarioPeriodo = calendarioPeriodo;
@@ -87,6 +94,8 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         this.getLikeSaveCountLike = getLikeSaveCountLike;
         this.saveLike = saveLike;
         this.getIconoPortalAlumno = getIconoPortalAlumno;
+        this.getColorTarjetaQR = getColorTarjetaQR;
+        this.getNombreServidor = getNombreServidor;
     }
 
     @Override
@@ -115,41 +124,65 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
                 .querySingle();
         firebaseNode = webconfig!=null?webconfig.getContent():"sinServer";
 
-        GetCursos.Response response = getCursos.execute();
-        alumnoUi = response.getAlumnoUi();
-        //iCRMEdu.variblesGlobales.setHabilitarAcceso(alumnoUi.getHabilitarAcceso());
-        //iCRMEdu.variblesGlobales.setBloqueoAcceso(!alumnoUi.getHabilitarAcceso());
-        //Por si se crea una actividad es remplasada se crea la actidad bloque de usuario
-        if(view!=null)view.initBloqueo();
-        //if(!alumnoUi.getHabilitarAcceso()){
-           // if(view!=null)view.showActivtyBloqueo();
-        //}
+        retrofitCancel = getCursos.execute(new GetCursos.Callback() {
+            @Override
+            public void getAlumno(AlumnoUi alumnoUi) {
+                MainPresenterImpl.this.alumnoUi = alumnoUi;
+            }
 
+            @Override
+            public void getAnioAcademico(AnioAcademicoUi anioAcademicoUi) {
+                //AnioAcademicoUi anioAcademicoUi = response.getAnioAcademicoUi();
+                if(view!=null)view.setNameAnioAcademico("Año Academ. " + anioAcademicoUi.getNombre());
+                MainPresenterImpl.this.anioAcademicoUi = anioAcademicoUi;
+                cancel = calendarioPeriodo.execute(anioAcademicoUi.getAnioAcademicoId(), new UpdateCalendarioPeriodo.Callback() {
+                    @Override
+                    public void onSucess() {
+                        //this.getColorTarjetaQR = getColorTarjetaQR;
+                        if(tabQR!=null) tabQR.colorTarjetaQr(getColorTarjetaQR.execute());
+                        showQR();
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(boolean success, GetCursos.Response response) {
+                showProgresCurso = false;
+                MainPresenterImpl.this.anioAcademicoUi = response.getAnioAcademicoUi();
+                MainPresenterImpl.this.alumnoUi = response.getAlumnoUi();
+                if(view!=null)view.setNameAnioAcademico("Año Academ. " + anioAcademicoUi.getNombre());
+                if(tabQR!=null) tabQR.logoEntidad(response.getAnioAcademicoUi());
+                if(tabQR!=null) tabQR.fotoAlumno(response.getAlumnoUi());
+                setupProgramaEducativo(response.getProgramaEduactivoUIList());
+                if(tabQR!=null) tabQR.programaEval(programaEducativo);
+                showQR();
+                if(tabQR!=null) tabQR.colorTarjetaQr(getColorTarjetaQR.execute());
+                MainPresenterImpl.this.cursosUiList.addAll(response.getCursosUiList());
+                setupCurso();
+                //iCRMEdu.variblesGlobales.setHabilitarAcceso(alumnoUi.getHabilitarAcceso());
+                //iCRMEdu.variblesGlobales.setBloqueoAcceso(!alumnoUi.getHabilitarAcceso());
+                //Por si se crea una actividad es remplasada se crea la actidad bloque de usuario
+                if(view!=null)view.initBloqueo();
+                //if(!alumnoUi.getHabilitarAcceso()){
+                // if(view!=null)view.showActivtyBloqueo();
+                //}
+                if(view!=null)view.setChangeIconoPortal(getIconoPortalAlumno.execute());
+
+                if(view!=null)view.changeNombreUsuario(alumnoUi.getNombre());
+                if(view!=null)view.changeFotoUsuario(alumnoUi.getFoto());
+                if(view!=null)view.changeFotoUsuarioApoderado(alumnoUi.getFotoApoderado());
+            }
+        });
 
         if(view!=null)view.changeNombreUsuario(alumnoUi.getNombre());
         if(view!=null)view.changeFotoUsuario(alumnoUi.getFoto());
         if(view!=null)view.changeFotoUsuarioApoderado(alumnoUi.getFotoApoderado());
 
-        AnioAcademicoUi anioAcademicoUi = response.getAnioAcademicoUi();
-        if(view!=null)view.setNameAnioAcademico("Año Academ. " + anioAcademicoUi.getNombre());
-
-        this.anioAcademicoUi = response.getAnioAcademicoUi();
-        setupProgramaEducativo(response.getProgramaEduactivoUIList());
-        this.cursosUiList.addAll(response.getCursosUiList());
-
-        cancel = calendarioPeriodo.execute(anioAcademicoUi.getAnioAcademicoId(), new UpdateCalendarioPeriodo.Callback() {
-            @Override
-            public void onSucess() {
-
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        });
-
-        if(view!=null)view.setChangeIconoPortal(getIconoPortalAlumno.execute());
     }
 
     private void updateFirebaseTipoNota() {
@@ -169,7 +202,6 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
 
     private void setupCurso(){
         hideProgress();
-        Log.d("setupCurso", this.cursosUiList.size()+"");
         List<CursosUi> cursosUiList = new ArrayList<>();
         for (CursosUi cursosUi : this.cursosUiList){
             if(programaEducativo!=null&&
@@ -177,6 +209,11 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
                     cursosUi.getProgramaEduactivoUI().getIdPrograma()==programaEducativo.getIdPrograma()){
                 cursosUiList.add(cursosUi);
             }
+        }
+        if(showProgresCurso){
+            if(tabCursosView!=null)tabCursosView.showProgress();
+        }else {
+            if(tabCursosView!=null)tabCursosView.hideProgress();
         }
         if(tabCursosView!=null)tabCursosView.showListCurso(cursosUiList);
     }
@@ -246,6 +283,9 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
             case Acceso_con_Google:
                 if(view!=null) view.accederGoogle();
                 break;
+            case Forzar_conexion:
+                if(view!=null) view.mostrarDialogoForzarConexion();
+                break;
 
         }
     }
@@ -277,6 +317,7 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
         //configuracionUiList.add(ConfiguracionUi.BORRAR_CACHE);
         //configuracionUiList.add(ConfiguracionUi.CONTACTOS);
         //configuracionUiList.add(ConfiguracionUi.ALARMA);
+        configuracionUiList.add(ConfiguracionUi.Forzar_conexion);
         configuracionUiList.add(ConfiguracionUi.Acceso_con_Google);
         configuracionUiList.add(ConfiguracionUi.CERRAR_SESION);
 
@@ -605,6 +646,27 @@ public class MainPresenterImpl extends BasePresenterImpl<MainView> implements Ma
     @Override
     public void onErrorCuentaFirebase() {
         if(view!=null)view.showMessage("User is signed out");
+    }
+
+    @Override
+    public void attachView(MainView.TabQR tabQR) {
+        this.tabQR=tabQR;
+
+        this.tabQR.tarjetaUsuario(alumnoUi, programaEducativo);
+        if(tabQR!=null) tabQR.logoEntidad(anioAcademicoUi);
+        if(tabQR!=null) tabQR.fotoAlumno(alumnoUi);
+        if(tabQR!=null) tabQR.colorTarjetaQr(getColorTarjetaQR.execute());
+        showQR();
+        if(tabQR!=null) tabQR.programaEval(programaEducativo);
+    }
+
+    void showQR(){
+        if(tabQR!=null&&alumnoUi!=null)this.tabQR.showQR(alumnoUi.getPersonaId() +'*' + getNombreServidor.execute()  + "|" + alumnoUi.getNombre2());
+    }
+
+    @Override
+    public void onTabQRDestroy() {
+        this.tabQR = null;
     }
 
     boolean actualizarUnavezTipoNota;

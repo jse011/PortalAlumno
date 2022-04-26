@@ -35,7 +35,8 @@ public class AndroidOnlineSimpleImpl implements Online {
         }
 
        if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
-            AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),callback );
+            //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),callback );
+           callback.onLoad(true);
         } else {
             Log.d(TAG, "No network available!");
             Log.d(TAG, "onLoad: "+false);

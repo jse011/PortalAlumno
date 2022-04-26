@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -42,6 +43,8 @@ public class PasswordFragment extends Fragment implements PasswordView, TextView
     Button btnSiguientePassword;
     @BindView(R.id.imageView17)
     ImageView imageView17;
+    @BindView(R.id.textView90)
+    TextView textView90;
     @BindView(R.id.btn_close_password)
     ImageView btnClosePassword;
     @BindView(R.id.img_usuario_password)
@@ -87,17 +90,18 @@ public class PasswordFragment extends Fragment implements PasswordView, TextView
         if(getResources().getString(R.string.app_name).equals("Educar Student")){
 
             Glide.with(imageView17)
-                    .load(R.drawable.logo_educar)
+                    .load(R.drawable.educar_d_login)
                     .into(imageView17);
 
             Glide.with(this)
                     .load(R.drawable.docente_mentor)
                     .into(imgInstitucion);
-
+            textView90.setText("Centro de Aprendizaje Virtual");
+            textView90.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEducarStudent));
 
         }else{
             Glide.with(imageView17)
-                    .load(R.drawable.docente_mentor)
+                    .load(R.drawable.icrm_d_login)
                     .into(imageView17);
             Glide.with(this)
                     .load(personaUiSelected.getInstitucionUrl())
@@ -105,6 +109,8 @@ public class PasswordFragment extends Fragment implements PasswordView, TextView
                             .centerInside()
                             .diskCacheStrategy(DiskCacheStrategy.ALL))
                     .into(imgInstitucion);
+            textView90.setText("Social iCRM Educativo Móvil");
+            textView90.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEvaStudent));
         }
     }
 

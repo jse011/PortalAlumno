@@ -13,6 +13,7 @@ public class AlumnoUi {
     private String celular;
     private String correo;
     private List<FamiliaUi> familiaUiList;
+    private String nombre2;
 
     public int getPersonaId() {
         return personaId;
@@ -92,5 +93,13 @@ public class AlumnoUi {
 
     public void setFamiliaUiList(List<FamiliaUi> familiaUiList) {
         this.familiaUiList = familiaUiList;
+    }
+
+    public void setNombre2(String nombre2) {
+        this.nombre2 = nombre2;
+    }
+
+    public String getNombre2() {
+        return nombre2;
     }
 }

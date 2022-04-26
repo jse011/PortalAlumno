@@ -376,11 +376,13 @@ public class TabSesionesRepositorioImpl implements TabSesionesRepositorio {
                         }else {
                             for (JSONFirebase alumnoSnapshot : JSONFirebase.d(response).getChildren()){
                                 PreguntaEvaluacionPA preguntaEvaluacionPA = new PreguntaEvaluacionPA();
-                                preguntaEvaluacionPA.setPreguntaId(UtilsFirebase.convert(alumnoSnapshot.child("PreguntaId").getValue(), ""));
-                                preguntaEvaluacionPA.setAlumnoId(UtilsFirebase.convert(alumnoSnapshot.child("AlumnoId").getValue(), 0));
-                                preguntaEvaluacionPA.setVariableId(UtilsFirebase.convert(alumnoSnapshot.child("VariableId").getValue(), ""));
-                                if(personaId==preguntaEvaluacionPA.getAlumnoId()){
-                                    preguntaEvaluacionPA.save();
+                                if(alumnoSnapshot.child("PreguntaId").exists()){
+                                    preguntaEvaluacionPA.setPreguntaId(UtilsFirebase.convert(alumnoSnapshot.child("PreguntaId").getValue(), ""));
+                                    preguntaEvaluacionPA.setAlumnoId(UtilsFirebase.convert(alumnoSnapshot.child("AlumnoId").getValue(), 0));
+                                    preguntaEvaluacionPA.setVariableId(UtilsFirebase.convert(alumnoSnapshot.child("VariableId").getValue(), ""));
+                                    if(personaId==preguntaEvaluacionPA.getAlumnoId()){
+                                        preguntaEvaluacionPA.save();
+                                    }
                                 }
                             }
                         }

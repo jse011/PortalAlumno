@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.gadgets.staticProgressBar.CustomProgress;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
 import com.consultoraestrategia.ss_portalalumno.util.LinkUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +105,8 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
         CardView cardView;
         @BindView(R.id.progress)
         FrameLayout progress;
+        @BindView(R.id.progressBar17)
+        ProgressBar progressBarForceUpload;
 
         private Listener listener;
         private TareaArchivoUi tareaArchivoUi;
@@ -137,22 +141,35 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
                 btnRecurso.setVisibility(View.GONE);
                 btnAction.setVisibility(View.GONE);
                 customProgress.setVisibility(View.GONE);
+                progressBarForceUpload.setVisibility(View.GONE);
             }else {
                 this.progress.setVisibility(View.GONE);
-                if(tareaArchivoUi.getFile()!=null){
-                    if(tareaArchivoUi.getState()==1){
-                        btnAction.setImageResource(R.drawable.ic_pause_youtube);
-                    }else {
-                        btnAction.setImageResource(R.drawable.ic_play_recurso);
-                    }
-                    btnRecurso.setVisibility(View.VISIBLE);
-                    btnAction.setVisibility(View.VISIBLE);
-                    customProgress.setVisibility(View.VISIBLE);
-                    customProgress.updateView();
+                 if(tareaArchivoUi.getFile()!=null){
+
+                     if(tareaArchivoUi.getForceUpload()){
+                         btnRecurso.setVisibility(View.GONE);
+                         btnAction.setVisibility(View.GONE);
+                         customProgress.setVisibility(View.GONE);
+                         progressBarForceUpload.setVisibility(View.VISIBLE);
+                         customProgress.updateView();
+                     }else{
+                         if(tareaArchivoUi.getState()==1){
+                             btnAction.setImageResource(R.drawable.ic_pause_youtube);
+                         }else {
+                             btnAction.setImageResource(R.drawable.ic_play_recurso);
+                         }
+                         btnRecurso.setVisibility(View.VISIBLE);
+                         btnAction.setVisibility(View.VISIBLE);
+                         customProgress.setVisibility(View.VISIBLE);
+                         progressBarForceUpload.setVisibility(View.GONE);
+                         customProgress.updateView();
+                     }
+
                 }else {
                     btnRecurso.setVisibility(View.VISIBLE);
                     btnAction.setVisibility(View.GONE);
                     customProgress.setVisibility(View.GONE);
+                     progressBarForceUpload.setVisibility(View.GONE);
                 }
             }
 
@@ -211,9 +228,10 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
                     if(tareaArchivoUi.getTipo() != TareaArchivoUi.Tipo.LINK){
                         listener.onClickOpenTareaArchivo(tareaArchivoUi);
                     }else {
-                        LinkUtils.SensibleLinkMovementMethod sensibleLinkMovementMethod = (LinkUtils.SensibleLinkMovementMethod)txtdescripcion.getMovementMethod();
-                        listener.oClickOpenLink(tareaArchivoUi, sensibleLinkMovementMethod.getClickedLink());
-
+                        List<String> urls = UtilsPortalAlumno.extractUrls(txtdescripcion.getText().toString());
+                        if(urls.size()> 0){
+                            listener.oClickOpenLink(tareaArchivoUi, urls.get(0));
+                        }
                     }
                     break;
             }
@@ -221,6 +239,11 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
 
         @Override
         public void onLinkClicked(View v, String link) {
+            if(tareaArchivoUi.getTipo() != TareaArchivoUi.Tipo.LINK){
+                listener.onClickOpenTareaArchivo(tareaArchivoUi);
+            }else {
+                listener.oClickOpenLink(tareaArchivoUi, link);
+            }
 
         }
 
@@ -229,9 +252,10 @@ public class AdjuntoAdapter extends RecyclerView.Adapter<AdjuntoAdapter.ViewHold
             if(tareaArchivoUi.getTipo() != TareaArchivoUi.Tipo.LINK){
                 listener.onClickOpenTareaArchivo(tareaArchivoUi);
             }else {
-                LinkUtils.SensibleLinkMovementMethod sensibleLinkMovementMethod = (LinkUtils.SensibleLinkMovementMethod)txtdescripcion.getMovementMethod();
-                listener.oClickOpenLink(tareaArchivoUi, sensibleLinkMovementMethod.getClickedLink());
-
+                List<String> urls = UtilsPortalAlumno.extractUrls(txtdescripcion.getText().toString());
+                if(urls.size()> 0){
+                    listener.oClickOpenLink(tareaArchivoUi, urls.get(0));
+                }
             }
         }
     }

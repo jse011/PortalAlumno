@@ -128,7 +128,7 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
 
                     List<JSONFirebase> jsonFirebaseList = JSONFirebase.d(response).getChildren();
                     for (JSONFirebase personaSnapshot: jsonFirebaseList){
-                        if(UtilsFirebase.convert(personaSnapshot.child("Tipo").getValue(),0)==1){
+                        if(UtilsFirebase.convert(personaSnapshot.child("PersonaId").getValue(),0)>0){
                             Persona persona = new Persona();
                             persona.setPersonaId(UtilsFirebase.convert(personaSnapshot.child("PersonaId").getValue(),0));
                             persona.setNombres(UtilsFirebase.convert(personaSnapshot.child("Nombres").getValue(),""));
@@ -196,7 +196,7 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("/"+nodeFirebase);
 
         ApiRetrofit apiRetrofit = ApiRetrofit.getInstance();
-        apiRetrofit.changeSetTime(10,15,15, TimeUnit.SECONDS);
+        apiRetrofit.changeSetTime(8,15,15, TimeUnit.SECONDS);
         RetrofitCancel<JsonObject> retrofitCancel = new RetrofitCancelImpl<>(apiRetrofit.getUnidadAprendizajeAlumno(silaboEventoId, tipoPeriodoId));
         retrofitCancel.enqueue(new RetrofitCancel.Callback<JsonObject>() {
             @Override
@@ -225,7 +225,7 @@ public class TabCursoRepositorioImpl implements TabCursoRepositorio {
                 List<T_GC_REL_UNIDAD_APREN_EVENTO_TIPO> t_gc_rel_unidad_apren_evento_tipos = new ArrayList<>();
 
                 if(dataSnapshot==null){
-
+                    callback.onLoad(true);
                 }else {
 
                     for (JSONFirebase unidadSnapshot: JSONFirebase.d(dataSnapshot).getChildren()){

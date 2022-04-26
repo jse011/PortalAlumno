@@ -26,9 +26,12 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioE
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioFileUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RubroEvalProcesoUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareasUI;
+import com.consultoraestrategia.ss_portalalumno.unidadAprendizaje.entities.UnidadAprendizajeUi;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +114,12 @@ public class TareasMvpPresenterImpl implements TareasMvpPresenter {
 
         this.headerTareasAprendizajeUIList.clear();
         this.headerTareasAprendizajeUIList.addAll(headerTareasAprendizajeUIList);
+        Collections.sort(this.headerTareasAprendizajeUIList, new Comparator<HeaderTareasAprendizajeUI>() {
+            @Override
+            public int compare(HeaderTareasAprendizajeUI o1, HeaderTareasAprendizajeUI o2) {
+                return Integer.compare(o2.getNroUnidad(),o1.getNroUnidad());
+            }
+        });
         if (view!=null)view.showTareasUIList(this.headerTareasAprendizajeUIList, idCurso, parametroDisenioUi);
         if(view!=null)view.hideProgress();
 

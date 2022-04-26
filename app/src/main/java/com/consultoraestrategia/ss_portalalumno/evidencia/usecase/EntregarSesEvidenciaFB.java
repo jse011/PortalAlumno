@@ -10,8 +10,8 @@ public class EntregarSesEvidenciaFB {
         this.repository = repository;
     }
 
-    public void execute(int cargaCursoId, int sesionAprendizajeId , EntregarTareaFB.Callback callback){
-        repository.entregarSesEvidencia(cargaCursoId, sesionAprendizajeId, new EvidenciaRepository.Callback() {
+    public void execute(int cargaCursoId, int sesionAprendizajeId, boolean forzarConexion, EntregarTareaFB.Callback callback){
+        repository.entregarSesEvidencia(cargaCursoId, sesionAprendizajeId,forzarConexion, new EvidenciaRepository.Callback() {
             @Override
             public void onLoad(boolean success) {
                 callback.onLoad(success);

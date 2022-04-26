@@ -28,4 +28,8 @@ interface EvidenciaView extends BaseView<EvidenciaPresenter> {
     void showVinculo(String path);
 
     void setTema(String color1, String color2, String color3);
+
+    void openGalery();
+
+    void openRecordVideo();
 }

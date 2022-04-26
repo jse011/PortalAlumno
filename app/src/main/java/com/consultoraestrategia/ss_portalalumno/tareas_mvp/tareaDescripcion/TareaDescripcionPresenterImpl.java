@@ -74,6 +74,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
     private GetTarea getTarea;
     private UploadLinkFB uploadLinkFB;
     private boolean entragadoAlumno;
+    private boolean forzarConexion;
 
     public TareaDescripcionPresenterImpl(UseCaseHandler handler, Resources res, GetRecuros getRecuros, DowloadImageUseCase dowloadImageUseCase, UpdateSuccesDowloadArchivo updateSuccesDowloadArchivo, MoverArchivosAlaCarpetaTarea moverArchivosAlaCarpetaTarea,
                                          UpdateFirebaseTareaAlumno updateFirebaseTareaAlumno, GetArchivoTareaAlumno getArchivoTareaAlumno, Online online, UploadArchivoStorageFB uploadArchivoStorageFB, DeleteArchivoStorageFB deleteArchivoStorageFB,
@@ -149,7 +150,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
         }
         if(view!=null)view.setFechaTarea(horaEntrega);
         this.tareaId = gbTareaUi.getTareaId();
-
+        this.forzarConexion = iCRMEdu.variblesConfiguracion.isForzarConexion();
     }
 
     @Override
@@ -246,6 +247,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
             @Override
             public void onSucces() {
                 if(view!=null)view.hideProgress();
+                if(view!=null)view.hideProgress2();
                 isEntragadoTareaAlumno();
                 getArchivoTareaAlumno();
             }
@@ -253,6 +255,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
             @Override
             public void onError() {
                 if(view!=null)view.hideProgress();
+                if(view!=null)view.hideProgress2();
             }
         });
     }
@@ -419,6 +422,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
     private void convertFileTareArchivoUi(File file) {
         TareaArchivoUi tareaArchivoUi = new TareaArchivoUi();
         tareaArchivoUi.setNombre(file.getName());
+        tareaArchivoUi.setForceUpload(forzarConexion);
         tareaArchivoUi.setColor(color1);
         tareaArchivoUi.setTipo(TareaArchivoUi.getType(file.getPath()));
         tareaArchivoUi.setDescripcion(tareaArchivoUi.getTipo().getNombre());
@@ -445,7 +449,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
     }
 
     private void uploadArchivoStorageFB(TareaArchivoUi tareaArchivoUi) {
-        StorageCancel storageCancel = this.uploadArchivoStorageFB.execute(tareaId, tareaArchivoUi, new UploadArchivoStorageFB.Callback() {
+        StorageCancel storageCancel = this.uploadArchivoStorageFB.execute(tareaId, tareaArchivoUi, forzarConexion, new UploadArchivoStorageFB.Callback() {
             @Override
             public void onChange(TareaArchivoUi tareaArchivoUi) {
                 if(view!=null)view.update(tareaArchivoUi);
@@ -466,7 +470,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
             public void onErrorMaxSize() {
                 tareasUIList.remove(tareaArchivoUi);
                 if(view!=null)view.remove(tareaArchivoUi);
-                if(view!=null)view.showMessage("El archivo es muy grande, el límite es de 38 MB");
+                if(view!=null)view.showMessage("El archivo es muy grande, el límite es de 00 MB");
             }
         });
 
@@ -549,33 +553,21 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
                 return;
             }
             showProgress();
-            online.online(new Online.Callback() {
-                @Override
-                public void onLoad(boolean online) {
-                    if(online){
-                        if(!disabledEntregado){
-                            if(view!=null)view.diabledButtons();
+            if(!disabledEntregado){
+                if(view!=null)view.diabledButtons();
 
-                            for (TareaArchivoUi tareaArchivoUi : new ArrayList<>(tareasUIList)){
-                                tareaArchivoUi.setEntregado(true);
-                                if(view!=null)view.update(tareaArchivoUi);
-                            }
-
-                            entregarTareaFB.execute(tareaId, success -> {
-                                disabledEntregado =false;
-                                isEntragadoTareaAlumno();
-                                hideProgress();
-                            });
-                        }
-                        disabledEntregado = true;
-                    }else {
-                        hideProgress();
-                        if(view!=null)view.modoOffline();
-                        if(view!=null)view.showMessageTop("sin conexión");
-                    }
-
+                for (TareaArchivoUi tareaArchivoUi : new ArrayList<>(tareasUIList)){
+                    tareaArchivoUi.setEntregado(true);
+                    if(view!=null)view.update(tareaArchivoUi);
                 }
-            });
+
+                entregarTareaFB.execute(tareaId, forzarConexion, success -> {
+                    disabledEntregado =false;
+                    isEntragadoTareaAlumno();
+                    hideProgress();
+                });
+            }
+            disabledEntregado = true;
 
         }
 
@@ -641,6 +633,7 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
             tareaArchivoUi.setColor(color1);
             tareaArchivoUi.setTipo(TareaArchivoUi.getType(nombre));
             tareaArchivoUi.setDescripcion(tareaArchivoUi.getTipo().getNombre());
+            tareaArchivoUi.setForceUpload(forzarConexion);
             boolean existe = false;
 
             for (TareaArchivoUi item : tareasUIList){
@@ -692,27 +685,33 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
         if(view!=null)view.showVinculo(clickedLink);
     }
 
+    @Override
+    public void onClickGaleria() {
+        if(view!=null)view.openGalery();
+    }
+
+    @Override
+    public void onClickRecordVideo() {
+        if(view!=null)view.openRecordVideo();
+    }
+
+    @Override
+    public void onResultGarlery(Uri imageUri, String imagefile) {
+        onResultDoc(imageUri, imagefile);
+    }
+
     private void uploadLinkFB(TareaArchivoUi tareaArchivoUi) {
-        online.online(new Online.Callback() {
+        uploadLinkFB.execute(tareaId, tareaArchivoUi, forzarConexion,new UploadLinkFB.Callback() {
             @Override
-            public void onLoad(boolean success) {
+            public void onFinish(boolean success) {
                 if(success){
-                    uploadLinkFB.execute(tareaId, tareaArchivoUi, new UploadLinkFB.Callback() {
-                        @Override
-                        public void onFinish(boolean success) {
-                            if(success){
-                                tareaArchivoUi.setDisabled(false);
-                                if(view!=null)view.update(tareaArchivoUi);
-                            }else {
-                                tareaArchivoUi.setDisabled(true);
-                                tareasUIList.remove(tareaArchivoUi);
-                                if(view!=null)view.remove(tareaArchivoUi);
-                                if(view!=null)view.showMessage("Error al guardar el vínculo");
-                            }
-                        }
-                    });
+                    tareaArchivoUi.setDisabled(false);
+                    if(view!=null)view.update(tareaArchivoUi);
                 }else {
-                    if(view!=null)view.showMessage("Sin conexión");
+                    tareaArchivoUi.setDisabled(true);
+                    tareasUIList.remove(tareaArchivoUi);
+                    if(view!=null)view.remove(tareaArchivoUi);
+                    if(view!=null)view.showMessage("Error al guardar el vínculo");
                 }
             }
         });
@@ -722,38 +721,25 @@ public class TareaDescripcionPresenterImpl extends BasePresenterImpl<TareasDecri
     private void deleteArchivoStorageFB(TareaArchivoUi tareaArchivoUi) {
         tareaArchivoUi.setDisabled(true);
         if(view!=null)view.update(tareaArchivoUi);
-        online.online(new Online.Callback() {
-            @Override
-            public void onLoad(boolean online) {
-                if(online){
-                    if(!TextUtils.isEmpty(tareaArchivoUi.getId())){
-                        deleteArchivoStorageFB.execute(tareaId, tareaArchivoUi, new DeleteArchivoStorageFB.Callback() {
-                            @Override
-                            public void onLoad(boolean success) {
-                                tareaArchivoUi.setDisabled(false);
-                                if(success){
-                                    tareasUIList.remove(tareaArchivoUi);
-                                    if(view!=null)view.remove(tareaArchivoUi);
-                                }else {
-                                    if(view!=null)view.update(tareaArchivoUi);
-                                    if(view!=null)view.showMessage("Acción cancelada");
-                                }
-                            }
-                        });
-                    }else {
-                        tareasUIList.remove(tareaArchivoUi);
-                        tareaArchivoUi.setDisabled(false);
-                        if(view!=null)view.remove(tareaArchivoUi);
-                    }
-                }else {
+        if(!TextUtils.isEmpty(tareaArchivoUi.getId())){
+            deleteArchivoStorageFB.execute(tareaId, tareaArchivoUi, forzarConexion,new DeleteArchivoStorageFB.Callback() {
+                @Override
+                public void onLoad(boolean success) {
                     tareaArchivoUi.setDisabled(false);
-                    if(view!=null)view.update(tareaArchivoUi);
-                    if(view!=null)view.modoOffline();
-                    if(view!=null)view.showMessageTop("sin conexión");
+                    if(success){
+                        tareasUIList.remove(tareaArchivoUi);
+                        if(view!=null)view.remove(tareaArchivoUi);
+                    }else {
+                        if(view!=null)view.update(tareaArchivoUi);
+                        if(view!=null)view.showMessage("Acción cancelada");
+                    }
                 }
-
-            }
-        });
+            });
+        }else {
+            tareasUIList.remove(tareaArchivoUi);
+            tareaArchivoUi.setDisabled(false);
+            if(view!=null)view.remove(tareaArchivoUi);
+        }
     }
 
     private void saveRegistorRecursos(RepositorioFileUi repositorioFileUi,UpdateSuccesDowloadArchivo.Callback callback ) {

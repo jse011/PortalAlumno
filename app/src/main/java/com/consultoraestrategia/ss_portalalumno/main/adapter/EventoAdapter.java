@@ -263,68 +263,60 @@ public class EventoAdapter  extends RecyclerView.Adapter<EventoAdapter.ViewHolde
             LinkUtils.autoLink(textContenido, this);
 
 
-            if (eventoUi.getTipoEventoUi().getTipo() == TipoEventoUi.EventoIconoEnumUI.NOTICIA ||
-                    eventoUi.getTipoEventoUi().getTipo() == TipoEventoUi.EventoIconoEnumUI.EVENTO||(eventoUi.getTipoEventoUi().getTipo() == TipoEventoUi.EventoIconoEnumUI.AGENDA)){
+            if(!previewAdjuntoUiList.isEmpty()){
+                contenImage.setVisibility(View.VISIBLE);
+                switch (previewAdjuntoUiList.size()){
+                    case 1:
+                        confPreviewOne();
+                        preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
+                        adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
 
-                if(!previewAdjuntoUiList.isEmpty()){
-                    contenImage.setVisibility(View.VISIBLE);
-                    switch (previewAdjuntoUiList.size()){
-                        case 1:
-                            confPreviewOne();
-                            preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
-                            adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
+                        break;
+                    case 2:
+                        confPreviewTwo();
+                        preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
+                        preview2.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
+                        adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
+                        adjuntoUiPreview2 = previewAdjuntoUiList.get(1);
 
-                            break;
-                        case 2:
-                            confPreviewTwo();
-                            preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
-                            preview2.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
-                            adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
-                            adjuntoUiPreview2 = previewAdjuntoUiList.get(1);
+                        break;
+                    case 3:
+                        confPreviewThree();
+                        preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
+                        preview3.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
+                        preview4.bindPreview(previewAdjuntoUiList.get(2).getImagePreview(), previewAdjuntoUiList.get(2).isVideo());
+                        adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
+                        adjuntoUiPreview3 = previewAdjuntoUiList.get(1);
+                        adjuntoUiPreview4 = previewAdjuntoUiList.get(2);
 
-                            break;
-                        case 3:
-                            confPreviewThree();
-                            preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
-                            preview3.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
-                            preview4.bindPreview(previewAdjuntoUiList.get(2).getImagePreview(), previewAdjuntoUiList.get(2).isVideo());
-                            adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
-                            adjuntoUiPreview3 = previewAdjuntoUiList.get(1);
-                            adjuntoUiPreview4 = previewAdjuntoUiList.get(2);
+                        break;
+                    case 4:
+                        confPreviewFour();
+                        preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
+                        preview2.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
+                        preview3.bindPreview(previewAdjuntoUiList.get(2).getImagePreview(), previewAdjuntoUiList.get(2).isVideo());
+                        preview4.bindPreview(previewAdjuntoUiList.get(3).getImagePreview(), previewAdjuntoUiList.get(3).isVideo());
+                        adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
+                        adjuntoUiPreview2 = previewAdjuntoUiList.get(1);
+                        adjuntoUiPreview3 = previewAdjuntoUiList.get(2);
+                        adjuntoUiPreview4 = previewAdjuntoUiList.get(3);
 
-                            break;
-                        case 4:
-                            confPreviewFour();
-                            preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
-                            preview2.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
-                            preview3.bindPreview(previewAdjuntoUiList.get(2).getImagePreview(), previewAdjuntoUiList.get(2).isVideo());
-                            preview4.bindPreview(previewAdjuntoUiList.get(3).getImagePreview(), previewAdjuntoUiList.get(3).isVideo());
-                            adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
-                            adjuntoUiPreview2 = previewAdjuntoUiList.get(1);
-                            adjuntoUiPreview3 = previewAdjuntoUiList.get(2);
-                            adjuntoUiPreview4 = previewAdjuntoUiList.get(3);
+                        break;
+                    default:
+                        confPreviewFour();
+                        preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
+                        preview2.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
+                        preview3.bindPreview(previewAdjuntoUiList.get(2).getImagePreview(), previewAdjuntoUiList.get(2).isVideo());
+                        preview4.bindMore(previewAdjuntoUiList.get(3).getImagePreview(),previewAdjuntoUiList.get(3).isVideo() ,previewAdjuntoUiList.size() - 4);
+                        adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
+                        adjuntoUiPreview2 = previewAdjuntoUiList.get(1);
+                        adjuntoUiPreview3 = previewAdjuntoUiList.get(2);
+                        adjuntoUiPreview4 = previewAdjuntoUiList.get(3);
 
-                            break;
-                        default:
-                            confPreviewFour();
-                            preview1.bindPreview(previewAdjuntoUiList.get(0).getImagePreview(), previewAdjuntoUiList.get(0).isVideo());
-                            preview2.bindPreview(previewAdjuntoUiList.get(1).getImagePreview(), previewAdjuntoUiList.get(1).isVideo());
-                            preview3.bindPreview(previewAdjuntoUiList.get(2).getImagePreview(), previewAdjuntoUiList.get(2).isVideo());
-                            preview4.bindMore(previewAdjuntoUiList.get(3).getImagePreview(),previewAdjuntoUiList.get(3).isVideo() ,previewAdjuntoUiList.size() - 4);
-                            adjuntoUiPreview1 = previewAdjuntoUiList.get(0);
-                            adjuntoUiPreview2 = previewAdjuntoUiList.get(1);
-                            adjuntoUiPreview3 = previewAdjuntoUiList.get(2);
-                            adjuntoUiPreview4 = previewAdjuntoUiList.get(3);
-
-                            break;
-                    }
-
-                }else {
-                    contenImage.setVisibility(View.GONE);
-                    previewUnBindAll();
+                        break;
                 }
 
-            }else{
+            }else {
                 contenImage.setVisibility(View.GONE);
                 previewUnBindAll();
             }

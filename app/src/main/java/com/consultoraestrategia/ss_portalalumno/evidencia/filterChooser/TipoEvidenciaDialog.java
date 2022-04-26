@@ -116,7 +116,7 @@ public class TipoEvidenciaDialog extends BottomSheetDialogFragment implements Vi
         unbinder.unbind();
     }
 
-    @OnClick({R.id.btn_add_link, R.id.btn_add_file, R.id.btn_camera})
+    @OnClick({R.id.btn_add_link, R.id.btn_add_file, R.id.btn_camera, R.id.btn_video, R.id.btn_galeria})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_add_link:
@@ -124,9 +124,17 @@ public class TipoEvidenciaDialog extends BottomSheetDialogFragment implements Vi
                 break;
             case R.id.btn_add_file:
                 callbackFilter.onClickAddFile();
+
                 break;
             case R.id.btn_camera:
                 callbackFilter.onClickCamera();
+
+                break;
+            case R.id.btn_galeria:
+                callbackFilter.onClickGaleria();
+                break;
+            case R.id.btn_video:
+                callbackFilter.onClickRecordVideo();
                 break;
         }
         dismiss();

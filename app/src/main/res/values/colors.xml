@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0088cc</color>
-    <color name="colorPrimaryDark">#2d43bc</color>
-    <color name="colorAccent">#5983f0</color>
-
+    <color name="colorPrimary">#173766</color>
+    <color name="colorPrimaryDark">#192B46</color>
+    <color name="colorAccent">#0277BD</color>
+    <color name="colorEducarStudent">#DCE316</color>
+    <color name="colorEvaStudent">#FDCA09</color>
+    <color name="colorDocenteMentor">#9C2B6E</color>
     <color name="backgarund">#F2F3F8</color>
     <color name="status_bar_lolipop">#6351535C</color>
 

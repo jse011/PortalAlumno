@@ -22,6 +22,14 @@ public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
     private String tareaId;
     @SerializedName("vint_UnidadAprendizajeIdList")
     private List<Integer> unidadAprendizajeIdList;
+    @SerializedName("vstr_ArchivoId")
+    private String archivoId;
+    @SerializedName("vstr_NombreLink")
+    private String nombreLink;
+    @SerializedName("vstr_Link")
+    private String decripcionLink;
+    @SerializedName("vbol_entregado")
+    private boolean entregadarTarea;
 
     public int getSilaboEventoId() {
         return silaboEventoId;
@@ -85,5 +93,37 @@ public class ParametroPortalEvaFirebase extends ApiRetrofit.Parameters {
 
     public List<Integer> getUnidadAprendizajeIdList() {
         return unidadAprendizajeIdList;
+    }
+
+    public void setArchivoId(String archivoId) {
+        this.archivoId = archivoId;
+    }
+
+    public String getArchivoId() {
+        return archivoId;
+    }
+
+    public boolean getEntregadarTarea() {
+        return entregadarTarea;
+    }
+
+    public void setEntregadarTarea(boolean entregadarTarea) {
+        this.entregadarTarea = entregadarTarea;
+    }
+
+    public String getNombreLink() {
+        return nombreLink;
+    }
+
+    public void setNombreLink(String nombreLink) {
+        this.nombreLink = nombreLink;
+    }
+
+    public String getDecripcionLink() {
+        return decripcionLink;
+    }
+
+    public void setDecripcionLink(String decripcionLink) {
+        this.decripcionLink = decripcionLink;
     }
 }

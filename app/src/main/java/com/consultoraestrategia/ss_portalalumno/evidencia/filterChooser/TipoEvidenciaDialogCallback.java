@@ -12,4 +12,7 @@ public interface TipoEvidenciaDialogCallback {
 
     void onClickCamera();
 
+    void onClickGaleria();
+
+    void onClickRecordVideo();
 }

@@ -1,12 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="server_client_id">108585189219302292278</string>
-    <string name="app_name">EVA Student</string>
-    <!--<string name="app_name">Educar Student</string>-->
+    <!--<string name="app_name">EVA Student</string>-->
+    <string name="app_name">Educar Student</string>
    <string name="activity_login_title">Iniciar Sesión</string>
    <string name="vision_crme" tools:ignore="ExtraTranslation">Instituciones Educativas apoyados por el Social iCRM Educativo Móvil</string>
    <string name="login_username_empty">Ingresar usuario</string>
    <string name="login_password_empty">Ingresar contraseña</string>
-   <string name="admin_service">http://admin.consultoraestrategia.com/ServiceAdmin/Service/ServiceAdmin.ashx</string>
+   <string name="admin_service">http://admin.icrmedu.com/ServiceAdmin/Service/ServiceAdmin.ashx</string>
    <string name="login_credentiales_invilite">Credenciales incorrectos</string>
    <string name="login_password_invilite">Contraseña incorrecta</string>
    <string name="login_msg_red_error">Oh, parece que perdiste tu conexión a uno de nuestros satélites!</string>

@@ -51,11 +51,8 @@ import com.consultoraestrategia.ss_portalalumno.entities.Webconfig;
 import com.consultoraestrategia.ss_portalalumno.entities.Webconfig_Table;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancel;
-import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
 import com.consultoraestrategia.ss_portalalumno.retrofit.ApiRetrofit;
-import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.TareasMvpDataSource;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.DownloadCancelUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RecursosUI;
@@ -68,10 +65,7 @@ import com.consultoraestrategia.ss_portalalumno.util.DriveUrlParser;
 import com.consultoraestrategia.ss_portalalumno.util.UtilsDBFlow;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeHelper;
 import com.consultoraestrategia.ss_portalalumno.util.YouTubeUrlParser;
-import com.raizlabs.android.dbflow.config.DatabaseDefinition;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -83,7 +77,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -148,9 +141,9 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                     case 379://video
                         isYoutube = !TextUtils.isEmpty(YouTubeHelper.extractVideoIdFromUrl(recursoDidacticoEvento.getUrl()));
                         if (!isYoutube) {
-                            isYoutube = !TextUtils.isEmpty(YouTubeHelper.extractVideoIdFromUrl(recursosUI.getDescripcion()));
+                            isYoutube = !TextUtils.isEmpty(YouTubeHelper.extractVideoIdFromUrl(recursosUI.getUrl()));
                             if (isYoutube) {
-                                recursosUI.setUrl(recursosUI.getDescripcion());
+                                recursosUI.setUrl(recursosUI.getUrl());
                             }
                         }
                         if (isYoutube) {
@@ -273,7 +266,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
             tareaArchivoUi.setPath(!TextUtils.isEmpty(tareaAlumnoArchivos.getPath())?tareaAlumnoArchivos.getPath():"");
             tareaArchivoUi.setEntregado(entregado);
             if(tareaAlumnoArchivos.isRepositorio()){
-                tareaArchivoUi.setTipo(TareaArchivoUi.getType(tareaArchivoUi.getPath()));
+                tareaArchivoUi.setTipo(TareaArchivoUi.getType(tareaArchivoUi.getNombre()));
                 tareaArchivoUi.setDescripcion(tareaArchivoUi.getTipo().getNombre());
             }else {
                 String idYoutube = YouTubeUrlParser.getVideoId(tareaArchivoUi.getPath());
@@ -295,17 +288,17 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
     }
 
     @Override
-    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, StorageCallback<TareaArchivoUi> callbackStorage) {
+    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, StorageCallback<TareaArchivoUi> callbackStorage) {
         return null;
     }
 
     @Override
-    public void deleteStorageFB(String tareaId,  TareaArchivoUi tareaArchivoUi,CallbackSimple callbackSimple) {
+    public void deleteStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple callbackSimple) {
 
     }
 
     @Override
-    public void publicarTareaAlumno(String tareaId, CallbackSimple callbackSimple) {
+    public void publicarTareaAlumno(String tareaId, boolean forzarConexion, CallbackSimple callbackSimple) {
 
     }
 
@@ -356,7 +349,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
     }
 
     @Override
-    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, CallbackSimple simple) {
+    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple simple) {
 
     }
 
@@ -480,7 +473,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
                         .where(TareasC_Table.unidadAprendizajeId.is(unidadAprendizaje.getUnidadAprendizajeId()))
                         .and(TareasC_Table.estadoId.notIn(265))
                         //.and(TareasC_Table.sesionAprendizajeId.eq(0))
-                        .orderBy(TareasC_Table.numero.asc())
+                        .orderBy(TareasC_Table.numero.desc())
                         .queryList());
             }else {
                 Log.d(TAG, "sesionAprendizajeId: "+ sesionAprendizajeId);
@@ -551,7 +544,7 @@ public class TareasLocalDataSource implements TareasMvpDataSource {
 
                 tareasUIList.add(tareasUI);
             }
-            Collections.reverse(tareasUIList);
+            //Collections.reverse(tareasUIList);
             headerTareasAprendizajeUI.setTareasUIList(tareasUIList);
             headerTareasAprendizajeUIList.add(headerTareasAprendizajeUI);
         }

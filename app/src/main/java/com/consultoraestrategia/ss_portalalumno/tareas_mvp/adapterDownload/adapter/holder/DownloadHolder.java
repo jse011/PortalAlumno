@@ -31,7 +31,10 @@ import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioF
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.RepositorioTipoFileU;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.TareaArchivoUi;
 import com.consultoraestrategia.ss_portalalumno.util.LinkUtils;
+import com.consultoraestrategia.ss_portalalumno.util.UtilsPortalAlumno;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -201,10 +204,12 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
         if(repositorioFileUi.getTipoFileU() != RepositorioTipoFileU.VINCULO){
             listener.onClickArchivo(repositorioFileUi);
         }else {
-            LinkUtils.SensibleLinkMovementMethod sensibleLinkMovementMethod = (LinkUtils.SensibleLinkMovementMethod)txtdescripcion.getMovementMethod();
-            listener.onClickOpenLinkArchivo(repositorioFileUi, sensibleLinkMovementMethod.getClickedLink());
-
+            List<String> urls = UtilsPortalAlumno.extractUrls(txtdescripcion.getText().toString());
+            if(urls.size()> 0){
+                listener.onClickOpenLinkArchivo(repositorioFileUi, urls.get(0));
+            }
         }
+
     }
 
     private void onClickDownload() {
@@ -245,6 +250,11 @@ public class DownloadHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     @Override
     public void onLinkClicked(View v, String link) {
+        if(repositorioFileUi.getTipoFileU() != RepositorioTipoFileU.VINCULO){
+            listener.onClickArchivo(repositorioFileUi);
+        }else {
+            listener.onClickOpenLinkArchivo(repositorioFileUi, link);
+        }
 
     }
 

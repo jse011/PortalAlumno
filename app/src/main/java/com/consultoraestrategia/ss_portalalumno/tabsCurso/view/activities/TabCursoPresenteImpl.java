@@ -79,18 +79,6 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
     }
 
     private void updateFireBaseUnidadAprendizaje() {
-        updateFireBasePersona.execute(cargaCursoId, new UpdateFireBasePersona.CallBack() {
-            @Override
-            public void onSucces() {
-
-            }
-
-            @Override
-            public void onError(String error) {
-
-            }
-        });
-
         updateFireBaseUnidadAprendizaje.execute(cargaCursoId, idCalendarioPeriodo, new UpdateFireBaseUnidadAprendizaje.CallBack() {
             @Override
             public void onSucces() {
@@ -102,6 +90,18 @@ public class TabCursoPresenteImpl extends BasePresenterImpl<TabCursoView> implem
             public void onError(String error) {
                 if(tabCursoUnidadView!=null)tabCursoUnidadView.notifyChangeFragment(false);
                 if(tabCursoTareaView!=null)tabCursoTareaView.notifyChangeFragment(false);
+            }
+        });
+
+        updateFireBasePersona.execute(cargaCursoId, new UpdateFireBasePersona.CallBack() {
+            @Override
+            public void onSucces() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
             }
         });
 

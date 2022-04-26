@@ -181,13 +181,15 @@ public class Login2PresenterImpl extends BasePresenterImpl<Login2View> implement
 
     @Override
     public void onClickUsuarioSiguiente(final String usuario, String password) {
+        //if(view!=null)view.showCorreo(true);
+
         if (TextUtils.isEmpty(usuario)) {
             showMessage(res.getString(R.string.login_username_empty));
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            if(view!=null)usuarioView.onErrorPassword(res.getString(R.string.login_password_empty));
+            if(usuarioView!=null)usuarioView.onErrorPassword(res.getString(R.string.login_password_empty));
             return;
         }
 

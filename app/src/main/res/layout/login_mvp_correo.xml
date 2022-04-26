@@ -4,13 +4,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:maxWidth="400dp"
+    android:layout_gravity="center">
 
 
     <ScrollView
         android:id="@+id/correo_scrollable"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,8 +28,9 @@
                 android:layout_height="70dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="32dp"
-                android:layout_marginEnd="52dp"
-                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="74dp"
+                android:layout_marginBottom="70dp"
+                android:scaleType="fitStart"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_siguiente_correo"
                 app:layout_constraintStart_toStartOf="parent"
@@ -52,13 +56,13 @@
                 android:id="@+id/textView90"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Acceder"
+                android:fontFamily="@font/quicksand"
                 android:textColor="#222326"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView89" />
+                android:textSize="18dp"
+                app:layout_constraintStart_toStartOf="@+id/textView109"
+                app:layout_constraintTop_toBottomOf="@+id/textView109" />
 
             <TextView
                 android:id="@+id/textView91"
@@ -66,10 +70,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Usa tu cuenta de iCRMEducativo"
+                android:fontFamily="@font/quicksand"
                 android:textColor="#61656a"
                 android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textView90"
                 app:layout_constraintTop_toBottomOf="@+id/textView90" />
 
             <TextView
@@ -103,6 +107,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Introduce su correo"
+                    android:fontFamily="@font/quicksand"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -112,9 +119,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="32dp"
+                android:fontFamily="@font/quicksand"
                 android:text="Siguiente"
                 android:textAllCaps="false"
                 android:textColor="#2d7eea"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/imageView9" />
@@ -126,6 +135,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Social iCRM Educativo Móvil"
                 android:textColor="#2d7eea"
+                android:fontFamily="@font/quicksand"
                 app:layout_constraintStart_toStartOf="@+id/til_correo"
                 app:layout_constraintTop_toBottomOf="@+id/til_correo" />
 
@@ -136,6 +146,7 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
+                android:fontFamily="@font/quicksand"
                 android:text="@string/vision_crme"
                 android:textColor="#61656a"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -149,10 +160,25 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="52dp"
                 android:layout_marginEnd="32dp"
+                android:scaleType="fitStart"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/docente_mentor" />
+                tools:src="@drawable/icrm_d_login" />
+
+            <TextView
+                android:id="@+id/textView109"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/quicksand_bold"
+                android:textSize="18dp"
+                app:layout_constraintEnd_toEndOf="@+id/imageView17"
+                app:layout_constraintStart_toStartOf="@+id/imageView17"
+                app:layout_constraintTop_toBottomOf="@+id/textView89"
+                tools:text="Social iCRM Educativo Móvil"
+                tools:textColor="@color/colorEvaStudent"
+                tools:textFontWeight="700" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
@@ -160,9 +186,14 @@
         android:id="@+id/btn_atras_correo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="42dp"
         android:padding="8dp"
+        tools:textFontWeight="700"
+        android:fontFamily="@font/quicksand"
+        android:imeOptions="actionDone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="?android:attr/homeAsUpIndicator"/>
+        app:srcCompat="?android:attr/homeAsUpIndicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

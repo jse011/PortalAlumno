@@ -11,8 +11,8 @@ public class UploadLinkFB {
         this.repository = repository;
     }
 
-    public void execute(String tareaId, TareaArchivoUi tareaArchivoUi, Callback callback){
-        repository.uploadLinkFB(tareaId, tareaArchivoUi, new TareasMvpDataSource.CallbackSimple() {
+    public void execute(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, Callback callback){
+        repository.uploadLinkFB(tareaId, tareaArchivoUi, forzarConexion, new TareasMvpDataSource.CallbackSimple() {
             @Override
             public void onLoad(boolean success) {
                 callback.onFinish(success);

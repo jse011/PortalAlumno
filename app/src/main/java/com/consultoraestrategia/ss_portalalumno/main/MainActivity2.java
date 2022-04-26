@@ -47,6 +47,7 @@ import com.consultoraestrategia.ss_portalalumno.base.viewpager.LifecycleImpl;
 import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImpl;
 import com.consultoraestrategia.ss_portalalumno.global.iCRMEdu;
 import com.consultoraestrategia.ss_portalalumno.lib.AppDatabase;
+import com.consultoraestrategia.ss_portalalumno.lib.bottomnavigationviewex.BottomNavigationViewEx;
 import com.consultoraestrategia.ss_portalalumno.login2.principal.Login2Activity;
 import com.consultoraestrategia.ss_portalalumno.login2.service.BloqueoRealTime;
 import com.consultoraestrategia.ss_portalalumno.main.adapter.MenuAdapter;
@@ -55,10 +56,12 @@ import com.consultoraestrategia.ss_portalalumno.main.data.repositorio.MainReposi
 import com.consultoraestrategia.ss_portalalumno.main.dialog.DialogAdjuntoDownload;
 import com.consultoraestrategia.ss_portalalumno.main.dialog.DialogListaBannerEvento;
 import com.consultoraestrategia.ss_portalalumno.main.dialog.DialogPreviewAdjuntoEvento;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetColorTarjetaQR;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetCursos;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetEventoAgenda;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetIconoPortalAlumno;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetLikeSaveCountLike;
+import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.GetNombreServidor;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.SaveLike;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateCalendarioPeriodo;
 import com.consultoraestrategia.ss_portalalumno.main.domain.usecase.UpdateFirebaseTipoNota;
@@ -91,7 +94,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.robohorse.gpversionchecker.GPVersionChecker;
@@ -162,7 +164,9 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
                 new GetEventoAgenda(mainRepositorio),
                 new GetLikeSaveCountLike(mainRepositorio),
                 new SaveLike(mainRepositorio),
-                new GetIconoPortalAlumno(mainRepositorio));
+                new GetIconoPortalAlumno(mainRepositorio),
+                new GetColorTarjetaQR(mainRepositorio),
+                new GetNombreServidor(mainRepositorio));
     }
 
     @Override
@@ -190,7 +194,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         initializingFirebase();
         ValidarLogueoFirebase();
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_host_fragment);
-        NavigationUI.setupWithNavController(bnve, navHostFragment.getNavController());
+        NavigationUI.setupWithNavController(bnve, navHostFragment.getNavController(), false);
 
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(new LifecycleImpl(0,this),true);
     }
@@ -311,7 +315,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         bnve.setItemIconTintList(null);
         // bnve.setTextSize(9);
         int iconSize = 45;
-        bnve.setIconSize(iconSize, iconSize);
+        //bnve.setIconSize(iconSize, iconSize);
         // set item height
         bnve.setItemHeight(BottomNavigationViewEx.dp2px(this, 48));
         //bnve.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf"));
@@ -680,7 +684,7 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
 
     @Override
     public void accederGoogle() {
-
+/*
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -705,7 +709,35 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
             });
         }else {
             signInGoogle();
-        }
+        }*/
+    }
+
+    @Override
+    public void mostrarDialogoForzarConexion() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setTitle("Solución de conexión");
+
+        builder.setMessage("Solucionar el problema que origina que no envíen los archivos.");
+        builder.setPositiveButton("Solucionar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                iCRMEdu.getiCRMEdu(MainActivity2.this).forzarConexion();
+                dialog.cancel();
+            }
+        });
+
+
+
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        //Create AdapterExample
+        builder.create().show();
     }
 
     void signInGoogle(){
@@ -798,6 +830,8 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
             presenter.onTabCursosDestroy();
         }else if(f instanceof TabFamilia){
             presenter.onTabFamiliaDestroy();
+        }else if(f instanceof TabQR){
+            presenter.onTabQRDestroy();
         }
     }
 
@@ -829,6 +863,10 @@ public class MainActivity2 extends BaseActivity<MainView, MainPresenter> impleme
         }else if(f instanceof TabFamilia){
             presenter.attachView((TabFamilia)f);
             ((TabFamilia)f).setPresenter(presenter);
+        }else if(f instanceof TabQR){
+            presenter.attachView((TabQR)f);
+            ((TabQR)f).setPresenter(presenter);
         }
     }
+
 }

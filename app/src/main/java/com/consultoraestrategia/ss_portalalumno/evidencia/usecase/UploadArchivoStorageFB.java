@@ -13,8 +13,8 @@ public class UploadArchivoStorageFB {
         this.repository = repository;
     }
 
-    public StorageCancel execute(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, Callback callback){
-        return repository.uploadStorageFB(cargaCursoId, sesionAprendizajeId, archivoSesEvidenciaUi, new EvidenciaRepository.StorageCallback<ArchivoSesEvidenciaUi>() {
+    public StorageCancel execute(int cargaCursoId, int sesionAprendizajeId, ArchivoSesEvidenciaUi archivoSesEvidenciaUi, boolean forzarConexion, Callback callback){
+        return repository.uploadStorageFB(cargaCursoId, sesionAprendizajeId, archivoSesEvidenciaUi, forzarConexion,new EvidenciaRepository.StorageCallback<ArchivoSesEvidenciaUi>() {
             @Override
             public void onChange(ArchivoSesEvidenciaUi item) {
                 callback.onChange(item);

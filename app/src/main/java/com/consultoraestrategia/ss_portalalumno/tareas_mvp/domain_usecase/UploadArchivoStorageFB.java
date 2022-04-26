@@ -18,8 +18,8 @@ public class UploadArchivoStorageFB {
         this.tareasMvpRepository = tareasMvpRepository;
     }
 
-    public StorageCancel execute(String tareaId, TareaArchivoUi tareaArchivoUi, Callback callback){
-        return tareasMvpRepository.uploadStorageFB(tareaId, tareaArchivoUi, new TareasMvpDataSource.StorageCallback<TareaArchivoUi>() {
+    public StorageCancel execute(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, Callback callback){
+        return tareasMvpRepository.uploadStorageFB(tareaId, tareaArchivoUi, forzarConexion, new TareasMvpDataSource.StorageCallback<TareaArchivoUi>() {
             @Override
             public void onChange(TareaArchivoUi item) {
                 callback.onChange(item);

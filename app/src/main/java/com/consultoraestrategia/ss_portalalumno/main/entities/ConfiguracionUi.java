@@ -10,6 +10,7 @@ public enum ConfiguracionUi
     BORRAR_CACHE("Borrar cache"),
     ALARMA("Hora de sincronización"),
     CONTACTOS("Actualizar Contactos"),
+    Forzar_conexion ("Solución de conexión"),
     Acceso_con_Google ("Acceso con Google "),
     CERRAR_SESION ("Cerrar Sesión");
 

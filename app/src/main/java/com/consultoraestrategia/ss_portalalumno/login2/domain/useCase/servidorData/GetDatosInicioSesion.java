@@ -17,7 +17,7 @@ public class GetDatosInicioSesion implements UseCaseLoginSincrono<GetDatosInicio
 
     @Override
     public RetrofitCancel execute(Request request, final Callback<Response> callback) {
-        return loginDataRepository.getDatosInicioSesion(request.getUsuarioId(), new LoginDataRepository.CallBackSucces<DatosProgressUi>() {
+        return loginDataRepository.getDatosInicioSesion(request.getUsuarioId(), false, new LoginDataRepository.CallBackSucces<DatosProgressUi>() {
             @Override
             public void onLoad(boolean success, DatosProgressUi item) {
                 if(success){

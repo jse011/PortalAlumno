@@ -21,32 +21,90 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <LinearLayout
-        android:id="@+id/btn_add_link"
+        android:id="@+id/btn_camera"
         android:background="?android:attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/imageView4"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="16dp"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_link_adjuntar"
+            app:srcCompat="@drawable/ic_camera_adjuntar_3"
             tools:ignore="VectorDrawableCompat" />
 
         <TextView
-            android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="24dp"
-            android:text="Vículo"
+            android:text="Cámara"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="16sp" />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/btn_video"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_videocam_adjuntar"
+            tools:ignore="VectorDrawableCompat" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="24dp"
+            android:text="Grabar video"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="16sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/btn_galeria"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_camera_adjuntar_2"
+            tools:ignore="VectorDrawableCompat" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="24dp"
+            android:text="Galería"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="16sp" />
+    </LinearLayout>
+    <View
+        android:id="@+id/textView31"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/md_grey_400"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitulo" />
 
     <LinearLayout
         android:id="@+id/btn_add_file"
@@ -73,20 +131,8 @@
             android:textSize="16sp" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/textView31"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
-        android:background="@color/md_grey_400"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitulo" />
-
     <LinearLayout
-        android:id="@+id/btn_camera"
+        android:id="@+id/btn_add_link"
         android:background="?android:attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -94,19 +140,21 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/imageView4"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="16dp"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_camera_adjuntar"
+            app:srcCompat="@drawable/ic_link_adjuntar"
             tools:ignore="VectorDrawableCompat" />
 
         <TextView
+            android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="24dp"
-            android:text="Tomar un foto"
+            android:text="Vículo"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="16sp" />
     </LinearLayout>

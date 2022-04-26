@@ -1,10 +1,12 @@
 /* JSON API for android application [Web Service] */
 package com.consultoraestrategia.ss_portalalumno.retrofit;
 
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
 
+import com.consultoraestrategia.ss_portalalumno.BuildConfig;
 import com.consultoraestrategia.ss_portalalumno.entities.AdminService;
 import com.consultoraestrategia.ss_portalalumno.entities.BEListaPadre;
 import com.consultoraestrategia.ss_portalalumno.entities.GlobalSettings;
@@ -35,14 +37,30 @@ import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.cert.CertificateException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -51,15 +69,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class ApiRetrofit {
     private static final String TAG = "RestAPI";
     public static final String REMOTE_URL = "http://crmeducativo.consultoraestrategia.com/CRMMovil/PortalAcadMovil.ashx";
-
-    private String url = REMOTE_URL;
+    
     private Retrofit retrofit;
     private Service service;
-    private OkHttpClient okHttpClient;
+    OkHttpClient okHttpClient;
 
     public static ApiRetrofit getInstance() {
         ApiRetrofit instance = new ApiRetrofit();
-        instance.updateServerUrl();
         instance.initialize();
         return instance;
     }
@@ -67,16 +83,24 @@ public class ApiRetrofit {
     private ApiRetrofit() {
     }
 
-    public void updateServerUrl(){
+    public String getUrl(){
         String serverUrl = GlobalSettings.getServerUrl();
         if (!TextUtils.isEmpty(serverUrl)) {
-            this.url = serverUrl;
+
+
+            if (BuildConfig.DEBUG) {
+               // serverUrl = serverUrl.replace("CRMMovil","CRMMovil2");
+            }
+            Log.d(TAG,"url1: " + serverUrl);
+            return serverUrl;
+        }else {
+            Log.d(TAG,"url: " + REMOTE_URL);
+            return  REMOTE_URL;
         }
     }
 
 
     public void initialize(){
-        Log.d(TAG,url);
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -84,7 +108,7 @@ public class ApiRetrofit {
         setTime(30,30,30, TimeUnit.SECONDS);
 
         this.retrofit  = new retrofit2.Retrofit.Builder()
-                .baseUrl(this.url.trim() + "/")
+                .baseUrl(getUrl().trim() + "/")
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -98,9 +122,9 @@ public class ApiRetrofit {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
-        Log.d(TAG, "url: " + this.url.trim() + "/");
+        
         this.retrofit  = new retrofit2.Retrofit.Builder()
-                .baseUrl(this.url.trim() + "/")
+                .baseUrl(getUrl().trim() + "/")
                 .client(this.okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -114,7 +138,7 @@ public class ApiRetrofit {
                 .setLenient()
                 .create();
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        OkHttpClient.Builder builder = UnsafeOkHttpClient.getUnsafeOkHttpClient();
         builder
                 .connectTimeout(connectTimeout, unit) // connect timeout
                 .writeTimeout(writeTimeout, unit) // write timeout
@@ -123,7 +147,7 @@ public class ApiRetrofit {
         okHttpClient = builder.build();
 
         this.retrofit  = new retrofit2.Retrofit.Builder()
-                .baseUrl(this.url.trim() + "/")
+                .baseUrl(getUrl().trim() + "/")
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -137,7 +161,7 @@ public class ApiRetrofit {
 
 
     public void setTime(long connectTimeout, long writeTimeout, long readTimeout, TimeUnit unit) {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        OkHttpClient.Builder builder = UnsafeOkHttpClient.getUnsafeOkHttpClient();
         builder
                 .connectTimeout(connectTimeout, unit) // connect timeout
                 .writeTimeout(writeTimeout, unit) // write timeout
@@ -149,7 +173,7 @@ public class ApiRetrofit {
     public Call<RestApiResponse<BEListaPadre>> flst_getDatosPortalAlumno(int usuarioId) {
         ParametroLogin parametroLogin = new ParametroLogin();
         parametroLogin.setUsuarioId(usuarioId);//
-        Log.d(TAG,"url: " + url);
+      
         ApiRequestBody<ParametroLogin> apiRequestBody = new ApiRequestBody<>("flst_getDatosPortalAlumno",parametroLogin);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -163,7 +187,7 @@ public class ApiRetrofit {
         parametroIdDrive.setTareaEventoId(tareaId);//
         parametroIdDrive.setNombre(nombre);
         parametroIdDrive.setUrl(url);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroIdDrive> apiRequestBody = new ApiRequestBody<>("f_SynckTareaAlumDrive",parametroIdDrive);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -179,7 +203,7 @@ public class ApiRetrofit {
         parametroIdDrive.setSesionAprendizajeId(sesionAprendizajeId);
         parametroIdDrive.setNombre(nombre);
         parametroIdDrive.setUrl(url);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroIdDrive> apiRequestBody = new ApiRequestBody<>("f_SynckEviSesDrive",parametroIdDrive);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -192,7 +216,7 @@ public class ApiRetrofit {
         parametroAgendaEvento.setUsuarioId(usuarioId);//
         parametroAgendaEvento.setAlumnoId(alumnoId);//
         parametroAgendaEvento.setTipoEventoId(tipoEventoId);
-        Log.d(TAG,"url: " + url);
+      
         ApiRequestBody<ParametroAgendaEvento> apiRequestBody = new ApiRequestBody<>("getEventoAgendaAlumno",parametroAgendaEvento);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -203,7 +227,7 @@ public class ApiRetrofit {
     public  Call<RestApiResponse<List<GrabacionSalaVirtual>>> getGrabacionesSalaVirtual(int sesionAprendizajeId) {
         ParametroSalaVirtual parametroSalaVirtual = new ParametroSalaVirtual();
         parametroSalaVirtual.setSesionAprendizajeId(sesionAprendizajeId);
-        Log.d(TAG,"url: " + url);
+       
         ApiRequestBody<ParametroSalaVirtual> apiRequestBody = new ApiRequestBody<>("getGrabacionesSalaVirtual",parametroSalaVirtual);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -216,7 +240,7 @@ public class ApiRetrofit {
         parametroSalaVirtual.setSesionAprendizajeId(sesionAprendizajeId);
         parametroSalaVirtual.setEntidadId(entidadId);
         parametroSalaVirtual.setGeoreferenciaId(georeferenciaId);
-        Log.d(TAG,"url: " + url);
+     
         ApiRequestBody<ParametroSalaVirtual> apiRequestBody = new ApiRequestBody<>("getReunionVirtualAlumno",parametroSalaVirtual);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -229,7 +253,7 @@ public class ApiRetrofit {
         parametro.setSesionAprendizajeId(sesionAprendizajeId);
         parametro.setPersonaId(personaId);
         parametro.setUsuarioId(usuarioId);
-        Log.d(TAG,"url: " + url);
+       
         ApiRequestBody<ParametroInstrumentoEncustaAlumno> apiRequestBody = new ApiRequestBody<>("getInstrumentoEncuestaEval",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -241,7 +265,7 @@ public class ApiRetrofit {
         ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setTipoPeriodoId(tipoPeriodoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getSesionAprendizajedAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -253,7 +277,7 @@ public class ApiRetrofit {
         ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setTipoPeriodoId(tipoPeriodoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getUnidadAprendizajeAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -264,7 +288,7 @@ public class ApiRetrofit {
     public Call<RestApiResponse<JsonObject>> getPersonaAlumno(int silaboEventoId) {
         ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
         parametro.setSilaboEventoId(silaboEventoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getPersonaAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -277,7 +301,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setUnidadAprendizajeid(unidadAprendizajeid);
         parametro.setSesionAprendizajeId(sesionAprendizajeId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getActividadColaborativaAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -290,7 +314,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setUnidadAprendizajeid(unidadAprendizajeid);
         parametro.setSesionAprendizajeId(sesionAprendizajeId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getPreguntasEvaluacionAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -303,7 +327,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setUnidadAprendizajeid(unidadAprendizajeid);
         parametro.setSesionAprendizajeId(sesionAprendizajeId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getPreguntasAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -316,7 +340,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setUnidadAprendizajeid(unidadAprendizajeid);
         parametro.setSesionAprendizajeId(sesionAprendizajeId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getActividadesAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -329,7 +353,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setSesionAprendizajeId(sesionAprendizajeId);
         parametro.setAlumnoId(alumnoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getInstrumentosAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -341,7 +365,7 @@ public class ApiRetrofit {
         ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setTipoPeriodoId(tipoPeriodoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getTareasAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -354,7 +378,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setUnidadAprendizajeid(unidadAprendizajeId);
         parametro.setAlumnoId(alumnoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getTareasAlumnoEvaluacion",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -365,7 +389,7 @@ public class ApiRetrofit {
     public Call<RestApiResponse<JsonObject>> getTipoNotaEva(int programaEducativoId) {
         ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
         parametro.setProgramaEducativoId(programaEducativoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getTipoNotaAlumno",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -379,7 +403,7 @@ public class ApiRetrofit {
         parametro.setUnidadAprendizajeid(unidadAprendizajeId);
         parametro.setTareaId(tareaId);
         parametro.setAlumnoId(alumnoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getTareaAlumnoEvaluacion",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -392,7 +416,7 @@ public class ApiRetrofit {
         parametro.setSilaboEventoId(silaboEventoId);
         parametro.setUnidadAprendizajeIdList(unidadAprendizajeIdList);
         parametro.setAlumnoId(alumnoId);
-        Log.d(TAG,"url: " + url);
+        
         ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getTareasAlumnoEvaluacion2",parametro);
         final Gson gsons = new Gson();
         final String representacionJSON = gsons.toJson(apiRequestBody);
@@ -400,6 +424,172 @@ public class ApiRetrofit {
         return service.getTareasAlumnoEvaluacion2(apiRequestBody);
     }
 
+    public Call<RestApiResponse<String>> uploadFileTareaAlumno(int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId,final InputStream inputStream ,String nameFile) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setTareaId(tareaId);
+        
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("uploadFileTareaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+
+        // create RequestBody instance from file
+        RequestBody requestFile = create(MediaType.parse(nameFile), inputStream);
+
+        return service.uploadFileTareaAlumno(apiRequestBody, MultipartBody.Part.createFormData("file", nameFile, requestFile));
+    }
+
+    public static RequestBody create(final MediaType mediaType, final InputStream inputStream) {
+        return new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return mediaType;
+            }
+
+            @Override
+            public long contentLength() {
+                try {
+                    return inputStream.available();
+                } catch (IOException e) {
+                    return 0;
+                }
+            }
+
+            @Override
+            public void writeTo(BufferedSink sink) throws IOException {
+                Source source = null;
+                try {
+                    source = Okio.source(inputStream);
+                    sink.writeAll(source);
+                } finally {
+                    Util.closeQuietly(source);
+                }
+            }
+        };
+    }
+
+    public  Call<RestApiResponse<Boolean>> deleteFileTareaAlumno(int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, String archivoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setTareaId(tareaId);
+        parametro.setArchivoId(archivoId);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("deleteFileTareaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.deleteFileTareaAlumno(apiRequestBody);
+    }
+
+    public  Call<RestApiResponse<Object>> entregarTareaAlumno(int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, boolean entregado) {
+
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setTareaId(tareaId);
+        parametro.setEntregadarTarea(entregado);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("entregarTareaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.entregarTareaAlumno(apiRequestBody);
+    }
+
+    public  Call<RestApiResponse<JsonObject>> getEvidenciaAlumno(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("getEvidenciaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.getUnidadAprendizajeAlumno(apiRequestBody);
+
+    }
+
+    public Call<RestApiResponse<Object>> entregarEvidenciaAlumno(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId, boolean entregado) {
+
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        parametro.setEntregadarTarea(entregado);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("entregarEvidenciaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.entregarTareaAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<String>> uploadFileEvidenciaAlumno(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId, InputStream inputStream, String nameFile) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("uploadFileEvidenciaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+
+        // create RequestBody instance from file
+        RequestBody requestFile = create(MediaType.parse(nameFile), inputStream);
+
+        return service.uploadFileTareaAlumno(apiRequestBody, MultipartBody.Part.createFormData("file", nameFile, requestFile));
+    }
+
+    public  Call<RestApiResponse<Boolean>>  deleteFileEvidenciaAlumno(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId, String archivoId) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        parametro.setArchivoId(archivoId);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("deleteFileEvidenciaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.deleteFileTareaAlumno(apiRequestBody);
+    }
+
+    public  Call<RestApiResponse<String>> uploadLinkEvidenciaAlumno(int silaboEventoId, int unidadAprendizajeId, int sesionAprendizajeId, int alumnoId, String nombre, String descripcion) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setSesionAprendizajeId(sesionAprendizajeId);
+        parametro.setNombreLink(nombre);
+        parametro.setDecripcionLink(descripcion);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("uploadLinkEvidenciaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.uploadLinkEvidenciaAlumno(apiRequestBody);
+    }
+
+    public Call<RestApiResponse<String>> uploadLinkTareaAlumno(int silaboEventoId, int unidadAprendizajeId, String tareaId, int alumnoId, String nombre, String descripcion) {
+        ParametroPortalEvaFirebase parametro = new ParametroPortalEvaFirebase();
+        parametro.setSilaboEventoId(silaboEventoId);
+        parametro.setUnidadAprendizajeid(unidadAprendizajeId);
+        parametro.setAlumnoId(alumnoId);
+        parametro.setTareaId(tareaId);
+        parametro.setNombreLink(nombre);
+        parametro.setDecripcionLink(descripcion);
+        ApiRequestBody<ParametroPortalEvaFirebase> apiRequestBody = new ApiRequestBody<>("uploadLinkTareaAlumno",parametro);
+        final Gson gsons = new Gson();
+        final String representacionJSON = gsons.toJson(apiRequestBody);
+        Log.d(TAG, "apiRequestBody : " + representacionJSON);
+        return service.uploadLinkEvidenciaAlumno(apiRequestBody);
+    }
 
     public class ApiRequestBody<T extends Parameters>{
         @SerializedName("interface")
@@ -447,10 +637,7 @@ public class ApiRetrofit {
     }
 
     public static abstract class Parameters{}
-
-    public String getUrl() {
-        return url;
-    }
+    
 
     public static class Log{
         public static void d(String TAG, String message) {
@@ -499,7 +686,7 @@ public class ApiRetrofit {
     public Call<RestApiResponse<Usuario>> fobj_ObtenerUsuario(int usuarioId) {
         ParametroChangeUser parametroChangeUser = new ParametroChangeUser();
         parametroChangeUser.setUsuarioId(usuarioId);//
-        Log.d(TAG,"url: " + url);
+        
         Log.d(TAG, "json: " + parametroChangeUser.toString());
         ApiRequestBody< ParametroChangeUser> apiRequestBody = new ApiRequestBody<>("fobj_ObtenerUsuario_By_Id",parametroChangeUser);
         final Gson gsons = new Gson();
@@ -511,7 +698,7 @@ public class ApiRetrofit {
     public  Call<RestApiResponse<Persona>> flst_ObtenerPersona(String usuario) {
         ParametroChangeUser parametroChangeUser = new ParametroChangeUser();
         parametroChangeUser.setUsuario(usuario);//
-        Log.d(TAG,"url: " + url);
+        
         Log.d(TAG, "json: " + parametroChangeUser.getUsuario());
         ApiRequestBody< ParametroChangeUser> apiRequestBody = new ApiRequestBody<>("flst_ObtenerPersona",parametroChangeUser);
         return service.flst_ObtenerPersona(apiRequestBody);
@@ -1336,3 +1523,4 @@ public class LoginDataRepositoryImpl implements LoginDataRepository {
     }
 }
 * */
+

@@ -42,8 +42,9 @@ public class AndroidOnlineImpl implements Online {
             Log.d(TAG, "modo offline");
         }else if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
             //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, false)  );
-            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Request(context.getString(R.string.admin_service)),new Response(true));
-            simpleCounterAsync.execute();
+            //SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Request(context.getString(R.string.admin_service)),new Response(false));
+            //simpleCounterAsync.execute();
+            callback.onLoad(true);
         } else {
             Log.d(TAG, "No network available!");
             Log.d(TAG, "onLoad: "+false);
@@ -64,9 +65,10 @@ public class AndroidOnlineImpl implements Online {
         }
 
         if (networkInfo!=null&&(networkInfo .isAvailable()) && (networkInfo .isConnected())) {
-            SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Request(context.getString(R.string.admin_service)) ,new Response(true));
-            simpleCounterAsync.execute();
+            //SimpleCounterAsync simpleCounterAsync = new SimpleCounterAsync(callback, new Request(context.getString(R.string.admin_service)) ,new Response(true));
+            //simpleCounterAsync.execute();
             //AsyncTaskExecutionHelper.executeParallel(new SimpleCounterAsync(),new Response(callback, true) );
+            callback.onLoad(true);
         } else {
             Log.d(TAG, "No network available!");
             Log.d(TAG, "onLoad: "+false);
@@ -91,7 +93,7 @@ public class AndroidOnlineImpl implements Online {
             boolean status = false;
             long time = new Date().getTime();
             long result = time - (consultTime!=null?consultTime:0);
-            if((result>1000)||response.isRestart()){
+            if((result>5000)||response.isRestart()){
                 consultTime = time;
                 //success = false;
                 //autoCancel();

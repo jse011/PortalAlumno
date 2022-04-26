@@ -3,8 +3,6 @@ package com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source;
 
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancel;
-import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.local.TareasLocalDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.remote.RemoteMvpDataSource;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
@@ -54,18 +52,18 @@ public class TareasMvpRepository implements TareasMvpDataSource {
     }
 
     @Override
-    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, StorageCallback<TareaArchivoUi> callbackStorage) {
-        return remoteDataSource.uploadStorageFB(tareaId, tareaArchivoUi, callbackStorage);
+    public StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, StorageCallback<TareaArchivoUi> callbackStorage) {
+        return remoteDataSource.uploadStorageFB(tareaId, tareaArchivoUi, forzarConexion, callbackStorage);
     }
 
     @Override
-    public void deleteStorageFB(String tareaId,  TareaArchivoUi tareaArchivoUi,CallbackSimple callbackSimple) {
-        remoteDataSource.deleteStorageFB(tareaId, tareaArchivoUi,callbackSimple);
+    public void deleteStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple callbackSimple) {
+        remoteDataSource.deleteStorageFB(tareaId, tareaArchivoUi, forzarConexion, callbackSimple);
     }
 
     @Override
-    public void publicarTareaAlumno(String tareaId, CallbackSimple callbackSimple) {
-        remoteDataSource.publicarTareaAlumno(tareaId, callbackSimple);
+    public void publicarTareaAlumno(String tareaId, boolean forzarConexion, CallbackSimple callbackSimple) {
+        remoteDataSource.publicarTareaAlumno(tareaId, forzarConexion, callbackSimple);
     }
 
     @Override
@@ -84,8 +82,8 @@ public class TareasMvpRepository implements TareasMvpDataSource {
     }
 
     @Override
-    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, CallbackSimple simple) {
-        remoteDataSource.uploadLinkFB(tareaId, tareaArchivoUi,simple);
+    public void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple simple) {
+        remoteDataSource.uploadLinkFB(tareaId, tareaArchivoUi, forzarConexion, simple);
     }
 
     @Override

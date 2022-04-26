@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,7 +42,8 @@ public class ListaUsuarioFragment extends Fragment implements ListaUsuarioView, 
     private PersonaAdapter usuarioAdapter;
     @BindView(R.id.imageView13)
     ImageView imageView13;
-
+    @BindView(R.id.textView90)
+    TextView textView90;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,13 +62,16 @@ public class ListaUsuarioFragment extends Fragment implements ListaUsuarioView, 
         if(getResources().getString(R.string.app_name).equals("Educar Student")){
 
             Glide.with(imageView13)
-                    .load(R.drawable.logo_educar)
+                    .load(R.drawable.educar_d_login)
                     .into(imageView13);
-
+            textView90.setText("Centro de Aprendizaje Virtual");
+            textView90.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEducarStudent));
         }else{
             Glide.with(imageView13)
-                    .load(R.drawable.docente_mentor)
+                    .load(R.drawable.icrm_d_login)
                     .into(imageView13);
+            textView90.setText("Social iCRM Educativo Móvil");
+            textView90.setTextColor(ContextCompat.getColor(getContext(), R.color.colorEvaStudent));
         }
     }
 

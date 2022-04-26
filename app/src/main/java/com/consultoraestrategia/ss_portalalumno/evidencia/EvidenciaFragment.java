@@ -2,6 +2,7 @@ package com.consultoraestrategia.ss_portalalumno.evidencia;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,8 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -24,11 +27,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import com.consultoraestrategia.ss_portalalumno.BuildConfig;
 import com.consultoraestrategia.ss_portalalumno.R;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseHandler;
 import com.consultoraestrategia.ss_portalalumno.base.UseCaseThreadPoolScheduler;
@@ -51,10 +56,17 @@ import com.consultoraestrategia.ss_portalalumno.firebase.online.AndroidOnlineImp
 import com.consultoraestrategia.ss_portalalumno.previewDrive.PreviewArchivoActivity;
 import com.consultoraestrategia.ss_portalalumno.tabsSesiones.fragments.TabSesionEvidenciaView;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.filterChooser.FilterChooserBottomSheetDialog;
+import com.consultoraestrategia.ss_portalalumno.tareas_mvp.tareaDescripcion.TareaDescripcionActivity;
+import com.fxn.interfaces.WorkFinish;
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
+import com.fxn.utility.PermUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -62,7 +74,7 @@ import butterknife.OnClick;
 
 public class EvidenciaFragment extends BaseFragment<EvidenciaView, EvidenciaPresenter, BaseFragmentListener> implements EvidenciaView, EvidenciaSesAdapter.Listener, TabSesionEvidenciaView, TipoEvidenciaDialogCallback {
     private final static int REQUEST_CODE_DOC_Q = 2312;
-    private static final int REQUEST_CODE_IMAGE_Q = 2314;
+    private static final int REQUEST_CODE_IMAGE_Q = 2314, REQUEST_GALLERY_IMAGE = 2315, REQUEST_VIDEO_CAPTURE = 2317, REQUEST_TAKE_PHOTO = 2316;
     @BindView(R.id.txt_titulo_tu_trabajo)
     TextView txtTituloTuTrabajo;
     @BindView(R.id.txt_sin_entregar)
@@ -224,7 +236,7 @@ public class EvidenciaFragment extends BaseFragment<EvidenciaView, EvidenciaPres
 
     @Override
     public void openCamera(ArrayList<String> photoSelected) {
-        Options options = Options.init()
+       /* Options options = Options.init()
                 .setCount(6)                                                   //Number of images to restict selection count
                 .setFrontfacing(false);                                      //Front Facing camera on start
         if (photoSelected != null && !photoSelected.isEmpty()) {
@@ -238,7 +250,52 @@ public class EvidenciaFragment extends BaseFragment<EvidenciaView, EvidenciaPres
                 .setPath(getResources().getString(R.string.app_name) + "/images")//Custom Path For media Storage
                 .setRequestCode(REQUEST_CODE_IMAGE_Q);                            //Request code for activity results
 
-        Pix.start(this, options);
+        Pix.start(this, options);*/
+
+        PermUtil.checkForCamaraWritePermissions(this, new WorkFinish() {
+            @Override
+            public void onWorkFinish(Boolean check) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(getContext(),
+                                BuildConfig.APPLICATION_ID+".provider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                }
+            }
+        });
+    }
+
+    String currentPhotoPath;
+    String currentPhotoFileName;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        currentPhotoFileName = image.getName();
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     @Override
@@ -295,6 +352,26 @@ public class EvidenciaFragment extends BaseFragment<EvidenciaView, EvidenciaPres
         btnEntregar.setCardBackgroundColor(Color.parseColor(color1));
         contEntrgado.setCardBackgroundColor(Color.parseColor(color1));
         txtAnularEntrega.setTextColor(Color.parseColor(color1));
+    }
+
+    @Override
+    public void openGalery() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, REQUEST_GALLERY_IMAGE);
+    }
+
+    @Override
+    public void openRecordVideo() {
+        PermUtil.checkForCamaraWritePermissions(this, new WorkFinish() {
+            @Override
+            public void onWorkFinish(Boolean check) {
+                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                if (takeVideoIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                }
+            }
+        });
     }
 
     @Override
@@ -389,6 +466,16 @@ public class EvidenciaFragment extends BaseFragment<EvidenciaView, EvidenciaPres
     }
 
     @Override
+    public void onClickGaleria() {
+        presenter.onClickGaleria();
+    }
+
+    @Override
+    public void onClickRecordVideo() {
+        presenter.onClickRecordVideo();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_IMAGE_Q) {
@@ -397,7 +484,37 @@ public class EvidenciaFragment extends BaseFragment<EvidenciaView, EvidenciaPres
         }else if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_DOC_Q){
             Uri uri = data.getData();
             presenter.onResultDoc(uri, getNombre(uri, getContext()));
+        }else if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            Uri uri = galleryAddPic();
+            presenter.onResultDoc(uri, currentPhotoFileName);
+        }else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == Activity.RESULT_OK) {
+            Uri videoUri = data.getData();
+            presenter.onResultDoc(videoUri,  queryName(getContext().getContentResolver(), videoUri));
+        }else if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_GALLERY_IMAGE){
+            Uri imageUri = data.getData();
+            presenter.onResultDoc(imageUri, queryName(getContext().getContentResolver(), imageUri));
         }
+    }
+
+    private Uri galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getContext().sendBroadcast(mediaScanIntent);
+        return  contentUri;
+    }
+
+
+    private static String queryName(ContentResolver resolver, Uri uri) {
+        Cursor returnCursor =
+                resolver.query(uri, null, null, null, null);
+        assert returnCursor != null;
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        returnCursor.moveToFirst();
+        String name = returnCursor.getString(nameIndex);
+        returnCursor.close();
+        return name;
     }
 
     public static String getNombre(Uri uri, Context context) {

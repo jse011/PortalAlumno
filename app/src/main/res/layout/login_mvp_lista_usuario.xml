@@ -10,13 +10,29 @@
         android:id="@+id/imageView13"
         android:layout_width="0dp"
         android:layout_height="85dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="52dp"
         android:layout_marginEnd="32dp"
+        android:scaleType="fitStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/insignia_colegio" />
+        tools:srcCompat="@drawable/icrm_d_login" />
+
+    <TextView
+        android:id="@+id/textView90"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/quicksand_bold"
+        android:textAlignment="textStart"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/imageView13"
+        app:layout_constraintTop_toBottomOf="@+id/imageView13"
+        tools:text="Social iCRM Educativo Móvil"
+        tools:textColor="@color/colorEvaStudent"
+        tools:textFontWeight="700" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rc_contactos"
@@ -32,17 +48,17 @@
 
     <TextView
         android:id="@+id/textView79"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
+        android:fontFamily="@font/quicksand"
         android:text="Elegir una cuenta"
         android:textColor="#FF222326"
-        android:textSize="18sp"
+        android:textSize="18dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView13" />
+        app:layout_constraintStart_toStartOf="@+id/textView90"
+        app:layout_constraintTop_toBottomOf="@+id/textView90" />
 
     <TextView
         android:id="@+id/btn_quitar_usuario"
@@ -50,6 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:text="Quitar una cuenta"
+        android:fontFamily="@font/quicksand"
         android:textColor="#FF515154"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/textView81" />
@@ -57,10 +74,10 @@
     <TextView
         android:id="@+id/textView81"
         android:layout_width="0dp"
-        android:layout_height="0.5dp"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="32dp"
+        android:layout_height="1dp"
         android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="4dp"
         android:background="@color/md_grey_300"
         app:layout_constraintBottom_toTopOf="@+id/btn_quitar_usuario"
         app:layout_constraintEnd_toEndOf="parent"

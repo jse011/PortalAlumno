@@ -2,8 +2,6 @@ package com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source;
 
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.FirebaseCancel;
 import com.consultoraestrategia.ss_portalalumno.firebase.wrapper.StorageCancel;
-import com.consultoraestrategia.ss_portalalumno.retrofit.wrapper.RetrofitCancel;
-import com.consultoraestrategia.ss_portalalumno.tareas_mvp.data_source.callbacks.GetTareasListCallback;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.DownloadCancelUi;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.HeaderTareasAprendizajeUI;
 import com.consultoraestrategia.ss_portalalumno.tareas_mvp.entities.ParametroDisenioUi;
@@ -26,11 +24,11 @@ public interface TareasMvpDataSource {
 
     List<TareaArchivoUi> getArchivoTareaAlumno(String tareaId);
 
-    StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, StorageCallback<TareaArchivoUi>  callbackStorage);
+    StorageCancel uploadStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, StorageCallback<TareaArchivoUi> callbackStorage);
 
-    void deleteStorageFB(String tareaId,  TareaArchivoUi tareaArchivoUi, CallbackSimple callbackSimple);
+    void deleteStorageFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple callbackSimple);
 
-    void publicarTareaAlumno(String tareaId, CallbackSimple callbackSimple);
+    void publicarTareaAlumno(String tareaId, boolean forzarConexion, CallbackSimple callbackSimple);
 
     TareasUI isEntregadoTareaAlumno(String tareaId);
 
@@ -38,7 +36,7 @@ public interface TareasMvpDataSource {
 
     TareasUI getTarea(String tareaId);
 
-    void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, CallbackSimple simple);
+    void uploadLinkFB(String tareaId, TareaArchivoUi tareaArchivoUi, boolean forzarConexion, CallbackSimple simple);
 
     interface CallbackTareas{
         void onParametroDisenio(ParametroDisenioUi parametroDisenioUi, int status);
